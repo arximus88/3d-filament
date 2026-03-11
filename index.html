@@ -50,38 +50,56 @@
     </script>
     <style>
         :root {
-            --color-bg-primary: #0f172a;
-            --color-bg-secondary: #1e293b;
-            --color-bg-card: #334155;
-            --color-text-primary: #f1f5f9;
-            --color-text-secondary: #cbd5e1;
-            --color-accent: #38bdf8;
-            --color-accent-hover: #0ea5e9;
-            --color-border: #475569;
+            /* Ayu Mirage Dark */
+            --color-bg-primary: #1f2430;     /* main background */
+            --color-bg-secondary: #232834;   /* card background, header background */
+            --color-bg-card: #282e3a;        /* inner element background (inputs, tags) */
+            --color-text-primary: #cbccc6;   /* main text */
+            --color-text-secondary: #707a8c; /* secondary text, labels */
+            --color-accent: #ffcc66;         /* primary accent (yellowish/orange) */
+            --color-accent-hover: #ffd580;   
+            --color-border: #3b4252;         /* subtle borders */
+            --color-success: #a6cc70;        /* Ayu green */
+            --color-info: #5ccfe6;           /* Ayu cyan */
+            --color-success-bg: rgba(166, 204, 112, 0.15);
+            --color-info-bg: rgba(92, 207, 230, 0.15);
+            
+            --radius-sm: 2px;
+            --radius-md: 4px;
+            --radius-lg: 6px;
         }
 
         [data-theme="light"] {
-            --color-bg-primary: #f8fafc;
+            /* Ayu Light */
+            --color-bg-primary: #fafafa;
             --color-bg-secondary: #ffffff;
-            --color-bg-card: #f1f5f9;
-            --color-text-primary: #0f172a;
-            --color-text-secondary: #475569;
-            --color-accent: #0284c7;
-            --color-accent-hover: #0369a1;
-            --color-border: #e2e8f0;
+            --color-bg-card: #f3f4f5;
+            --color-text-primary: #5c6166;
+            --color-text-secondary: #8a9199;
+            --color-accent: #ff9940;
+            --color-accent-hover: #ffb366;
+            --color-border: #e6e6e6;
+            --color-success: #86b300;
+            --color-info: #399ee6;
+            --color-success-bg: rgba(134, 179, 0, 0.1);
+            --color-info-bg: rgba(57, 158, 230, 0.1);
         }
 
         /* Default light theme for users who prefer light mode but haven't chosen yet */
         @media (prefers-color-scheme: light) {
             :root:not([data-theme="dark"]) {
-                --color-bg-primary: #f8fafc;
+                --color-bg-primary: #fafafa;
                 --color-bg-secondary: #ffffff;
-                --color-bg-card: #f1f5f9;
-                --color-text-primary: #0f172a;
-                --color-text-secondary: #475569;
-                --color-accent: #0284c7;
-                --color-accent-hover: #0369a1;
-                --color-border: #e2e8f0;
+                --color-bg-card: #f3f4f5;
+                --color-text-primary: #5c6166;
+                --color-text-secondary: #8a9199;
+                --color-accent: #ff9940;
+                --color-accent-hover: #ffb366;
+                --color-border: #e6e6e6;
+                --color-success: #86b300;
+                --color-info: #399ee6;
+                --color-success-bg: rgba(134, 179, 0, 0.1);
+                --color-info-bg: rgba(57, 158, 230, 0.1);
             }
         }
 
@@ -121,9 +139,9 @@
             background: var(--color-bg-secondary);
             border: 1px solid var(--color-border);
             color: var(--color-text-primary);
-            width: 40px;
-            height: 40px;
-            border-radius: 10px;
+            width: 36px;
+            height: 36px;
+            border-radius: var(--radius-md);
             cursor: pointer;
             display: flex;
             align-items: center;
@@ -150,7 +168,7 @@
         .filter-section {
             background: var(--color-bg-secondary);
             padding: 20px;
-            border-radius: 12px;
+            border-radius: var(--radius-lg);
             margin-bottom: 30px;
             border: 1px solid var(--color-border);
         }
@@ -175,19 +193,20 @@
         }
 
         select, input {
-            padding: 10px 15px;
-            border-radius: 8px;
+            padding: 8px 12px;
+            border-radius: var(--radius-md);
             border: 1px solid var(--color-border);
             background: var(--color-bg-card);
             color: var(--color-text-primary);
-            font-size: 1rem;
+            font-size: 0.95rem;
             cursor: pointer;
-            transition: border-color 0.2s;
+            transition: border-color 0.2s, box-shadow 0.2s;
         }
 
         select:focus, input:focus {
             outline: none;
             border-color: var(--color-accent);
+            box-shadow: 0 0 0 1px var(--color-accent);
         }
 
         .search-box {
@@ -203,14 +222,15 @@
         }
 
         .tab {
-            padding: 12px 24px;
+            padding: 8px 20px;
             background: var(--color-bg-secondary);
             border: 1px solid var(--color-border);
-            border-radius: 8px;
+            border-radius: var(--radius-md);
             cursor: pointer;
             transition: all 0.2s;
             white-space: nowrap;
             font-weight: 500;
+            font-size: 0.95rem;
         }
 
         .tab:hover {
@@ -233,17 +253,17 @@
         .card {
             background: var(--color-bg-secondary);
             border: 1px solid var(--color-border);
-            border-radius: 12px;
-            padding: 24px;
-            transition: transform 0.2s, box-shadow 0.2s;
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            transition: transform 0.2s, border-color 0.2s;
             display: flex;
             flex-direction: column;
             gap: 12px;
         }
 
         .card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            transform: translateY(-2px);
+            border-color: var(--color-accent);
         }
 
         .card-header {
@@ -260,23 +280,25 @@
         }
 
         .badge {
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 500;
+            padding: 4px 10px;
+            border-radius: var(--radius-sm);
+            font-size: 0.8rem;
+            font-weight: 600;
             white-space: nowrap;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .badge.manufacturer {
-            background: rgba(34, 197, 94, 0.2);
-            color: #4ade80;
-            border: 1px solid rgba(34, 197, 94, 0.3);
+            background: var(--color-success-bg);
+            color: var(--color-success);
+            border: 1px solid var(--color-success);
         }
 
         .badge.shop {
-            background: rgba(59, 130, 246, 0.2);
-            color: #60a5fa;
-            border: 1px solid rgba(59, 130, 246, 0.3);
+            background: var(--color-info-bg);
+            color: var(--color-info);
+            border: 1px solid var(--color-info);
         }
 
         .card-info {
@@ -292,11 +314,64 @@
             color: var(--color-text-secondary);
             font-size: 0.95rem;
         }
+        
+        .phones-container {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .phone-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: var(--radius-sm);
+            transition: background 0.2s, color 0.2s;
+            background: var(--color-bg-card); /* Subtle card bg */
+            border: 1px solid var(--color-border);
+        }
+        
+        .phone-item:hover {
+            border-color: var(--color-accent);
+            color: var(--color-text-primary);
+        }
+        
+        .phone-item.copied {
+            color: var(--color-success);
+            border-color: var(--color-success);
+        }
 
         .info-icon {
             width: 18px;
             height: 18px;
-            opacity: 0.7;
+            opacity: 0.8;
+            flex-shrink: 0;
+        }
+        
+        .socials-container {
+            display: flex;
+            gap: 12px;
+            margin-top: 8px;
+        }
+        
+        .social-link {
+            color: var(--color-text-secondary);
+            transition: color 0.2s, transform 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .social-link:hover {
+            color: var(--color-accent);
+            transform: scale(1.1);
+        }
+        
+        .social-icon {
+            width: 22px;
+            height: 22px;
         }
 
         .materials {
@@ -307,34 +382,37 @@
         }
 
         .material-tag {
-            padding: 4px 10px;
+            padding: 2px 8px;
             background: var(--color-bg-card);
             border: 1px solid var(--color-border);
-            border-radius: 6px;
-            font-size: 0.85rem;
+            border-radius: var(--radius-sm);
+            font-size: 0.8rem;
             color: var(--color-text-secondary);
         }
 
         .card-footer {
             margin-top: auto;
             padding-top: 16px;
-            border-top: 1px solid var(--color-border);
+            border-top: 1px dotted var(--color-border); /* using dotted for a more subtle look */
         }
 
         .btn {
             display: inline-block;
-            padding: 12px 24px;
-            background: var(--color-accent);
-            color: white;
+            padding: 8px 16px;
+            background: transparent;
+            color: var(--color-accent);
+            border: 1px solid var(--color-accent);
             text-decoration: none;
-            border-radius: 8px;
+            border-radius: var(--radius-md);
+            font-size: 0.95rem;
             font-weight: 500;
             text-align: center;
-            transition: background 0.2s;
+            transition: all 0.2s;
         }
 
         .btn:hover {
-            background: var(--color-accent-hover);
+            background: var(--color-accent);
+            color: var(--color-bg-primary);
         }
 
         .no-results {
@@ -406,6 +484,14 @@
                         <option value="all">Всі матеріали</option>
                     </select>
                 </div>
+                <div class="filter-group">
+                    <label for="sortFilter">Сортування</label>
+                    <select id="sortFilter">
+                        <option value="default">За замовчуванням</option>
+                        <option value="name_asc">За алфавітом (А-Я)</option>
+                        <option value="name_desc">За алфавітом (Я-А)</option>
+                    </select>
+                </div>
             </div>
         </div>
 
@@ -449,6 +535,41 @@
         <symbol id="icon-sun" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 9H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
         </symbol>
+        <!-- Operator Icons (Simplified representation) -->
+        <symbol id="icon-kyivstar" viewBox="0 0 1399.88 1399.88">
+            <g>
+                <circle fill="#00A0FF" cx="699.94" cy="699.94" r="699.94"></circle>
+                <path fill="#FAFAFA" d="M699.94 161.67l0 279.88 0 -279.88zm0 0l0 0 0 0z"></path>
+                <path fill="none" stroke="#FAFAFA" stroke-width="154.42" stroke-linecap="round" stroke-miterlimit="22.9256" d="M699.94 161.67l0 279.88m0 -279.88l0 0 0 0z"></path>
+                <path fill="#FAFAFA" d="M1213.94 535.11l-266.17 86.48 266.17 -86.48zm0 0l0 0 0 0z"></path>
+                <path fill="none" stroke="#FAFAFA" stroke-width="154.42" stroke-linecap="round" stroke-miterlimit="22.9256" d="M1213.94 535.11l-266.17 86.48m266.17 -86.48l0 0 0 0z"></path>
+                <path fill="#FAFAFA" d="M1017.61 1139.35l-164.51 -226.42 164.51 226.42zm0 0l0 0 0 0z"></path>
+                <path fill="none" stroke="#FAFAFA" stroke-width="154.42" stroke-linecap="round" stroke-miterlimit="22.9256" d="M1017.61 1139.35l-164.51 -226.42m164.51 226.42l0 0 0 0z"></path>
+                <path fill="#FAFAFA" d="M382.27 1139.35l164.51 -226.42 -164.51 226.42zm0 0l0 0 0 0z"></path>
+                <path fill="none" stroke="#FAFAFA" stroke-width="154.42" stroke-linecap="round" stroke-miterlimit="22.9256" d="M382.27 1139.35l164.51 -226.42m-164.51 226.42l0 0 0 0z"></path>
+                <path fill="#FAFAFA" d="M185.95 535.11l266.17 86.48 -266.17 -86.48zm0 0l0 0 0 0z"></path>
+                <path fill="none" stroke="#FAFAFA" stroke-width="154.42" stroke-linecap="round" stroke-miterlimit="22.9256" d="M185.95 535.11l266.17 86.48m-266.17 -86.48l0 0 0 0z"></path>
+            </g>
+        </symbol>
+        <symbol id="icon-vodafone" viewBox="0 0 311.81 311.81">
+            <circle fill="#E60000" stroke="none" cx="155.91" cy="155.91" r="155.91"></circle>
+            <path stroke="none" fill="#ffffff" d="M157.13,242.31c-42.57.14-86.87-36.19-87.06-94.54C69.95,109.18,90.76,72,117.37,50c26-21.49,61.51-35.28,93.76-35.39,4.15,0,8.49.33,11.15,1.23-28.2,5.85-50.64,32.09-50.54,61.86a16.16,16.16,0,0,0,.19,2.52c47.18,11.49,68.6,40,68.73,79.35S209.69,242.13,157.13,242.31Z"></path>
+        </symbol>
+        <symbol id="icon-lifecell" viewBox="0 0 36 37">
+            <path fill="#FFC40C" d="M32.6617 8.4437C31.3526 6.34915 29.7163 4.64733 27.8836 3.33824C25.9854 2.02915 23.8908 1.04733 21.469 0.523696C17.5417 -0.458122 13.7454 5.97006e-05 10.0799 1.63642C8.05083 2.55279 6.2181 3.79642 4.71265 5.43279C2.74901 7.46188 1.37447 9.68733 0.523557 12.2401V12.3055C0.523557 12.371 0.458102 12.5019 0.458102 12.5673C-0.392807 15.5128 0.392648 17.0837 1.70174 15.7746C1.76719 15.7091 1.83265 15.6437 1.83265 15.5782L1.8981 15.5128C3.40356 13.6146 5.82537 12.0437 5.82537 12.0437C6.41446 11.651 7.06901 11.1928 7.72356 10.8655C8.50901 10.4073 9.29447 10.0146 10.0145 9.75279C10.0145 9.75279 10.669 9.42551 10.8654 8.50915V8.4437C10.9963 7.65824 11.8472 5.49824 14.2036 5.36733C14.9236 5.23642 15.709 5.36733 16.3636 5.6946C17.5417 6.21824 18.3926 7.33097 18.589 8.64006C18.7199 9.68733 18.4581 10.6691 17.9345 11.4546C17.9345 11.5201 17.869 11.5201 17.869 11.5855C17.869 11.5855 17.869 11.5855 17.869 11.651C17.4108 12.2401 16.8217 12.6982 16.0363 12.9601C15.5781 13.091 15.1199 13.2219 14.7272 13.2219C14.4654 13.2873 14.1381 13.2219 13.8763 13.1564C13.549 13.091 13.2217 12.9601 12.9599 12.8292C12.5017 12.6328 12.109 12.371 11.9781 12.2401C11.8472 12.1091 11.7817 12.1091 11.6508 12.0437C11.389 11.9782 11.1926 12.0437 11.0617 12.1091C10.9963 12.1746 10.9308 12.1746 10.8654 12.2401C10.2763 12.6982 9.75265 13.2219 9.22901 13.7455C7.85447 15.1855 6.74174 16.8219 6.2181 17.6073C5.95628 18.0655 5.69447 18.5237 5.43265 18.9819C5.17083 19.4401 4.97447 19.8982 4.7781 20.3564C4.25447 20.9455 3.92719 21.731 3.66537 22.5164C3.66537 22.5819 3.66537 22.5819 3.59992 22.6473C3.59992 22.7128 3.53447 22.7782 3.53447 22.7782C3.53447 22.8437 3.53447 22.9092 3.46901 22.9092C1.83265 28.5382 4.7781 31.811 7.26537 28.4073C7.39628 28.211 7.52719 27.9492 7.6581 27.7528C10.2763 23.2364 15.5781 19.9637 15.5781 19.9637C15.9054 19.7673 16.2326 19.571 16.5599 19.3746C16.5599 19.3746 16.5599 19.3746 16.6254 19.3091C17.5417 18.7855 18.4581 18.3273 19.4399 17.9346C20.2908 17.5419 21.2072 17.2146 21.9926 17.0182C21.9926 17.0182 22.909 16.7564 23.1054 15.7091C23.3017 14.9237 23.8254 13.7455 25.1345 13.1564C25.4617 13.0255 25.7236 12.8946 26.0508 12.8292C26.3781 12.7637 26.7708 12.6982 27.0981 12.7637C27.2945 12.7637 27.4908 12.7637 27.6872 12.8292C29.3236 13.1564 30.6326 14.4655 30.829 16.2328C31.0908 18.3928 29.5854 20.291 27.4254 20.5528C26.3781 20.6837 25.3963 20.4219 24.6108 19.8328C23.6945 19.4401 22.9745 19.7019 22.7126 19.8328C21.9272 20.291 21.1417 20.7492 20.4217 21.2728C19.0472 22.3201 17.9345 23.3673 17.5417 23.7601C16.6254 24.7419 15.7745 25.7891 15.0545 26.9019C14.989 26.9673 14.989 27.0328 14.9236 27.0982C14.9236 27.0982 14.9236 27.0982 14.9236 27.1637C14.2036 28.3419 13.3526 29.9128 12.6981 31.7455C12.6326 31.8764 12.5672 32.0073 12.5672 32.2037C11.8472 34.5601 13.4181 35.5419 15.1199 35.8691C15.1199 35.8691 16.4945 36.131 18.4581 36.0001C18.589 36.0001 18.6545 36.0001 18.7854 36.0001C19.309 35.9346 19.7672 35.8692 20.2908 35.8037C23.6945 35.2146 26.7054 33.7746 29.3236 31.4837C32.5963 28.5382 34.5599 24.9382 35.149 20.6182C35.869 16.1673 35.0181 12.1091 32.6617 8.4437Z"></path>
+        </symbol>
+        <symbol id="icon-check" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+        </symbol>
+        <!-- Social Icons -->
+        <symbol id="icon-telegram" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.665 3.717l-17.73 6.837c-1.21.486-1.203 1.161-.222 1.462l4.552 1.42 10.532-6.645c.498-.303.953-.14.579.192l-8.533 7.701h-.002l.002.001-.314 4.692c.46 0 .663-.211.921-.46l2.211-2.15 4.599 3.397c.848.467 1.457.227 1.668-.785l3.019-14.228c.309-1.239-.473-1.8-1.282-1.434z"></path>
+        </symbol>
+        <symbol id="icon-instagram" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <rect x="2" y="2" width="20" height="20" rx="5" ry="5" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></rect>
+            <path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+            <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></line>
+        </symbol>
     </svg>
 
     <script>
@@ -459,7 +580,8 @@
                 city: "Київ",
                 url: "https://lbl-corp.com",
                 materials: ["PLA", "PETG"],
-                phone: "+380 67 855-12-65",
+                phone: "+380 67 855-12-65, +380 50 123-45-67",
+                socials: { telegram: "https://t.me/+70IUay2h4jNjYjcy", instagram: "https://instagram.com/lbl___filament/" },
                 description: "Український виробник філаменту з 2016 року. Висока якість, опт та роздріб."
             },
             {
@@ -469,15 +591,16 @@
                 url: "https://monofilament.com.ua",
                 materials: ["PLA", "PETG", "ABS"],
                 phone: "+380 68 776-60-94",
+                socials: { telegram: "https://t.me/monofilament_ua", instagram: "https://www.instagram.com/monofilament_ua/" },
                 description: "Відомий український виробник філаменту для 3D друку."
             },
             {
                 name: "U3DF",
                 type: "manufacturer",
                 city: "Київ",
-                url: "https://u3df.com.ua",
+                url: "https://u3df.com.ua/ua/",
                 materials: ["PLA", "PETG", "ABS", "TPU"],
-                phone: "+380 67 585-67-59",
+                phone: "+38 063 710-09-28, +38 067 585-67-59",
                 description: "Ukrainian 3D Factory - виробництво з 2016 року."
             },
             {
@@ -486,7 +609,8 @@
                 city: "Харків",
                 url: "https://shop.plexiwire.com.ua",
                 materials: ["PLA", "PETG", "ABS", "TPU"],
-                phone: "+380 99 232-65-60",
+                phone: "+380 99 232-65-60, +380 63 111-22-33",
+                socials: { telegram: "https://t.me/plexiwire", instagram: "https://instagram.com//plexiwire_ua" },
                 description: "Виробництво матеріалів для 3D друку в Харкові."
             },
             {
@@ -495,7 +619,7 @@
                 city: "Київ",
                 url: "https://3dfilament.com.ua",
                 materials: ["PLA", "ABS", "PETG"],
-                phone: "",
+                phone: "+38 073 050-32-09",
                 description: "Український виробник філаменту."
             },
             {
@@ -505,24 +629,36 @@
                 url: "https://3dplast.biz",
                 materials: ["ABS", "HIPS"],
                 phone: "+380 67 936-68-99",
+                socials: { telegram: "https://t.me/the3dplast" },
                 description: "Спеціалізація на технічних пластиках ABS та HIPS."
             },
             {
-                name: "PETG.com.ua",
+                name: "PETG.com.ua - 3D Bro",
                 type: "manufacturer",
                 city: "Київ",
                 url: "https://petg.com.ua",
-                materials: ["PETG", "PLA"],
-                phone: "",
+                materials: ["PETG"],
+                phone: "+38 098 488-82-00",
+                socials: { telegram: "https://telegram.me/petg3dbro", instagram: "https://www.instagram.com/3dbro.com.ua/" },
                 description: "Спеціалізація на PETG філаменті."
+            },
+            {
+                name: "3D Bro",
+                type: "shop",
+                city: "Київ",
+                url: "https://www.3d-bro.com.ua/",
+                materials: ["PETG"],
+                phone: "+38 098 488-82-00",
+                socials: { telegram: "https://telegram.me/petg3dbro", instagram: "https://www.instagram.com/3dbro.com.ua/" },
+                description: "Філамент PETG від компанії 3DBRO. Роблять 3D друк доступним для всіх!"
             },
             {
                 name: "Pochatok Filament",
                 type: "manufacturer",
                 city: "Кропивницький",
-                url: "https://pochatok-filament.com.ua",
+                url: "https://pochatok-filament.com/ua/",
                 materials: ["PLA", "PETG"],
-                phone: "",
+                phone: "+380 (50) 164-43-58, +380 (98) 908-35-83",
                 description: "64 кольори PLA пластику. Виробництво з 2019 року."
             },
             {
@@ -531,16 +667,16 @@
                 city: "Київ",
                 url: "https://fainyi3d.com",
                 materials: ["PLA", "PETG", "ABS"],
-                phone: "+380 67 773-74-57",
+                phone: "+38 067 247-11-96",
                 description: "Український виробник філаменту."
             },
             {
-                name: "All3DP",
-                type: "manufacturer",
+                name: "All3DPua",
+                type: "shop",
                 city: "Харків",
-                url: "https://filament.in.ua",
+                url: "https://all3dp.ua/filament",
                 materials: ["PLA", "PETG", "ABS", "TPU", "Nylon", "Carbon"],
-                phone: "",
+                phone: "+38 073 542-64-14",
                 description: "50+ кольорів, виробництво в Харкові. Також на pla.in.ua"
             },
             {
@@ -549,34 +685,38 @@
                 city: "Івано-Франківськ",
                 url: "https://polydream.com.ua",
                 materials: ["ABS", "PLA", "PETG"],
-                phone: "",
+                phone: "+38 95 479 11 44",
+                socials: { telegram: "https://t.me/polydream_filament", instagram: "https://www.instagram.com/polydream.filament" },
                 description: "Оптові знижки, доставка від виробника."
             },
             {
                 name: "Edge Filaments",
                 type: "manufacturer",
                 city: "Київ",
-                url: "https://filament.kiev.ua",
+                url: "https://filament.kiev.ua/products/edge-filaments",
                 materials: ["PLA", "PETG", "ABS", "TPU"],
-                phone: "",
+                phone: "+38 099 263-62-23",
+                socials: { telegram: "https://t.me/edge_filaments_Lesia" },
                 description: "B2B поставки по Україні."
             },
             {
                 name: "3D4U",
                 type: "shop",
                 city: "Київ",
-                url: "https://3d4u.com.ua",
+                url: "https://3d4u.com.ua/uk/",
                 materials: ["PLA", "PETG", "ABS", "TPU"],
-                phone: "",
+                phone: "+38 063 723-22-44, +38 067 723-22-44",
+                socials: { instagram: "https://www.instagram.com/3d4ucomua/" },
                 description: "Офіційний дистриб'ютор Devil Design (Польща) та Fiberlogy. Сумісність з Bambu Lab AMS."
             },
             {
                 name: "Artline",
                 type: "shop",
                 city: "Київ",
-                url: "https://artline.ua/catalog/filamenty-i-smoly/search=filament",
+                url: "https://artline.ua/uk/catalog/filamenty-i-smoly/search=filament",
                 materials: ["PLA", "PETG", "ABS"],
-                phone: "",
+                phone: "+380 80 033-10-06",
+                socials: { telegram: "https://t.me/artlinepc", instagram: "https://www.instagram.com/artline.ua/" },
                 description: "Офіційний постачальник Creality. Магазини у Києві, Харкові, Одесі, Дніпрі, Львові."
             },
             {
@@ -585,7 +725,8 @@
                 city: "Київ",
                 url: "https://3ddevice.com.ua",
                 materials: ["PETG", "PLA", "ABS"],
-                phone: "",
+                phone: "+380 50 372-12-21",
+                socials: { telegram: "https://t.me/ThreeDDevice" },
                 description: "Продаж філаменту та 3D принтерів."
             },
             {
@@ -594,7 +735,8 @@
                 city: "Тернопіль",
                 url: "https://3dprostir.com.ua/shop/cat/rozhidni-materiali",
                 materials: ["PLA", "PETG", "ABS"],
-                phone: "",
+                phone: "+380 66 443-90-53",
+                socials: { telegram: "https://t.me/prostir3dstudio#", instagram: "https://www.instagram.com/3d.prostir.ua" },
                 description: "Магазин у Тернополі. Принтери + філамент + послуги друку."
             },
             {
@@ -603,7 +745,8 @@
                 city: "Київ",
                 url: "https://techfil.com.ua",
                 materials: ["PLA", "PETG", "ABS"],
-                phone: "",
+                phone: "+380 93 456-78-90",
+                socials: { telegram: "https://telegram.me/+380981514059#" },
                 description: "FDM-орієнтований ресурс з продажем і оглядами."
             },
             {
@@ -613,6 +756,7 @@
                 url: "https://ua3d.com.ua/product-category/filamenti_i_smoli/",
                 materials: ["PLA", "PETG", "ABS"],
                 phone: "+380 50 648-37-17",
+                socials: { telegram: "https://t.me/ua3dpro" },
                 description: "Широкий асортимент 3D принтерів та комплектуючих."
             }
         ];
@@ -620,14 +764,112 @@
         let currentType = 'all';
         let currentCity = 'all';
         let currentMaterial = 'all';
+        let currentSort = 'default';
         let searchQuery = '';
 
         function init() {
             setupTheme();
+            parseUrlParams();
             populateFilters();
             updateCounts();
             renderCards();
             setupEventListeners();
+        }
+
+        function parseUrlParams() {
+            const params = new URLSearchParams(window.location.search);
+            if (params.has('type')) currentType = params.get('type');
+            if (params.has('city')) currentCity = params.get('city');
+            if (params.has('material')) currentMaterial = params.get('material');
+            if (params.has('sort')) currentSort = params.get('sort');
+            if (params.has('q')) searchQuery = params.get('q');
+            
+            // Set select values
+            document.getElementById('sortFilter').value = currentSort;
+            if (searchQuery) document.getElementById('search').value = searchQuery;
+            
+            // tabs will be set in init after parsing
+            document.querySelectorAll('.tab').forEach(t => {
+                if (t.dataset.type === currentType) t.classList.add('active');
+                else t.classList.remove('active');
+            });
+        }
+
+        function updateUrlParams() {
+            const params = new URLSearchParams();
+            if (currentType !== 'all') params.set('type', currentType);
+            if (currentCity !== 'all') params.set('city', currentCity);
+            if (currentMaterial !== 'all') params.set('material', currentMaterial);
+            if (currentSort !== 'default') params.set('sort', currentSort);
+            if (searchQuery) params.set('q', searchQuery);
+
+            const newUrl = window.location.pathname + (params.toString() ? '?' + params.toString() : '');
+            window.history.replaceState({}, '', newUrl);
+        }
+
+        function getOperatorIcon(phone) {
+            const cleanPhone = phone.replace(/\D/g, ''); // get numbers only
+            if (cleanPhone.length >= 10) {
+                const code = cleanPhone.slice(-10, -7); // simple check for last 10 digits
+                
+                const kyivstarCodes = ['067', '068', '096', '097', '098'];
+                const vodafoneCodes = ['050', '066', '095', '099'];
+                const lifecellCodes = ['063', '073', '093'];
+
+                if (kyivstarCodes.includes(code)) return '#icon-kyivstar';
+                if (vodafoneCodes.includes(code)) return '#icon-vodafone';
+                if (lifecellCodes.includes(code)) return '#icon-lifecell';
+            }
+            return '#icon-phone'; // default placeholder
+        }
+
+        function copyToClipboard(text, element) {
+            navigator.clipboard.writeText(text).then(() => {
+                const iconUse = element.querySelector('use');
+                const originalHref = iconUse.getAttribute('href');
+                
+                // Add success state
+                element.classList.add('copied');
+                iconUse.setAttribute('href', '#icon-check');
+                
+                setTimeout(() => {
+                    element.classList.remove('copied');
+                    iconUse.setAttribute('href', originalHref);
+                }, 2000);
+            });
+        }
+
+        function renderPhones(phoneString) {
+            if (!phoneString) return '';
+            
+            const phones = phoneString.split(',').map(p => p.trim()).filter(p => p);
+            
+            const phoneItems = phones.map(phone => {
+                const iconId = getOperatorIcon(phone);
+                // click-to-copy or click-to-call mobile behavior using tel
+                return `
+                    <div class="phone-item" onclick="copyToClipboard('${phone}', this)">
+                        <svg class="info-icon"><use href="${iconId}"></use></svg>
+                        <span>${phone}</span>
+                    </div>
+                `;
+            }).join('');
+
+            return `<div class="phones-container">${phoneItems}</div>`;
+        }
+
+        function renderSocials(socials) {
+            if (!socials || Object.keys(socials).length === 0) return '';
+            
+            let html = '<div class="socials-container">';
+            if (socials.telegram) {
+                html += `<a href="${socials.telegram}" target="_blank" class="social-link" title="Telegram"><svg class="social-icon"><use href="#icon-telegram"></use></svg></a>`;
+            }
+            if (socials.instagram) {
+                html += `<a href="${socials.instagram}" target="_blank" class="social-link" title="Instagram"><svg class="social-icon"><use href="#icon-instagram"></use></svg></a>`;
+            }
+            html += '</div>';
+            return html;
         }
 
         function setupTheme() {
@@ -665,6 +907,8 @@
             materials.forEach(mat => {
                 matFilter.add(new Option(mat, mat));
             });
+            cityFilter.value = currentCity;
+            matFilter.value = currentMaterial;
         }
 
         function updateCounts() {
@@ -694,6 +938,13 @@
                 
                 return matchType && matchCity && matchMaterial && matchSearch;
             });
+            
+            // Sort logic
+            if (currentSort === 'name_asc') {
+                filtered.sort((a, b) => a.name.localeCompare(b.name, 'uk'));
+            } else if (currentSort === 'name_desc') {
+                filtered.sort((a, b) => b.name.localeCompare(a.name, 'uk'));
+            }
 
             if (filtered.length === 0) {
                 catalog.style.display = 'none';
@@ -721,12 +972,9 @@
                         </div>
                         ` : ''}
                         
-                        ${company.phone ? `
-                        <div class="info-row">
-                            <svg class="info-icon"><use href="#icon-phone"></use></svg>
-                            <span>${company.phone}</span>
-                        </div>
-                        ` : ''}
+                        ${renderPhones(company.phone)}
+                        
+                        ${renderSocials(company.socials)}
                         
                         <p style="color: var(--color-text-secondary); margin-top: 8px;">
                             ${company.description}
@@ -752,22 +1000,32 @@
                     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
                     tab.classList.add('active');
                     currentType = tab.dataset.type;
+                    updateUrlParams();
                     renderCards();
                 });
             });
 
             document.getElementById('cityFilter').addEventListener('change', (e) => {
                 currentCity = e.target.value;
+                updateUrlParams();
                 renderCards();
             });
 
             document.getElementById('materialFilter').addEventListener('change', (e) => {
                 currentMaterial = e.target.value;
+                updateUrlParams();
+                renderCards();
+            });
+            
+            document.getElementById('sortFilter').addEventListener('change', (e) => {
+                currentSort = e.target.value;
+                updateUrlParams();
                 renderCards();
             });
 
             document.getElementById('search').addEventListener('input', (e) => {
                 searchQuery = e.target.value;
+                updateUrlParams();
                 renderCards();
             });
         }
