@@ -1,0 +1,260 @@
+---
+import Layout from '../layouts/Layout.astro';
+import CompanyCard from '../components/CompanyCard.astro';
+import { getCollection } from 'astro:content';
+
+const allCompanies = await getCollection('companies');
+const companies = allCompanies.map(c => c.data);
+
+const cities = [...new Set(companies.map(c => c.city))].sort();
+const materials = [...new Set(companies.flatMap(c => c.materials))].sort();
+
+const manufacturerCount = companies.filter(c => c.type === 'manufacturer').length;
+const shopCount = companies.filter(c => c.type === 'shop').length;
+
+// Structured data: ItemList with all companies
+const structuredData = {
+  '@context': 'https://schema.org',
+  '@type': 'ItemList',
+  name: 'Виробники та магазини 3D Філаменту в Україні',
+  description: 'Найповніший каталог українських виробників та магазинів філаменту для 3D друку',
+  numberOfItems: companies.length,
+  itemListElement: companies.map((c, i) => ({
+    '@type': 'ListItem',
+    position: i + 1,
+    name: c.name,
+    url: `https://3d-filament.pages.dev/company/${c.id}`,
+  })),
+};
+---
+
+<Layout
+  title="Каталог 3D Філаменту України — Виробники та магазини"
+  description="Найповніший каталог українських виробників та магазинів філаменту для 3D друку. PLA, PETG, ABS, TPU та інші матеріали з доставкою по Україні."
+>
+  <script type="application/ld+json" set:html={JSON.stringify(structuredData)} />
+
+  <!-- Filter Section -->
+  <div class="filter-section">
+    <div class="filter-controls">
+      <div class="filter-group search-box">
+        <label for="search">Пошук</label>
+        <input type="text" id="search" placeholder="Введіть назву компанії..." autocomplete="off" />
+      </div>
+      <div class="filter-group">
+        <label for="cityFilter">Місто</label>
+        <select id="cityFilter">
+          <option value="all">Всі міста</option>
+          {cities.map(city => <option value={city}>{city}</option>)}
+        </select>
+      </div>
+      <div class="filter-group">
+        <label for="materialFilter">Матеріал</label>
+        <select id="materialFilter">
+          <option value="all">Всі матеріали</option>
+          {materials.map(mat => <option value={mat}>{mat}</option>)}
+        </select>
+      </div>
+      <div class="filter-group">
+        <label for="sortFilter">Сортування</label>
+        <select id="sortFilter">
+          <option value="default">За замовчуванням</option>
+          <option value="name_asc">За алфавітом (А-Я)</option>
+          <option value="name_desc">За алфавітом (Я-А)</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs" id="tabs">
+    <button class="tab active" data-type="all">Всі <span class="tab-count">({companies.length})</span></button>
+    <button class="tab" data-type="manufacturer">Виробники <span class="tab-count">({manufacturerCount})</span></button>
+    <button class="tab" data-type="shop">Магазини <span class="tab-count">({shopCount})</span></button>
+  </div>
+
+  <!-- Grid — server-rendered, all cards present in HTML for SEO -->
+  <div class="grid" id="catalog">
+    {companies.map(company => (
+      <CompanyCard company={company} />
+    ))}
+  </div>
+
+  <div class="no-results" id="noResults" style="display:none">
+    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width:64px;height:64px;opacity:0.3;margin-bottom:20px">
+      <use href="#icon-search"></use>
+    </svg>
+    <h3>Нічого не знайдено</h3>
+    <p>Спробуйте змінити фільтри або пошуковий запит</p>
+  </div>
+</Layout>
+
+<style>
+  .filter-section {
+    background: var(--color-bg-secondary);
+    padding: 20px;
+    border-radius: var(--radius-lg);
+    margin-bottom: 30px;
+    border: 1px solid var(--color-border);
+  }
+  .filter-controls {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    align-items: flex-end;
+  }
+  .filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+  .filter-group label {
+    font-size: 0.9rem;
+    color: var(--color-text-secondary);
+    font-weight: 500;
+  }
+  .search-box { flex: 1; min-width: 250px; }
+  select, input {
+    padding: 8px 12px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border);
+    background: var(--color-bg-card);
+    color: var(--color-text-primary);
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  select:focus, input:focus {
+    outline: none;
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 1px var(--color-accent);
+  }
+  .tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 30px;
+    overflow-x: auto;
+  }
+  .tab {
+    padding: 8px 20px;
+    background: var(--color-bg-secondary);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+    font-weight: 500;
+    font-size: 0.95rem;
+    color: var(--color-text-primary);
+  }
+  .tab:hover { background: var(--color-bg-card); }
+  .tab.active {
+    background: var(--color-accent);
+    color: var(--color-bg-primary);
+    border-color: var(--color-accent);
+  }
+  .tab-count { opacity: 0.7; font-size: 0.85em; }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 20px;
+    margin-bottom: 40px;
+  }
+  .no-results {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--color-text-secondary);
+  }
+  @media (max-width: 768px) {
+    .grid { grid-template-columns: 1fr; }
+    .filter-controls { flex-direction: column; }
+    .filter-group, .search-box { width: 100%; }
+  }
+</style>
+
+<script>
+  // Client-side filtering (cards pre-rendered for SEO, JS enhances interactivity)
+  const cards = Array.from(document.querySelectorAll<HTMLElement>('.card'));
+  const searchInput = document.getElementById('search') as HTMLInputElement;
+  const cityFilter = document.getElementById('cityFilter') as HTMLSelectElement;
+  const materialFilter = document.getElementById('materialFilter') as HTMLSelectElement;
+  const sortFilter = document.getElementById('sortFilter') as HTMLSelectElement;
+  const tabs = document.querySelectorAll<HTMLElement>('.tab');
+  const catalog = document.getElementById('catalog')!;
+  const noResults = document.getElementById('noResults')!;
+
+  let currentType = 'all';
+
+  // Parse URL params on load
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('type')) currentType = params.get('type')!;
+  if (params.get('city')) cityFilter.value = params.get('city')!;
+  if (params.get('material')) materialFilter.value = params.get('material')!;
+  if (params.get('sort')) sortFilter.value = params.get('sort')!;
+  if (params.get('q')) searchInput.value = params.get('q')!;
+  tabs.forEach(t => t.classList.toggle('active', t.dataset.type === currentType));
+
+  function updateUrl() {
+    const p = new URLSearchParams();
+    if (currentType !== 'all') p.set('type', currentType);
+    if (cityFilter.value !== 'all') p.set('city', cityFilter.value);
+    if (materialFilter.value !== 'all') p.set('material', materialFilter.value);
+    if (sortFilter.value !== 'default') p.set('sort', sortFilter.value);
+    if (searchInput.value) p.set('q', searchInput.value);
+    window.history.replaceState({}, '', window.location.pathname + (p.toString() ? '?' + p.toString() : ''));
+  }
+
+  function filterAndSort() {
+    const query = searchInput.value.toLowerCase();
+    const city = cityFilter.value;
+    const material = materialFilter.value;
+    const sort = sortFilter.value;
+
+    let visible = cards.filter(card => {
+      const typeMatch = currentType === 'all' || card.dataset.type === currentType;
+      const cityMatch = city === 'all' || card.dataset.city === city;
+      const matMatch = material === 'all' || (card.dataset.materials || '').split(',').includes(material.toLowerCase());
+      const textContent = (card.querySelector('.card-title')?.textContent || '') + ' ' + (card.querySelector('.card-description')?.textContent || '');
+      const queryMatch = !query || textContent.toLowerCase().includes(query);
+      return typeMatch && cityMatch && matMatch && queryMatch;
+    });
+
+    // Sort
+    if (sort === 'name_asc' || sort === 'name_desc') {
+      visible.sort((a, b) => {
+        const aName = a.querySelector('.card-title')?.textContent?.trim() || '';
+        const bName = b.querySelector('.card-title')?.textContent?.trim() || '';
+        const cmp = aName.localeCompare(bName, 'uk');
+        return sort === 'name_asc' ? cmp : -cmp;
+      });
+    }
+
+    // Hide all, show filtered
+    cards.forEach(c => c.style.display = 'none');
+    visible.forEach(c => {
+      c.style.display = '';
+      catalog.appendChild(c); // reorder in DOM for sort
+    });
+
+    noResults.style.display = visible.length === 0 ? 'block' : 'none';
+    catalog.style.display = visible.length === 0 ? 'none' : 'grid';
+    updateUrl();
+  }
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      tabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      currentType = tab.dataset.type || 'all';
+      filterAndSort();
+    });
+  });
+
+  searchInput.addEventListener('input', filterAndSort);
+  cityFilter.addEventListener('change', filterAndSort);
+  materialFilter.addEventListener('change', filterAndSort);
+  sortFilter.addEventListener('change', filterAndSort);
+
+  // Apply initial state from URL
+  filterAndSort();
+</script>

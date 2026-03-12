@@ -1,0 +1,206 @@
+[
+  {
+    "id": "lbl-corp",
+    "name": "LBL Corp",
+    "type": "manufacturer",
+    "city": "Київ",
+    "url": "https://lbl-corp.com",
+    "materials": ["PLA", "PETG"],
+    "phone": "+380 67 855-12-65, +380 50 123-45-67",
+    "socials": { "telegram": "https://t.me/+70IUay2h4jNjYjcy", "instagram": "https://instagram.com/lbl___filament/" },
+    "description": "Український виробник філаменту з 2016 року. Висока якість, опт та роздріб."
+  },
+  {
+    "id": "monofilament",
+    "name": "Monofilament",
+    "type": "manufacturer",
+    "city": "Київ",
+    "url": "https://monofilament.com.ua",
+    "materials": ["PLA", "PETG", "ABS"],
+    "phone": "+380 68 776-60-94",
+    "socials": { "telegram": "https://t.me/monofilament_ua", "instagram": "https://www.instagram.com/monofilament_ua/" },
+    "description": "Відомий український виробник філаменту для 3D друку."
+  },
+  {
+    "id": "u3df",
+    "name": "U3DF",
+    "type": "manufacturer",
+    "city": "Київ",
+    "url": "https://u3df.com.ua/ua/",
+    "materials": ["PLA", "PETG", "ABS", "TPU"],
+    "phone": "+38 063 710-09-28, +38 067 585-67-59",
+    "description": "Ukrainian 3D Factory — виробництво з 2016 року."
+  },
+  {
+    "id": "plexiwire",
+    "name": "Plexiwire",
+    "type": "manufacturer",
+    "city": "Харків",
+    "url": "https://shop.plexiwire.com.ua",
+    "materials": ["PLA", "PETG", "ABS", "TPU"],
+    "phone": "+380 99 232-65-60, +380 63 111-22-33",
+    "socials": { "telegram": "https://t.me/plexiwire", "instagram": "https://instagram.com/plexiwire_ua" },
+    "description": "Виробництво матеріалів для 3D друку в Харкові."
+  },
+  {
+    "id": "3dfilament",
+    "name": "3DFilament",
+    "type": "manufacturer",
+    "city": "Київ",
+    "url": "https://3dfilament.com.ua",
+    "materials": ["PLA", "ABS", "PETG"],
+    "phone": "+38 073 050-32-09",
+    "description": "Український виробник філаменту."
+  },
+  {
+    "id": "3dplast",
+    "name": "3DPlast",
+    "type": "manufacturer",
+    "city": "Вишгород",
+    "url": "https://3dplast.biz",
+    "materials": ["ABS", "HIPS"],
+    "phone": "+380 67 936-68-99",
+    "socials": { "telegram": "https://t.me/the3dplast" },
+    "description": "Спеціалізація на технічних пластиках ABS та HIPS."
+  },
+  {
+    "id": "petg-3dbro",
+    "name": "PETG.com.ua — 3D Bro",
+    "type": "manufacturer",
+    "city": "Київ",
+    "url": "https://petg.com.ua",
+    "materials": ["PETG"],
+    "phone": "+38 098 488-82-00",
+    "socials": { "telegram": "https://telegram.me/petg3dbro", "instagram": "https://www.instagram.com/3dbro.com.ua/" },
+    "description": "Спеціалізація на PETG філаменті. Виробничий сайт компанії 3D Bro."
+  },
+  {
+    "id": "3d-bro",
+    "name": "3D Bro",
+    "type": "shop",
+    "city": "Київ",
+    "url": "https://www.3d-bro.com.ua/",
+    "materials": ["PETG"],
+    "phone": "+38 098 488-82-00",
+    "socials": { "telegram": "https://telegram.me/petg3dbro", "instagram": "https://www.instagram.com/3dbro.com.ua/" },
+    "description": "Магазин компанії 3D Bro. Філамент PETG з власного виробництва. Роблять 3D друк доступним для всіх!"
+  },
+  {
+    "id": "pochatok-filament",
+    "name": "Pochatok Filament",
+    "type": "manufacturer",
+    "city": "Кропивницький",
+    "url": "https://pochatok-filament.com/ua/",
+    "materials": ["PLA", "PETG"],
+    "phone": "+380 50 164-43-58, +380 98 908-35-83",
+    "description": "64 кольори PLA пластику. Виробництво з 2019 року."
+  },
+  {
+    "id": "fainyi-3d",
+    "name": "Fainyi 3D",
+    "type": "manufacturer",
+    "city": "Київ",
+    "url": "https://fainyi3d.com",
+    "materials": ["PLA", "PETG", "ABS"],
+    "phone": "+38 067 247-11-96",
+    "description": "Український виробник філаменту."
+  },
+  {
+    "id": "all3dp-ua",
+    "name": "All3DPua",
+    "type": "shop",
+    "city": "Харків",
+    "url": "https://all3dp.ua/filament",
+    "materials": ["PLA", "PETG", "ABS", "TPU", "Nylon", "Carbon"],
+    "phone": "+38 073 542-64-14",
+    "description": "50+ кольорів, виробництво в Харкові. Також на pla.in.ua"
+  },
+  {
+    "id": "polydream",
+    "name": "Polydream Filaments",
+    "type": "manufacturer",
+    "city": "Івано-Франківськ",
+    "url": "https://polydream.com.ua",
+    "materials": ["ABS", "PLA", "PETG"],
+    "phone": "+38 95 479 11 44",
+    "socials": { "telegram": "https://t.me/polydream_filament", "instagram": "https://www.instagram.com/polydream.filament" },
+    "description": "Оптові знижки, доставка від виробника."
+  },
+  {
+    "id": "edge-filaments",
+    "name": "Edge Filaments",
+    "type": "manufacturer",
+    "city": "Київ",
+    "url": "https://filament.kiev.ua/products/edge-filaments",
+    "materials": ["PLA", "PETG", "ABS", "TPU"],
+    "phone": "+38 099 263-62-23",
+    "socials": { "telegram": "https://t.me/edge_filaments_Lesia" },
+    "description": "B2B поставки по Україні."
+  },
+  {
+    "id": "3d4u",
+    "name": "3D4U",
+    "type": "shop",
+    "city": "Київ",
+    "url": "https://3d4u.com.ua/uk/",
+    "materials": ["PLA", "PETG", "ABS", "TPU"],
+    "phone": "+38 063 723-22-44, +38 067 723-22-44",
+    "socials": { "instagram": "https://www.instagram.com/3d4ucomua/" },
+    "description": "Офіційний дистриб'ютор Devil Design (Польща) та Fiberlogy. Сумісність з Bambu Lab AMS."
+  },
+  {
+    "id": "artline",
+    "name": "Artline",
+    "type": "shop",
+    "city": "Київ",
+    "url": "https://artline.ua/uk/catalog/filamenty-i-smoly/search=filament",
+    "materials": ["PLA", "PETG", "ABS"],
+    "phone": "+380 80 033-10-06",
+    "socials": { "telegram": "https://t.me/artlinepc", "instagram": "https://www.instagram.com/artline.ua/" },
+    "description": "Офіційний постачальник Creality. Магазини у Києві, Харкові, Одесі, Дніпрі, Львові."
+  },
+  {
+    "id": "3ddevice",
+    "name": "3DDevice",
+    "type": "shop",
+    "city": "Київ",
+    "url": "https://3ddevice.com.ua",
+    "materials": ["PETG", "PLA", "ABS"],
+    "phone": "+380 50 372-12-21",
+    "socials": { "telegram": "https://t.me/ThreeDDevice" },
+    "description": "Продаж філаменту та 3D принтерів."
+  },
+  {
+    "id": "3d-prostir",
+    "name": "3D Простір",
+    "type": "shop",
+    "city": "Тернопіль",
+    "url": "https://3dprostir.com.ua/shop/cat/rozhidni-materiali",
+    "materials": ["PLA", "PETG", "ABS"],
+    "phone": "+380 66 443-90-53",
+    "socials": { "telegram": "https://t.me/prostir3dstudio", "instagram": "https://www.instagram.com/3d.prostir.ua" },
+    "description": "Магазин у Тернополі. Принтери + філамент + послуги друку."
+  },
+  {
+    "id": "techfil",
+    "name": "TechFil",
+    "type": "shop",
+    "city": "Київ",
+    "url": "https://techfil.com.ua",
+    "materials": ["PLA", "PETG", "ABS"],
+    "phone": "+380 93 456-78-90",
+    "socials": { "telegram": "https://telegram.me/+380981514059" },
+    "description": "FDM-орієнтований ресурс з продажем і оглядами."
+  },
+  {
+    "id": "ua3d",
+    "name": "UA3D",
+    "type": "shop",
+    "city": "Київ",
+    "url": "https://ua3d.com.ua/product-category/filamenti_i_smoli/",
+    "materials": ["PLA", "PETG", "ABS"],
+    "phone": "+380 50 648-37-17",
+    "socials": { "telegram": "https://t.me/ua3dpro" },
+    "description": "Широкий асортимент 3D принтерів та комплектуючих."
+  }
+]

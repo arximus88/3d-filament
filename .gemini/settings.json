@@ -1,0 +1,10 @@
+{
+  "mcp": {
+    "context7": {
+      "libraries": [
+        "/websites/astro_build",
+        "/llmstxt/astro_build_llms-full_txt"
+      ]
+    }
+  }
+}

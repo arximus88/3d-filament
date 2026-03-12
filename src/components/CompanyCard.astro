@@ -1,0 +1,231 @@
+---
+interface Company {
+  id: string;
+  name: string;
+  type: 'manufacturer' | 'shop';
+  city: string;
+  url: string;
+  materials: string[];
+  phone?: string;
+  description: string;
+  socials?: {
+    telegram?: string;
+    instagram?: string;
+  };
+}
+
+interface Props {
+  company: Company;
+  showLink?: boolean;
+}
+
+const { company, showLink = true } = Astro.props;
+
+function getOperatorIcon(phone: string): string {
+  const clean = phone.replace(/\D/g, '');
+  if (clean.length >= 10) {
+    const code = clean.slice(-10, -7);
+    if (['067','068','096','097','098'].includes(code)) return '#icon-kyivstar';
+    if (['050','066','095','099'].includes(code)) return '#icon-vodafone';
+    if (['063','073','093'].includes(code)) return '#icon-lifecell';
+  }
+  return '#icon-phone';
+}
+
+const phones = company.phone ? company.phone.split(',').map(p => p.trim()).filter(Boolean) : [];
+---
+
+<div class="card" data-type={company.type} data-city={company.city} data-materials={company.materials.join(',').toLowerCase()}>
+  <div class="card-header">
+    <h2 class="card-title">
+      {showLink
+        ? <a href={`/company/${company.id}`} class="company-link">{company.name}</a>
+        : company.name
+      }
+    </h2>
+    <span class={`badge ${company.type}`}>
+      {company.type === 'manufacturer' ? 'Виробник' : 'Магазин'}
+    </span>
+  </div>
+
+  <div class="card-info">
+    {company.city && (
+      <div class="info-row">
+        <svg class="info-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><use href="#icon-location"></use></svg>
+        <span>{company.city}</span>
+      </div>
+    )}
+
+    {phones.length > 0 && (
+      <div class="phones-container">
+        {phones.map(phone => (
+          <a href={`tel:${phone.replace(/\s/g, '')}`} class="phone-item">
+            <svg class="info-icon"><use href={getOperatorIcon(phone)}></use></svg>
+            <span>{phone}</span>
+          </a>
+        ))}
+      </div>
+    )}
+
+    {company.socials && Object.values(company.socials).some(Boolean) && (
+      <div class="socials-container">
+        {company.socials.telegram && (
+          <a href={company.socials.telegram} target="_blank" rel="noopener noreferrer" class="social-link" title="Telegram">
+            <svg class="social-icon"><use href="#icon-telegram"></use></svg>
+          </a>
+        )}
+        {company.socials.instagram && (
+          <a href={company.socials.instagram} target="_blank" rel="noopener noreferrer" class="social-link" title="Instagram">
+            <svg class="social-icon"><use href="#icon-instagram"></use></svg>
+          </a>
+        )}
+      </div>
+    )}
+
+    <p class="card-description">{company.description}</p>
+  </div>
+
+  <div class="materials">
+    {company.materials.map(mat => (
+      <span class="material-tag">{mat}</span>
+    ))}
+  </div>
+
+  <div class="card-footer">
+    <a href={company.url} target="_blank" rel="noopener noreferrer" class="btn">
+      Перейти на сайт →
+    </a>
+    {showLink && (
+      <a href={`/company/${company.id}`} class="btn btn-secondary">
+        Детальніше
+      </a>
+    )}
+  </div>
+</div>
+
+<style>
+  .card {
+    background: var(--color-bg-secondary);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    transition: transform 0.2s, border-color 0.2s;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .card:hover {
+    transform: translateY(-2px);
+    border-color: var(--color-accent);
+  }
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    gap: 10px;
+  }
+  .card-title {
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: var(--color-accent);
+  }
+  .company-link {
+    color: inherit;
+    text-decoration: none;
+  }
+  .company-link:hover { text-decoration: underline; }
+  .badge {
+    padding: 4px 10px;
+    border-radius: var(--radius-sm);
+    font-size: 0.8rem;
+    font-weight: 600;
+    white-space: nowrap;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    flex-shrink: 0;
+  }
+  .badge.manufacturer {
+    background: var(--color-success-bg);
+    color: var(--color-success);
+    border: 1px solid var(--color-success);
+  }
+  .badge.shop {
+    background: var(--color-info-bg);
+    color: var(--color-info);
+    border: 1px solid var(--color-info);
+  }
+  .card-info { display: flex; flex-direction: column; gap: 8px; }
+  .info-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--color-text-secondary);
+    font-size: 0.95rem;
+  }
+  .info-icon { width: 18px; height: 18px; opacity: 0.8; flex-shrink: 0; }
+  .phones-container { display: flex; flex-direction: column; gap: 6px; }
+  .phone-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 8px;
+    border-radius: var(--radius-sm);
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    text-decoration: none;
+    color: var(--color-text-primary);
+    font-size: 0.9rem;
+    transition: border-color 0.2s;
+  }
+  .phone-item:hover { border-color: var(--color-accent); }
+  .socials-container { display: flex; gap: 12px; margin-top: 4px; }
+  .social-link {
+    color: var(--color-text-secondary);
+    transition: color 0.2s, transform 0.2s;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .social-link:hover { color: var(--color-accent); transform: scale(1.1); }
+  .social-icon { width: 22px; height: 22px; }
+  .card-description { color: var(--color-text-secondary); margin-top: 4px; font-size: 0.95rem; }
+  .materials {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 4px;
+  }
+  .material-tag {
+    padding: 2px 8px;
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    font-size: 0.8rem;
+    color: var(--color-text-secondary);
+  }
+  .card-footer {
+    margin-top: auto;
+    padding-top: 16px;
+    border-top: 1px dotted var(--color-border);
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .btn {
+    display: inline-block;
+    padding: 7px 14px;
+    background: transparent;
+    color: var(--color-accent);
+    border: 1px solid var(--color-accent);
+    text-decoration: none;
+    border-radius: var(--radius-md);
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-align: center;
+    transition: all 0.2s;
+  }
+  .btn:hover { background: var(--color-accent); color: var(--color-bg-primary); }
+  .btn-secondary {
+    color: var(--color-text-secondary);
+    border-color: var(--color-border);
+  }
+  .btn-secondary:hover { background: var(--color-bg-card); color: var(--color-text-primary); }
+</style>

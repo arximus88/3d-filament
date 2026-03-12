@@ -1,0 +1,154 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import CompanyCard from '../../components/CompanyCard.astro';
+import { getCollection } from 'astro:content';
+
+interface Company {
+  id: string;
+  name: string;
+  type: 'manufacturer' | 'shop';
+  city: string;
+  url: string;
+  materials: string[];
+  phone?: string;
+  description: string;
+  socials?: {
+    telegram?: string;
+    instagram?: string;
+  };
+}
+
+export async function getStaticPaths() {
+  const entries = await getCollection('companies');
+  return entries.map(entry => ({
+    params: { slug: entry.id },
+    props: { company: entry.data as Company },
+  }));
+}
+
+interface Props {
+  company: Company;
+}
+
+const { company } = Astro.props;
+
+// LocalBusiness structured data — only real data from companies.json, no hallucinations
+const localBusiness: Record<string, unknown> = {
+  '@context': 'https://schema.org',
+  '@type': company.type === 'manufacturer' ? 'LocalBusiness' : 'Store',
+  name: company.name,
+  description: company.description,
+  url: company.url,
+  address: {
+    '@type': 'PostalAddress',
+    addressLocality: company.city,
+    addressCountry: 'UA',
+  },
+};
+
+if (company.phone) {
+  const phones = company.phone.split(',').map((p: string) => p.trim());
+  localBusiness.telephone = phones.length === 1 ? phones[0] : phones;
+}
+
+const sameAs: string[] = [];
+if (company.socials?.telegram) sameAs.push(company.socials.telegram);
+if (company.socials?.instagram) sameAs.push(company.socials.instagram);
+if (sameAs.length > 0) localBusiness.sameAs = sameAs;
+
+const typeLabel = company.type === 'manufacturer' ? 'Виробник' : 'Магазин';
+const title = `${company.name} — ${typeLabel} філаменту в ${company.city} | 3D Filament UA`;
+const description = `${company.name}: ${company.description} Матеріали: ${company.materials.join(', ')}. Місто: ${company.city}.`;
+---
+
+<Layout title={title} description={description}>
+  <script type="application/ld+json" set:html={JSON.stringify(localBusiness)} />
+
+  <div style="margin-bottom: 20px;">
+    <a href="/" class="back-link">← Назад до каталогу</a>
+  </div>
+
+  <div class="company-page">
+    <CompanyCard company={company} showLink={false} />
+
+    <div class="company-details">
+      <h2>Деталі</h2>
+      <div class="details-grid">
+        <div class="detail-item">
+          <span class="detail-label">Тип</span>
+          <span>{typeLabel}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Місто</span>
+          <span>{company.city}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Матеріали</span>
+          <span>{company.materials.join(', ')}</span>
+        </div>
+        {company.phone && (
+          <div class="detail-item">
+            <span class="detail-label">Телефон</span>
+            <div>
+              {company.phone.split(',').map((p: string) => (
+                <a href={`tel:${p.trim().replace(/[\s-]/g, '')}`} class="phone-link">{p.trim()}</a>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<style>
+  .back-link {
+    color: var(--color-accent);
+    text-decoration: none;
+    font-size: 0.95rem;
+    transition: opacity 0.2s;
+  }
+  .back-link:hover { opacity: 0.8; }
+  .company-page {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    margin-bottom: 40px;
+  }
+  .company-details {
+    background: var(--color-bg-secondary);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+  }
+  .company-details h2 {
+    color: var(--color-accent);
+    margin-bottom: 16px;
+    font-size: 1.2rem;
+  }
+  .details-grid { display: flex; flex-direction: column; gap: 12px; }
+  .detail-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--color-border);
+  }
+  .detail-item:last-child { border-bottom: none; padding-bottom: 0; }
+  .detail-label {
+    font-size: 0.8rem;
+    color: var(--color-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+  }
+  .phone-link {
+    color: var(--color-accent);
+    text-decoration: none;
+    display: block;
+  }
+  .phone-link:hover { text-decoration: underline; }
+  @media (max-width: 768px) {
+    .company-page { grid-template-columns: 1fr; }
+  }
+</style>

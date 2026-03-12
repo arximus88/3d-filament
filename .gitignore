@@ -1,1 +1,10 @@
+# Project
 stats/
+.plan/
+
+# Astro / Node
+node_modules/
+dist/
+.astro/
+node_modules/
+bun.lock
