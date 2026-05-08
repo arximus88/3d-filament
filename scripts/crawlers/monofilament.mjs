@@ -166,12 +166,62 @@ const COLOR_RU_UK = {
   "пурпурный": "пурпуровий",
   "койот": "койот",
   "градиент": "градієнт",
+  "неоновый": "неоновий",
+  "пастельный": "пастельний",
+  "термохромный": "термохромний",
+  "матовый": "матовий",
+  "оливковый": "оливковий",
+  "коралловый": "кораловий",
+  "светло-серый": "світло-сірий",
+  "светло-зеленый": "світло-зелений",
+  "светло-синий": "світло-синій",
+  "темно-серый": "темно-сірий",
+  "тёмно-серый": "темно-сірий",
+  "темно-зеленый": "темно-зелений",
+  "тёмно-зеленый": "темно-зелений",
+  "темно-синий": "темно-синій",
+  "тёмно-синий": "темно-синій",
+  "случайный": "випадковий",
+  "телесный": "тілесний",
+  "фосфоресцентный": "фосфоресцентний",
+  "цвет": "",
+  "фиолетово-розовый": "фіолетово-рожевий",
+  "коричневыйполупрозрачный": "коричневий напівпрозорий",
+  // Single-token forms not normalised by the suffix transliteration
+  "оранжевий": "помаранчевий",
+  "синий": "синій",
+  "желтий": "жовтий",
+  "индиго": "індиго",
+  "мятний": "м'ятний",
 };
+
+// Cheap transliteration for RU adjective endings we haven't whitelisted.
+// Applied per-token AFTER the dictionary lookup, so dictionary entries win.
+function transliterateRuTail(t) {
+  return t
+    .replace(/ё/gu, "е")
+    .replace(/Ё/gu, "Е")
+    .replace(/ы/gu, "и")
+    .replace(/ый$/u, "ий")
+    .replace(/ий$/u, "ий"); // no-op safeguard
+}
+
+function normaliseToken(t) {
+  const k = t.toLowerCase();
+  if (k in COLOR_RU_UK) return COLOR_RU_UK[k];
+  return transliterateRuTail(k);
+}
 
 function normaliseColor(raw) {
   if (!raw) return raw;
-  const tokens = raw.split(/\s+/).map(t => COLOR_RU_UK[t.toLowerCase()] ?? t);
-  return tokens.join(" ");
+  const tokens = raw.split(/\s+/).map((word) => {
+    // Hyphenated compounds like "жёлтый-зелёный-синий" need per-segment lookup.
+    if (word.includes("-")) {
+      return word.split("-").map(normaliseToken).join("-");
+    }
+    return normaliseToken(word);
+  });
+  return tokens.filter(Boolean).join(" ").trim();
 }
 
 function extractFirstProductUrl(html) {
@@ -244,6 +294,18 @@ export async function crawlMonofilament({ verbose = true } = {}) {
         pricePerSpool && dims.weightKg
           ? Math.round((pricePerSpool / dims.weightKg) * 100) / 100
           : null;
+      // Monofilament's source data is Russian and the site has no UK
+      // translation, so we don't reuse the JSON-LD name verbatim. Instead
+      // we synthesise a clean Ukrainian display name from the parsed
+      // fields, matching the bilingual conventions of the rest of the site.
+      const synthName = [
+        cat.material,
+        dims.color,
+        dims.weightKg ? `${dims.weightKg} кг` : null,
+        dims.diameterMm ? `${dims.diameterMm} мм` : null,
+      ]
+        .filter(Boolean)
+        .join(" • ");
       products.push({
         store: "monofilament",
         storeType: "manufacturer",
@@ -263,7 +325,7 @@ export async function crawlMonofilament({ verbose = true } = {}) {
         // cannot confidently mark out-of-stock (the page is partially JS-rendered),
         // so absence from the map maps to null/unknown rather than false.
         inStock: stockMap.has(url) ? true : null,
-        name: v.name?.replace(/\s+/g, " ").trim() ?? null,
+        name: synthName,
       });
     }
     await new Promise((r) => setTimeout(r, jitter()));
