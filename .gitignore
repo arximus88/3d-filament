@@ -1,6 +1,8 @@
 # Project
 stats/
 .plan/
+.cline/
+.mcp.json
 
 # Astro / Node
 node_modules/

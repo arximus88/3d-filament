@@ -2,6 +2,7 @@
 import Layout from '../../layouts/Layout.astro';
 import CompanyCard from '../../components/CompanyCard.astro';
 import { getCollection } from 'astro:content';
+import stockData from '../../data/stock.json';
 
 interface Company {
   id: string;
@@ -31,6 +32,9 @@ interface Props {
 }
 
 const { company } = Astro.props;
+const stockByCompany = (stockData.companies ?? {}) as Record<string, Record<string, string> & { checkedAt?: string | null; _error?: string }>;
+const stock = stockByCompany[company.id];
+const checkedAt = stock?.checkedAt ?? stockData.lastChecked ?? null;
 
 // LocalBusiness structured data — only real data from companies.json, no hallucinations
 const localBusiness: Record<string, unknown> = {
@@ -69,7 +73,7 @@ const description = `${company.name}: ${company.description} Матеріали:
   </div>
 
   <div class="company-page">
-    <CompanyCard company={company} showLink={false} />
+    <CompanyCard company={company} stock={stock} showLink={false} />
 
     <div class="company-details">
       <h2>Деталі</h2>
@@ -86,6 +90,12 @@ const description = `${company.name}: ${company.description} Матеріали:
           <span class="detail-label">Матеріали</span>
           <span>{company.materials.join(', ')}</span>
         </div>
+        {checkedAt && (
+          <div class="detail-item">
+            <span class="detail-label">Наявність перевірено</span>
+            <span>{new Date(checkedAt).toLocaleString('uk-UA')}</span>
+          </div>
+        )}
         {company.phone && (
           <div class="detail-item">
             <span class="detail-label">Телефон</span>

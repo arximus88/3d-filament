@@ -1,0 +1,131 @@
+{
+  "name": "3d-filament-daily-stock-crawler",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 6 * * *"
+            }
+          ]
+        }
+      },
+      "id": "schedule-trigger",
+      "name": "Daily 06:00 UTC",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [240, 320]
+    },
+    {
+      "parameters": {
+        "url": "https://raw.githubusercontent.com/arximus88/3d-filament/main/src/data/companies.json",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "id": "fetch-companies",
+      "name": "Fetch companies.json",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [480, 320]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "language": "javaScript",
+        "jsCode": "// =================================================================\n// 3d-filament daily stock crawler — Code node logic\n// Mirrors scripts/crawl-stock.mjs in the repo. Keep them in sync.\n// =================================================================\n\nconst IN_PATTERNS = [\n  /є\\s+в\\s+наявн/iu,\n  /в\\s+наявності/iu,\n  /є\\s+на\\s+склад/iu,\n  /available/i,\n  /in\\s+stock/i,\n];\nconst OUT_PATTERNS = [\n  /немає\\s+в\\s+наявн/iu,\n  /не\\s+в\\s+наявн/iu,\n  /відсутн/iu,\n  /під\\s+замовлення/iu,\n  /очікуєт/iu,\n  /закінчив/iu,\n  /out\\s+of\\s+stock/i,\n  /sold\\s+out/i,\n];\nconst STRIP_TAGS = /<(script|style|noscript)[\\s\\S]*?<\\/\\1>/gi;\nconst WINDOW = 200;\nconst OVERRIDES = {};\n\nfunction escapeRegex(s) { return s.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\\\$&'); }\n\nfunction detectMaterialStatus(html, material) {\n  const needle = new RegExp(`\\\\b${escapeRegex(material)}\\\\b`, 'giu');\n  let match, sawIn = false, sawOut = false, sawAny = false;\n  while ((match = needle.exec(html)) !== null) {\n    sawAny = true;\n    const start = Math.max(0, match.index - WINDOW);\n    const end = Math.min(html.length, match.index + match[0].length + WINDOW);\n    const ctx = html.slice(start, end);\n    if (OUT_PATTERNS.some(re => re.test(ctx))) sawOut = true;\n    else if (IN_PATTERNS.some(re => re.test(ctx))) sawIn = true;\n    if (sawIn) break;\n  }\n  if (!sawAny) return 'unknown';\n  if (sawIn) return 'in';\n  if (sawOut) return 'out';\n  return 'unknown';\n}\n\nfunction parseStock(html, materials, companyId) {\n  const cleaned = String(html).replace(STRIP_TAGS, ' ');\n  const result = {};\n  const override = OVERRIDES[companyId] ? OVERRIDES[companyId](cleaned, materials) || {} : {};\n  for (const m of materials) result[m] = override[m] || detectMaterialStatus(cleaned, m);\n  return result;\n}\n\n// HTTP node may emit companies as one item (array) or many items (one per company).\nconst items = $input.all();\nlet companies;\nif (items.length === 1 && Array.isArray(items[0].json)) companies = items[0].json;\nelse if (items.length === 1 && Array.isArray(items[0].json.data)) companies = items[0].json.data;\nelse companies = items.map(i => i.json);\n\nconst UA = 'Mozilla/5.0 (compatible; 3d-filament-stock-bot/1.0; +https://3d-filament.pages.dev)';\nconst out = { lastChecked: new Date().toISOString(), companies: {} };\n\nfor (const c of companies) {\n  const checkedAt = new Date().toISOString();\n  try {\n    const html = await this.helpers.httpRequest({\n      method: 'GET',\n      url: c.url,\n      headers: { 'User-Agent': UA, 'Accept-Language': 'uk,en;q=0.8' },\n      timeout: 15000,\n      json: false,\n      returnFullResponse: false,\n    });\n    out.companies[c.id] = { ...parseStock(html, c.materials, c.id), checkedAt };\n  } catch (err) {\n    out.companies[c.id] = { _error: String(err.message || err), checkedAt };\n  }\n  await new Promise(r => setTimeout(r, 1500));\n}\n\nconst json = JSON.stringify(out, null, 2) + '\\n';\nconst date = out.lastChecked.slice(0, 10);\nconst summary = Object.entries(out.companies).map(([id, s]) => {\n  if (s._error) return `${id}: ERROR (${s._error})`;\n  const counts = { in: 0, out: 0, unknown: 0 };\n  for (const [k, v] of Object.entries(s)) if (k !== 'checkedAt') counts[v] = (counts[v] || 0) + 1;\n  return `${id}: ${counts.in} in / ${counts.out} out / ${counts.unknown} unknown`;\n}).join('\\n');\n\nreturn [{ json: { content: json, commitMessage: `chore(stock): daily update ${date}`, summary } }];"
+      },
+      "id": "crawl-and-parse",
+      "name": "Crawl & parse",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [720, 320]
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "operation": "edit",
+        "owner": "arximus88",
+        "repository": "3d-filament",
+        "filePath": "src/data/stock.json",
+        "fileContent": "={{ $json.content }}",
+        "commitMessage": "={{ $json.commitMessage }}",
+        "additionalParameters": {
+          "branch": {
+            "branch": "main"
+          }
+        }
+      },
+      "id": "commit-stock-json",
+      "name": "Commit stock.json",
+      "type": "n8n-nodes-base.github",
+      "typeVersion": 1.1,
+      "position": [960, 320],
+      "credentials": {
+        "githubApi": {
+          "id": "REPLACE_WITH_YOUR_GITHUB_CREDENTIAL_ID",
+          "name": "GitHub (3d-filament write)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## 3d-filament daily stock crawler\n\n**Schedule:** every day at 06:00 UTC\n\n**Flow:** fetch companies.json from GitHub → in one Code node, sequentially fetch each store's homepage and run the Ukrainian-language stock heuristic → commit `src/data/stock.json` back to `main`. Cloudflare Pages auto-rebuilds on push.\n\n**Setup before first run:**\n1. Create a GitHub PAT with `contents: write` on `arximus88/3d-filament` and add it as a GitHub credential in n8n.\n2. Replace `REPLACE_WITH_YOUR_GITHUB_CREDENTIAL_ID` in the Commit node (or re-pick the credential in the UI).\n3. Test once with the manual ▶ button before activating the schedule.\n\nThe Code node logic mirrors `scripts/parse-stock.mjs` + `scripts/crawl-stock.mjs` in the repo — keep them in sync if you edit one.",
+        "height": 320,
+        "width": 380
+      },
+      "id": "sticky-readme",
+      "name": "README",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [240, 540]
+    }
+  ],
+  "connections": {
+    "Daily 06:00 UTC": {
+      "main": [
+        [
+          {
+            "node": "Fetch companies.json",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch companies.json": {
+      "main": [
+        [
+          {
+            "node": "Crawl & parse",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Crawl & parse": {
+      "main": [
+        [
+          {
+            "node": "Commit stock.json",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "active": false,
+  "pinData": {},
+  "tags": []
+}

@@ -14,12 +14,41 @@ interface Company {
   };
 }
 
+type StockStatus = 'in' | 'out' | 'unknown';
+type CompanyStock = Partial<Record<string, StockStatus>> & {
+  checkedAt?: string | null;
+  _error?: string;
+};
+
 interface Props {
   company: Company;
+  stock?: CompanyStock;
   showLink?: boolean;
 }
 
-const { company, showLink = true } = Astro.props;
+const { company, stock, showLink = true } = Astro.props;
+
+function statusFor(material: string): StockStatus {
+  const v = stock?.[material];
+  return v === 'in' || v === 'out' ? v : 'unknown';
+}
+
+const cardStock: 'in' | 'out' | 'partial' | 'unknown' = (() => {
+  if (!stock || stock._error) return 'unknown';
+  const statuses = company.materials.map(statusFor);
+  const ins = statuses.filter(s => s === 'in').length;
+  const outs = statuses.filter(s => s === 'out').length;
+  if (ins > 0 && outs > 0) return 'partial';
+  if (ins > 0) return 'in';
+  if (outs > 0) return 'out';
+  return 'unknown';
+})();
+
+const stockLabel: Record<StockStatus, string> = {
+  in: 'В наявності',
+  out: 'Немає',
+  unknown: '—',
+};
 
 function getOperatorIcon(phone: string): string {
   const clean = phone.replace(/\D/g, '');
@@ -35,7 +64,7 @@ function getOperatorIcon(phone: string): string {
 const phones = company.phone ? company.phone.split(',').map(p => p.trim()).filter(Boolean) : [];
 ---
 
-<div class="card" data-type={company.type} data-city={company.city} data-materials={company.materials.join(',').toLowerCase()}>
+<div class="card" data-type={company.type} data-city={company.city} data-materials={company.materials.join(',').toLowerCase()} data-stock={cardStock}>
   <div class="card-header">
     <h2 class="card-title">
       {showLink
@@ -86,9 +115,15 @@ const phones = company.phone ? company.phone.split(',').map(p => p.trim()).filte
   </div>
 
   <div class="materials">
-    {company.materials.map(mat => (
-      <span class="material-tag">{mat}</span>
-    ))}
+    {company.materials.map(mat => {
+      const s = statusFor(mat);
+      return (
+        <span class={`material-tag stock-${s}`} title={stockLabel[s]} aria-label={`${mat}: ${stockLabel[s]}`}>
+          <span class={`stock-dot stock-dot-${s}`} aria-hidden="true"></span>
+          {mat}
+        </span>
+      );
+    })}
   </div>
 
   <div class="card-footer">
@@ -194,6 +229,9 @@ const phones = company.phone ? company.phone.split(',').map(p => p.trim()).filte
     margin-top: 4px;
   }
   .material-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
     padding: 2px 8px;
     background: var(--color-bg-card);
     border: 1px solid var(--color-border);
@@ -201,6 +239,28 @@ const phones = company.phone ? company.phone.split(',').map(p => p.trim()).filte
     font-size: 0.8rem;
     color: var(--color-text-secondary);
   }
+  .material-tag.stock-in {
+    background: var(--color-success-bg);
+    border-color: var(--color-success);
+    color: var(--color-success);
+  }
+  .material-tag.stock-out {
+    background: var(--color-danger-bg);
+    border-color: var(--color-danger);
+    color: var(--color-danger);
+    text-decoration: line-through;
+    text-decoration-color: color-mix(in srgb, var(--color-danger) 60%, transparent);
+  }
+  .stock-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    background: var(--color-text-secondary);
+  }
+  .stock-dot-in { background: var(--color-success); }
+  .stock-dot-out { background: var(--color-danger); }
+  .stock-dot-unknown { background: var(--color-text-secondary); opacity: 0.5; }
   .card-footer {
     margin-top: auto;
     padding-top: 16px;
