@@ -1,8 +1,12 @@
 {
-  "lastChecked": "2026-05-08T15:21:57.244Z",
+  "lastChecked": "2026-05-08T15:50:37.881Z",
   "stats": {
     "plexiwire": {
       "products": 76,
+      "errors": 0
+    },
+    "lbl-corp": {
+      "products": 20,
       "errors": 0
     }
   },
@@ -24,7 +28,7 @@
       "image": "https://shop.plexiwire.com.ua/content/images/16/1800x1800l80mc100/pla-natural-400-68525940400364.webp",
       "inStock": true,
       "name": "PLA пластик для 3D принтера натуральний 400м / 1.185кг / 1.75мм",
-      "checkedAt": "2026-05-08T15:21:57.244Z"
+      "checkedAt": "2026-05-08T15:50:37.881Z"
     },
     {
       "store": "plexiwire",
@@ -43,7 +47,7 @@
       "image": "https://shop.plexiwire.com.ua/content/images/18/1800x1800l80mc100/pla-black-400-95669052229785.webp",
       "inStock": true,
       "name": "PLA пластик для 3D принтера чорний 400м / 1.185кг / 1.75мм",
-      "checkedAt": "2026-05-08T15:21:57.244Z"
+      "checkedAt": "2026-05-08T15:50:37.881Z"
     },
     {
       "store": "plexiwire",
@@ -62,7 +66,7 @@
       "image": "https://shop.plexiwire.com.ua/content/images/22/1800x1800l80mc100/pla-green-400-85561254606524.webp",
       "inStock": true,
       "name": "PLA пластик для 3D принтера зелений 400м / 1.185кг / 1.75мм",
-      "checkedAt": "2026-05-08T15:21:57.244Z"
+      "checkedAt": "2026-05-08T15:50:37.881Z"
     },
     {
       "store": "plexiwire",
@@ -81,7 +85,7 @@
       "image": "https://shop.plexiwire.com.ua/content/images/24/1800x1800l80mc100/pla-orange-400-40338988798278.webp",
       "inStock": true,
       "name": "PLA пластик для 3D принтера помаранчевий 400м / 1.185кг / 1.75мм",
-      "checkedAt": "2026-05-08T15:21:57.244Z"
+      "checkedAt": "2026-05-08T15:50:37.881Z"
     },
     {
       "store": "plexiwire",
@@ -100,7 +104,7 @@
       "image": "https://shop.plexiwire.com.ua/content/images/26/1800x1800l80mc100/pla-red-400-26212095840632.webp",
       "inStock": true,
       "name": "PLA пластик для 3D принтера червоний 400м / 1.185кг / 1.75мм",
-      "checkedAt": "2026-05-08T15:21:57.244Z"
+      "checkedAt": "2026-05-08T15:50:37.881Z"
     },
     {
       "store": "plexiwire",
@@ -119,7 +123,7 @@
       "image": "https://shop.plexiwire.com.ua/content/images/30/1800x1800l80mc100/pla-brown-400-41902652893845.webp",
       "inStock": true,
       "name": "PLA пластик для 3D принтера коричневий 400м / 1.185кг / 1.75мм",
-      "checkedAt": "2026-05-08T15:21:57.244Z"
+      "checkedAt": "2026-05-08T15:50:37.881Z"
     },
     {
       "store": "plexiwire",
@@ -138,7 +142,7 @@
       "image": "https://shop.plexiwire.com.ua/content/images/34/1800x1800l80mc100/pla-white-400-20577876223427.webp",
       "inStock": true,
       "name": "PLA пластик для 3D принтера білий 400м / 1.185кг / 1.75мм",
-      "checkedAt": "2026-05-08T15:21:57.244Z"
+      "checkedAt": "2026-05-08T15:50:37.881Z"
     },
     {
       "store": "plexiwire",
@@ -157,7 +161,7 @@
       "image": "https://shop.plexiwire.com.ua/content/images/38/1800x1800l80mc100/pla-pink-400-16932620705148.webp",
       "inStock": true,
       "name": "PLA пластик для 3D принтера рожевий 400м / 1.185кг / 1.75мм",
-      "checkedAt": "2026-05-08T15:21:57.244Z"
+      "checkedAt": "2026-05-08T15:50:37.881Z"
     },
     {
       "store": "plexiwire",
@@ -176,7 +180,7 @@
       "image": "https://shop.plexiwire.com.ua/content/images/42/1800x1800l80mc100/pla-lime-green-400-55952319377252.webp",
       "inStock": true,
       "name": "PLA пластик для 3D принтера салатовий 400м / 1.185кг / 1.75мм",
-      "checkedAt": "2026-05-08T15:21:57.244Z"
+      "checkedAt": "2026-05-08T15:50:37.881Z"
     },
     {
       "store": "plexiwire",
@@ -195,7 +199,7 @@
       "image": "https://shop.plexiwire.com.ua/content/images/44/1800x1800l80mc100/pla-light-blue-400-28558833771823.webp",
       "inStock": true,
       "name": "PLA пластик для 3D принтера блакитний 400м / 1.185кг / 1.75мм",
-      "checkedAt": "2026-05-08T15:21:57.244Z"
+      "checkedAt": "2026-05-08T15:50:37.881Z"
     },
     {
       "store": "plexiwire",
@@ -214,7 +218,7 @@
       "image": "https://shop.plexiwire.com.ua/content/images/46/1800x1800l80mc100/pla-gray-400-37383022060040.webp",
       "inStock": true,
       "name": "PLA пластик для 3D принтера сірий 400м / 1.185кг / 1.75мм",
-      "checkedAt": "2026-05-08T15:21:57.244Z"
+      "checkedAt": "2026-05-08T15:50:37.881Z"
     },
     {
       "store": "plexiwire",
@@ -233,7 +237,7 @@
       "image": "https://shop.plexiwire.com.ua/content/images/14/1800x1800l80mc100/pla-silver-400-64946099816224.webp",
       "inStock": true,
       "name": "PLA пластик для 3D принтера срібло 400м / 1.185кг / 1.75мм",
-      "checkedAt": "2026-05-08T15:21:57.244Z"
+      "checkedAt": "2026-05-08T15:50:37.881Z"
     },
     {
       "store": "plexiwire",
@@ -252,7 +256,7 @@
       "image": "https://shop.plexiwire.com.ua/content/images/40/1800x1800l80mc100/pla-khaki-400-30167510511311.webp",
       "inStock": true,
       "name": "PLA пластик для 3D принтера хакі 400м / 1.185кг / 1.75мм",
-      "checkedAt": "2026-05-08T15:21:57.244Z"
+      "checkedAt": "2026-05-08T15:50:37.881Z"
     },
     {
       "store": "plexiwire",
@@ -271,7 +275,7 @@
       "image": "https://shop.plexiwire.com.ua/content/images/9/1800x1800l80mc100/pla-bronze-400-56696008180437.webp",
       "inStock": true,
       "name": "PLA пластик для 3D принтера бронза 400м / 1.185кг / 1.75мм",
-      "checkedAt": "2026-05-08T15:21:57.244Z"
+      "checkedAt": "2026-05-08T15:50:37.881Z"
     },
     {
       "store": "plexiwire",
@@ -290,7 +294,7 @@
       "image": "https://shop.plexiwire.com.ua/content/images/27/1800x1800l80mc100/pla-gold-400-65845087372830.webp",
       "inStock": true,
       "name": "PLA пластик для 3D принтера золото 400м / 1.185кг / 1.75мм",
-      "checkedAt": "2026-05-08T15:21:57.244Z"
+      "checkedAt": "2026-05-08T15:50:37.881Z"
     },
     {
       "store": "plexiwire",
@@ -309,7 +313,7 @@
       "image": "https://shop.plexiwire.com.ua/content/images/36/1800x1800l80mc100/pla-copper-400-71730377410406.webp",
       "inStock": true,
       "name": "PLA пластик для 3D принтера мідь 400м / 1.185кг / 1.75мм",
-      "checkedAt": "2026-05-08T15:21:57.244Z"
+      "checkedAt": "2026-05-08T15:50:37.881Z"
     },
     {
       "store": "plexiwire",
@@ -328,7 +332,7 @@
       "image": "https://shop.plexiwire.com.ua/content/images/37/1800x1800l80mc100/pla-steel-400-30966598934222.webp",
       "inStock": true,
       "name": "PLA пластик для 3D принтера сталь 400м / 1.185кг / 1.75мм",
-      "checkedAt": "2026-05-08T15:21:57.244Z"
+      "checkedAt": "2026-05-08T15:50:37.881Z"
     },
     {
       "store": "plexiwire",
@@ -347,7 +351,7 @@
       "image": "https://shop.plexiwire.com.ua/content/images/33/1280x1280l80mc100/pla-purple-300-60899506343165.webp",
       "inStock": true,
       "name": "PLA пластик для 3D принтера фіолетовий 300м / 0.9кг / 1.75мм",
-      "checkedAt": "2026-05-08T15:21:57.244Z"
+      "checkedAt": "2026-05-08T15:50:37.881Z"
     },
     {
       "store": "plexiwire",
@@ -366,7 +370,7 @@
       "image": "https://shop.plexiwire.com.ua/content/images/40/1800x1800l80mc100/pla-blue-100-87686485752560.webp",
       "inStock": true,
       "name": "PLA пластик для 3D принтера синій 100м / 0.3кг / 1.75мм",
-      "checkedAt": "2026-05-08T15:21:57.244Z"
+      "checkedAt": "2026-05-08T15:50:37.881Z"
     },
     {
       "store": "plexiwire",
@@ -385,7 +389,7 @@
       "image": "https://shop.plexiwire.com.ua/content/images/44/1800x1800l80mc100/pla-yellow-100-37350914530731.webp",
       "inStock": true,
       "name": "PLA пластик для 3D принтера жовтий 100м / 0.3кг / 1.75мм",
-      "checkedAt": "2026-05-08T15:21:57.244Z"
+      "checkedAt": "2026-05-08T15:50:37.881Z"
     },
     {
       "store": "plexiwire",
@@ -404,7 +408,7 @@
       "image": "https://shop.plexiwire.com.ua/content/images/48/1800x1800l80mc100/petg-plastik-dlya-3d-printera-naturalnyy-400m-12kg-175mm-86001158779375.webp",
       "inStock": true,
       "name": "PETG пластик для 3D принтера натуральний 400м / 1,2кг / 1,75мм",
-      "checkedAt": "2026-05-08T15:21:57.244Z"
+      "checkedAt": "2026-05-08T15:50:37.881Z"
     },
     {
       "store": "plexiwire",
@@ -423,7 +427,7 @@
       "image": "https://shop.plexiwire.com.ua/content/images/4/1800x1800l80mc100/petg-red-400-96606932941574.webp",
       "inStock": true,
       "name": "PETG пластик для 3D принтера червоний  400м / 1,2кг / 1,75мм",
-      "checkedAt": "2026-05-08T15:21:57.244Z"
+      "checkedAt": "2026-05-08T15:50:37.881Z"
     },
     {
       "store": "plexiwire",
@@ -442,7 +446,7 @@
       "image": "https://shop.plexiwire.com.ua/content/images/6/1800x1800l80mc100/petg-blue-400-44683802159679.webp",
       "inStock": true,
       "name": "PETG пластик для 3D принтера синій  400м / 1,2кг / 1,75мм",
-      "checkedAt": "2026-05-08T15:21:57.244Z"
+      "checkedAt": "2026-05-08T15:50:37.881Z"
     },
     {
       "store": "plexiwire",
@@ -461,7 +465,7 @@
       "image": "https://shop.plexiwire.com.ua/content/images/8/1800x1800l80mc100/petg-yellow-400-82205745648459.webp",
       "inStock": true,
       "name": "PETG пластик для 3D принтера жовтий 400м / 1,2кг / 1,75мм",
-      "checkedAt": "2026-05-08T15:21:57.244Z"
+      "checkedAt": "2026-05-08T15:50:37.881Z"
     },
     {
       "store": "plexiwire",
@@ -480,7 +484,7 @@
       "image": "https://shop.plexiwire.com.ua/content/images/10/1800x1800l80mc100/petg-green-400-18047963894815.webp",
       "inStock": true,
       "name": "PETG пластик для 3D принтера зелений 400м / 1,2кг / 1,75мм",
-      "checkedAt": "2026-05-08T15:21:57.244Z"
+      "checkedAt": "2026-05-08T15:50:37.881Z"
     },
     {
       "store": "plexiwire",
@@ -499,7 +503,7 @@
       "image": "https://shop.plexiwire.com.ua/content/images/6/1800x1800l80mc100/petg-silver-400-96291729710761.webp",
       "inStock": true,
       "name": "PETG пластик для 3D принтера срібло 1,75мм (400м / 1,2кг)",
-      "checkedAt": "2026-05-08T15:21:57.244Z"
+      "checkedAt": "2026-05-08T15:50:37.881Z"
     },
     {
       "store": "plexiwire",
@@ -518,7 +522,7 @@
       "image": "https://shop.plexiwire.com.ua/content/images/9/1800x1800l80mc100/petg-orange-400-78914764569295.webp",
       "inStock": true,
       "name": "PETG пластик для 3D принтера помаранчевий 1,75мм (400м / 1,2кг)",
-      "checkedAt": "2026-05-08T15:21:57.244Z"
+      "checkedAt": "2026-05-08T15:50:37.881Z"
     },
     {
       "store": "plexiwire",
@@ -537,7 +541,7 @@
       "image": "https://shop.plexiwire.com.ua/content/images/1/1800x1800l80mc100/petg-white-300-58981815275634.webp",
       "inStock": true,
       "name": "PETG пластик для 3D принтера білий 300м / 0,9кг / 1,75мм",
-      "checkedAt": "2026-05-08T15:21:57.244Z"
+      "checkedAt": "2026-05-08T15:50:37.881Z"
     },
     {
       "store": "plexiwire",
@@ -556,7 +560,7 @@
       "image": "https://shop.plexiwire.com.ua/content/images/3/1800x1800l80mc100/petg-black-300-95400691672003.webp",
       "inStock": true,
       "name": "PETG пластик для 3D принтера чорний 300м / 0,9кг / 1,75мм",
-      "checkedAt": "2026-05-08T15:21:57.244Z"
+      "checkedAt": "2026-05-08T15:50:37.881Z"
     },
     {
       "store": "plexiwire",
@@ -575,7 +579,7 @@
       "image": "https://shop.plexiwire.com.ua/content/images/21/1800x1800l80mc100/petg-gray-100-14557722458246.webp",
       "inStock": true,
       "name": "PETG пластик для 3D принтера сірий 100м / 0,3кг / 1,75мм",
-      "checkedAt": "2026-05-08T15:21:57.244Z"
+      "checkedAt": "2026-05-08T15:50:37.881Z"
     },
     {
       "store": "plexiwire",
@@ -594,7 +598,7 @@
       "image": "https://shop.plexiwire.com.ua/content/images/37/1800x1800l80mc100/petg-khaki-400-62372859347529.webp",
       "inStock": true,
       "name": "PETG пластик для 3D принтера хакі 100м / 0,3кг / 1,75мм",
-      "checkedAt": "2026-05-08T15:21:57.244Z"
+      "checkedAt": "2026-05-08T15:50:37.881Z"
     },
     {
       "store": "plexiwire",
@@ -613,7 +617,7 @@
       "image": "https://shop.plexiwire.com.ua/content/images/36/1800x1800l80mc100/60158485711208.webp",
       "inStock": true,
       "name": "ABS пластик для 3D принтера чорний 400м / 1кг / 1.75мм",
-      "checkedAt": "2026-05-08T15:21:57.244Z"
+      "checkedAt": "2026-05-08T15:50:37.881Z"
     },
     {
       "store": "plexiwire",
@@ -632,7 +636,7 @@
       "image": "https://shop.plexiwire.com.ua/content/images/38/1800x1800l80mc100/76168391914674.webp",
       "inStock": true,
       "name": "ABS пластик для 3D принтера червоний 400м / 1кг / 1.75мм",
-      "checkedAt": "2026-05-08T15:21:57.244Z"
+      "checkedAt": "2026-05-08T15:50:37.881Z"
     },
     {
       "store": "plexiwire",
@@ -651,7 +655,7 @@
       "image": "https://shop.plexiwire.com.ua/content/images/40/1800x1800l80mc100/29132126290218.webp",
       "inStock": true,
       "name": "ABS пластик для 3D принтера синій 400м / 1кг / 1.75мм",
-      "checkedAt": "2026-05-08T15:21:57.244Z"
+      "checkedAt": "2026-05-08T15:50:37.881Z"
     },
     {
       "store": "plexiwire",
@@ -670,7 +674,7 @@
       "image": "https://shop.plexiwire.com.ua/content/images/42/1800x1800l80mc100/22011388150863.webp",
       "inStock": true,
       "name": "ABS пластик для 3D принтера зелений 400м / 1кг / 1.75мм",
-      "checkedAt": "2026-05-08T15:21:57.244Z"
+      "checkedAt": "2026-05-08T15:50:37.881Z"
     },
     {
       "store": "plexiwire",
@@ -689,7 +693,7 @@
       "image": "https://shop.plexiwire.com.ua/content/images/44/1800x1800l80mc100/61538069115491.webp",
       "inStock": true,
       "name": "ABS пластик для 3D принтера жовтий 400м / 1кг / 1.75мм",
-      "checkedAt": "2026-05-08T15:21:57.244Z"
+      "checkedAt": "2026-05-08T15:50:37.881Z"
     },
     {
       "store": "plexiwire",
@@ -708,7 +712,7 @@
       "image": "https://shop.plexiwire.com.ua/content/images/46/1800x1800l80mc100/49716337349273.webp",
       "inStock": true,
       "name": "ABS пластик для 3D принтера натуральний 400м / 1кг / 1.75мм",
-      "checkedAt": "2026-05-08T15:21:57.244Z"
+      "checkedAt": "2026-05-08T15:50:37.881Z"
     },
     {
       "store": "plexiwire",
@@ -727,7 +731,7 @@
       "image": "https://shop.plexiwire.com.ua/content/images/48/1800x1800l80mc100/92039261494462.webp",
       "inStock": true,
       "name": "ABS пластик для 3D принтера помаранчевий 400м / 1кг / 1.75мм",
-      "checkedAt": "2026-05-08T15:21:57.244Z"
+      "checkedAt": "2026-05-08T15:50:37.881Z"
     },
     {
       "store": "plexiwire",
@@ -746,7 +750,7 @@
       "image": "https://shop.plexiwire.com.ua/content/images/50/1800x1800l80mc100/84283109062683.webp",
       "inStock": true,
       "name": "ABS пластик для 3D принтера бордовий 400м / 1кг / 1.75мм",
-      "checkedAt": "2026-05-08T15:21:57.244Z"
+      "checkedAt": "2026-05-08T15:50:37.881Z"
     },
     {
       "store": "plexiwire",
@@ -765,7 +769,7 @@
       "image": "https://shop.plexiwire.com.ua/content/images/2/1800x1800l80mc100/78337817042404.webp",
       "inStock": true,
       "name": "ABS пластик для 3D принтера блакитний 400м / 1кг / 1.75мм",
-      "checkedAt": "2026-05-08T15:21:57.244Z"
+      "checkedAt": "2026-05-08T15:50:37.881Z"
     },
     {
       "store": "plexiwire",
@@ -784,7 +788,7 @@
       "image": "https://shop.plexiwire.com.ua/content/images/4/1800x1800l80mc100/16865919094952.webp",
       "inStock": true,
       "name": "ABS пластик для 3D принтера коричневий 400м / 1кг / 1.75мм",
-      "checkedAt": "2026-05-08T15:21:57.244Z"
+      "checkedAt": "2026-05-08T15:50:37.881Z"
     },
     {
       "store": "plexiwire",
@@ -803,7 +807,7 @@
       "image": "https://shop.plexiwire.com.ua/content/images/6/1800x1800l80mc100/66782666048944.webp",
       "inStock": true,
       "name": "ABS пластик для 3D принтера рожевий 400м / 1кг / 1.75мм",
-      "checkedAt": "2026-05-08T15:21:57.244Z"
+      "checkedAt": "2026-05-08T15:50:37.881Z"
     },
     {
       "store": "plexiwire",
@@ -822,7 +826,7 @@
       "image": "https://shop.plexiwire.com.ua/content/images/8/1800x1800l80mc100/56015042258836.webp",
       "inStock": true,
       "name": "ABS пластик для 3D принтера салатовий 400м / 1кг / 1.75мм",
-      "checkedAt": "2026-05-08T15:21:57.244Z"
+      "checkedAt": "2026-05-08T15:50:37.881Z"
     },
     {
       "store": "plexiwire",
@@ -841,7 +845,7 @@
       "image": "https://shop.plexiwire.com.ua/content/images/10/1800x1800l80mc100/72135120012814.webp",
       "inStock": true,
       "name": "ABS пластик для 3D принтера фіолетовий 400м / 1кг / 1.75мм",
-      "checkedAt": "2026-05-08T15:21:57.244Z"
+      "checkedAt": "2026-05-08T15:50:37.881Z"
     },
     {
       "store": "plexiwire",
@@ -860,7 +864,7 @@
       "image": "https://shop.plexiwire.com.ua/content/images/12/1800x1800l80mc100/37172001546175.webp",
       "inStock": true,
       "name": "ABS пластик для 3D принтера срібло 400м / 1кг / 1.75мм",
-      "checkedAt": "2026-05-08T15:21:57.244Z"
+      "checkedAt": "2026-05-08T15:50:37.881Z"
     },
     {
       "store": "plexiwire",
@@ -879,7 +883,7 @@
       "image": "https://shop.plexiwire.com.ua/content/images/14/1800x1800l80mc100/23514260261645.webp",
       "inStock": true,
       "name": "ABS пластик для 3D принтера сірий 400м / 1кг / 1.75мм",
-      "checkedAt": "2026-05-08T15:21:57.244Z"
+      "checkedAt": "2026-05-08T15:50:37.881Z"
     },
     {
       "store": "plexiwire",
@@ -898,7 +902,7 @@
       "image": "https://shop.plexiwire.com.ua/content/images/35/1800x1800l80mc100/abs-white-300-99663300503785.webp",
       "inStock": true,
       "name": "ABS пластик для 3D принтера білий 300м / 0.75кг / 1.75мм",
-      "checkedAt": "2026-05-08T15:21:57.244Z"
+      "checkedAt": "2026-05-08T15:50:37.881Z"
     },
     {
       "store": "plexiwire",
@@ -917,7 +921,7 @@
       "image": "https://shop.plexiwire.com.ua/content/images/24/1800x1800l80mc100/82235787405064.webp",
       "inStock": true,
       "name": "ABS+ пластик для 3D принтера зелений 400м / 1кг / 1.75мм",
-      "checkedAt": "2026-05-08T15:21:57.244Z"
+      "checkedAt": "2026-05-08T15:50:37.881Z"
     },
     {
       "store": "plexiwire",
@@ -936,7 +940,7 @@
       "image": "https://shop.plexiwire.com.ua/content/images/27/1800x1800l80mc100/49853351172520.webp",
       "inStock": true,
       "name": "ABS+ пластик для 3D принтера червоний 400м / 1кг / 1.75мм",
-      "checkedAt": "2026-05-08T15:21:57.244Z"
+      "checkedAt": "2026-05-08T15:50:37.881Z"
     },
     {
       "store": "plexiwire",
@@ -955,7 +959,7 @@
       "image": "https://shop.plexiwire.com.ua/content/images/24/1800x1800l80mc100/88666458696752.webp",
       "inStock": true,
       "name": "ABS+ пластик для 3D принтера синій 300м / 0.75кг / 1.75мм",
-      "checkedAt": "2026-05-08T15:21:57.244Z"
+      "checkedAt": "2026-05-08T15:50:37.881Z"
     },
     {
       "store": "plexiwire",
@@ -974,7 +978,7 @@
       "image": "https://shop.plexiwire.com.ua/content/images/26/1800x1800l80mc100/74956885919041.webp",
       "inStock": true,
       "name": "ABS+ пластик для 3D принтера жовтий 300м / 0.75кг / 1.75мм",
-      "checkedAt": "2026-05-08T15:21:57.244Z"
+      "checkedAt": "2026-05-08T15:50:37.881Z"
     },
     {
       "store": "plexiwire",
@@ -993,7 +997,7 @@
       "image": "https://shop.plexiwire.com.ua/content/images/32/1800x1800l80mc100/11970040943956.webp",
       "inStock": true,
       "name": "ABS+ пластик для 3D принтера білий 300м / 0.75кг / 1.75мм",
-      "checkedAt": "2026-05-08T15:21:57.244Z"
+      "checkedAt": "2026-05-08T15:50:37.881Z"
     },
     {
       "store": "plexiwire",
@@ -1012,7 +1016,7 @@
       "image": "https://shop.plexiwire.com.ua/content/images/31/1800x1800l80mc100/abs-plus-black-100-83945615565888.webp",
       "inStock": true,
       "name": "ABS+ пластик для 3D принтера чорний 100м / 0.25кг / 1.75мм",
-      "checkedAt": "2026-05-08T15:21:57.244Z"
+      "checkedAt": "2026-05-08T15:50:37.881Z"
     },
     {
       "store": "plexiwire",
@@ -1031,7 +1035,7 @@
       "image": "https://shop.plexiwire.com.ua/content/images/27/1800x1800l80mc100/abs-plus-grey-300-55998817691287.webp",
       "inStock": true,
       "name": "ABS+ пластик для 3D принтера сірий 300м / 0.75кг / 1.75мм",
-      "checkedAt": "2026-05-08T15:21:57.244Z"
+      "checkedAt": "2026-05-08T15:50:37.881Z"
     },
     {
       "store": "plexiwire",
@@ -1050,7 +1054,7 @@
       "image": "https://shop.plexiwire.com.ua/content/images/12/1800x1800l80mc100/asa-blue-400-92364776829441.webp",
       "inStock": true,
       "name": "ASA пластик для 3D принтера синій 400м / 1кг / 1.75мм",
-      "checkedAt": "2026-05-08T15:21:57.244Z"
+      "checkedAt": "2026-05-08T15:50:37.881Z"
     },
     {
       "store": "plexiwire",
@@ -1069,7 +1073,7 @@
       "image": "https://shop.plexiwire.com.ua/content/images/18/1800x1800l80mc100/asa-red-400-62621007860404.webp",
       "inStock": true,
       "name": "ASA пластик для 3D принтера червоний 400м / 1кг / 1.75мм",
-      "checkedAt": "2026-05-08T15:21:57.244Z"
+      "checkedAt": "2026-05-08T15:50:37.881Z"
     },
     {
       "store": "plexiwire",
@@ -1088,7 +1092,7 @@
       "image": "https://shop.plexiwire.com.ua/content/images/16/1800x1800l80mc100/asa-green-300-87445508631738.webp",
       "inStock": true,
       "name": "ASA пластик для 3D принтера зелений 300м / 0.75кг / 1.75мм",
-      "checkedAt": "2026-05-08T15:21:57.244Z"
+      "checkedAt": "2026-05-08T15:50:37.881Z"
     },
     {
       "store": "plexiwire",
@@ -1107,7 +1111,7 @@
       "image": "https://shop.plexiwire.com.ua/content/images/8/1800x1800l80mc100/asa-white-100-20436458149727.webp",
       "inStock": true,
       "name": "ASA пластик для 3D принтера білий 100м / 0.25кг / 1.75мм",
-      "checkedAt": "2026-05-08T15:21:57.244Z"
+      "checkedAt": "2026-05-08T15:50:37.881Z"
     },
     {
       "store": "plexiwire",
@@ -1126,7 +1130,7 @@
       "image": "https://shop.plexiwire.com.ua/content/images/26/1800x1800l80mc100/asa-gray-100-12097982658549.webp",
       "inStock": true,
       "name": "ASA пластик для 3D принтера сірий 100м / 0.25кг / 1.75мм",
-      "checkedAt": "2026-05-08T15:21:57.244Z"
+      "checkedAt": "2026-05-08T15:50:37.881Z"
     },
     {
       "store": "plexiwire",
@@ -1145,7 +1149,7 @@
       "image": "https://shop.plexiwire.com.ua/content/images/9/1800x1800l80mc100/asa-black-400-36524236578370.webp",
       "inStock": false,
       "name": "ASA пластик для 3D принтера чорний 400м / 1кг / 1.75мм",
-      "checkedAt": "2026-05-08T15:21:57.244Z"
+      "checkedAt": "2026-05-08T15:50:37.881Z"
     },
     {
       "store": "plexiwire",
@@ -1164,7 +1168,7 @@
       "image": "https://shop.plexiwire.com.ua/content/images/21/1800x1800l80mc100/asa-khaki-400-72198026910838.webp",
       "inStock": false,
       "name": "ASA пластик для 3D принтера хакі 400м / 1кг / 1.75мм",
-      "checkedAt": "2026-05-08T15:21:57.244Z"
+      "checkedAt": "2026-05-08T15:50:37.881Z"
     },
     {
       "store": "plexiwire",
@@ -1183,7 +1187,7 @@
       "image": "https://shop.plexiwire.com.ua/content/images/3/1800x1800l80mc100/flex-natural-200-93364403560956.webp",
       "inStock": true,
       "name": "FLEX 90 пластик для 3D принтера натуральний 200м / 0.6кг / 1.75мм",
-      "checkedAt": "2026-05-08T15:21:57.244Z"
+      "checkedAt": "2026-05-08T15:50:37.881Z"
     },
     {
       "store": "plexiwire",
@@ -1202,7 +1206,7 @@
       "image": "https://shop.plexiwire.com.ua/content/images/3/1800x1800l80mc100/flex-red-100-31796882866036.webp",
       "inStock": true,
       "name": "FLEX 90 пластик для 3D принтера червоний 100м / 0.3кг / 1.75мм",
-      "checkedAt": "2026-05-08T15:21:57.244Z"
+      "checkedAt": "2026-05-08T15:50:37.881Z"
     },
     {
       "store": "plexiwire",
@@ -1221,7 +1225,7 @@
       "image": "https://shop.plexiwire.com.ua/content/images/7/1800x1800l80mc100/flex-green-100-52362996270649.webp",
       "inStock": true,
       "name": "FLEX 90 пластик для 3D принтера зелений 100м / 0.3кг / 1.75мм",
-      "checkedAt": "2026-05-08T15:21:57.244Z"
+      "checkedAt": "2026-05-08T15:50:37.881Z"
     },
     {
       "store": "plexiwire",
@@ -1240,7 +1244,7 @@
       "image": "https://shop.plexiwire.com.ua/content/images/8/1800x1800l80mc100/flex-yellow-100-19934581481391.webp",
       "inStock": true,
       "name": "FLEX 90 пластик для 3D принтера жовтий 100м / 0.3кг / 1.75мм",
-      "checkedAt": "2026-05-08T15:21:57.244Z"
+      "checkedAt": "2026-05-08T15:50:37.881Z"
     },
     {
       "store": "plexiwire",
@@ -1259,7 +1263,7 @@
       "image": "https://shop.plexiwire.com.ua/content/images/15/1800x1800l80mc100/flex-blue-300-76749559155592.webp",
       "inStock": false,
       "name": "FLEX 90 пластик для 3D принтера синій 300м / 0.9кг / 1.75мм",
-      "checkedAt": "2026-05-08T15:21:57.244Z"
+      "checkedAt": "2026-05-08T15:50:37.881Z"
     },
     {
       "store": "plexiwire",
@@ -1278,7 +1282,7 @@
       "image": "https://shop.plexiwire.com.ua/content/images/17/1800x1800l80mc100/flex-orange-300-24423800063158.webp",
       "inStock": false,
       "name": "FLEX 90 пластик для 3D принтера помаранчевий 300м / 0.9кг / 1.75мм",
-      "checkedAt": "2026-05-08T15:21:57.244Z"
+      "checkedAt": "2026-05-08T15:50:37.881Z"
     },
     {
       "store": "plexiwire",
@@ -1297,7 +1301,7 @@
       "image": "https://shop.plexiwire.com.ua/content/images/19/1800x1800l80mc100/flex-gray-300-32854225129741.webp",
       "inStock": false,
       "name": "FLEX 90 пластик для 3D принтера сірий 300м / 0.9кг / 1.75мм",
-      "checkedAt": "2026-05-08T15:21:57.244Z"
+      "checkedAt": "2026-05-08T15:50:37.881Z"
     },
     {
       "store": "plexiwire",
@@ -1316,7 +1320,7 @@
       "image": "https://shop.plexiwire.com.ua/content/images/17/1800x1800l80mc100/22833407420606.webp",
       "inStock": true,
       "name": "NYLON CF10 пластик для 3D принтера чорний 200м / 0.55кг / 1.75мм",
-      "checkedAt": "2026-05-08T15:21:57.244Z"
+      "checkedAt": "2026-05-08T15:50:37.881Z"
     },
     {
       "store": "plexiwire",
@@ -1335,7 +1339,7 @@
       "image": "https://shop.plexiwire.com.ua/content/images/34/1800x1800l80mc100/46772417887904.webp",
       "inStock": true,
       "name": "NYLON пластик для 3D принтера натуральний 200м / 0.55кг / 1.75мм",
-      "checkedAt": "2026-05-08T15:21:57.244Z"
+      "checkedAt": "2026-05-08T15:50:37.881Z"
     },
     {
       "store": "plexiwire",
@@ -1354,7 +1358,7 @@
       "image": "https://shop.plexiwire.com.ua/content/images/36/1800x1800l80mc100/60616512365728.webp",
       "inStock": true,
       "name": "NYLON пластик для 3D принтера чорний 200м / 0.55кг / 1.75мм",
-      "checkedAt": "2026-05-08T15:21:57.244Z"
+      "checkedAt": "2026-05-08T15:50:37.881Z"
     },
     {
       "store": "plexiwire",
@@ -1373,7 +1377,7 @@
       "image": "https://shop.plexiwire.com.ua/content/images/50/1800x1800l80mc100/pla-cf10-black-100-88407772661273.webp",
       "inStock": true,
       "name": "PLA CF10 пластик для 3D принтера чорний 100м / 0.3кг / 1.75мм",
-      "checkedAt": "2026-05-08T15:21:57.244Z"
+      "checkedAt": "2026-05-08T15:50:37.881Z"
     },
     {
       "store": "plexiwire",
@@ -1392,7 +1396,7 @@
       "image": "https://shop.plexiwire.com.ua/content/images/48/1800x1800l80mc100/pla-cf10-black-200-97339761001410.webp",
       "inStock": false,
       "name": "PLA CF10 пластик для 3D принтера чорний 200м / 0.6кг / 1.75мм",
-      "checkedAt": "2026-05-08T15:21:57.244Z"
+      "checkedAt": "2026-05-08T15:50:37.881Z"
     },
     {
       "store": "plexiwire",
@@ -1411,7 +1415,7 @@
       "image": "https://shop.plexiwire.com.ua/content/images/24/1800x1800l80mc100/18642003347922.webp",
       "inStock": true,
       "name": "PETG CF10 пластик для 3D принтера чорний 400м / 1.2кг / 1.75мм",
-      "checkedAt": "2026-05-08T15:21:57.244Z"
+      "checkedAt": "2026-05-08T15:50:37.881Z"
     },
     {
       "store": "plexiwire",
@@ -1430,7 +1434,7 @@
       "image": "https://shop.plexiwire.com.ua/content/images/36/1800x1800l80mc100/abs-cf10-black-100-49145033277497.webp",
       "inStock": true,
       "name": "ABS CF 10 пластик для 3D принтера чорний 100м / 0,25кг / 1.75мм",
-      "checkedAt": "2026-05-08T15:21:57.244Z"
+      "checkedAt": "2026-05-08T15:50:37.881Z"
     },
     {
       "store": "plexiwire",
@@ -1449,7 +1453,387 @@
       "image": "https://shop.plexiwire.com.ua/content/images/35/1800x1800l80mc100/abs-cf10-black-200-59102734038519.webp",
       "inStock": false,
       "name": "ABS CF 10 пластик для 3D принтера чорний 200м / 0,5кг / 1.75мм",
-      "checkedAt": "2026-05-08T15:21:57.244Z"
+      "checkedAt": "2026-05-08T15:50:37.881Z"
+    },
+    {
+      "store": "lbl-corp",
+      "storeType": "manufacturer",
+      "brand": "LBL",
+      "material": "PLA",
+      "color": "зелений",
+      "weightKg": 0.8,
+      "lengthM": 260,
+      "diameterMm": 1.75,
+      "pricePerSpool": 384,
+      "pricePerKg": 480,
+      "currency": "UAH",
+      "sku": "lbl_pla_800_Green",
+      "url": "https://lbl-corp.com/pla-plastyk-dlia-3d-pryntera-zelenyi-0.800-kh-230-m-1.75-mm/",
+      "image": "https://lbl-corp.com/content/images/10/1800x1445l80mc0/pla-plastyk-dlia-3d-pryntera-zelenyi-0.800-kh-230-m-1.75-mm-69982719959117.webp",
+      "inStock": true,
+      "name": "PLA філамент Зелений пластик для 3D принтера 0.800 кг / 260 м / 1.75 мм lbl_pla_800_Green фото",
+      "checkedAt": "2026-05-08T15:50:37.881Z"
+    },
+    {
+      "store": "lbl-corp",
+      "storeType": "manufacturer",
+      "brand": "LBL",
+      "material": "PETG",
+      "color": "помаранчевий",
+      "weightKg": 3,
+      "lengthM": 960,
+      "diameterMm": 1.75,
+      "pricePerSpool": 1182,
+      "pricePerKg": 394,
+      "currency": "UAH",
+      "sku": "lbl_pet_3kg_Orange",
+      "url": "https://lbl-corp.com/copet-plastyk-dlia-3d-pryntera-3.0-kh-960-m-1.75-mm-pomaranchevyi/",
+      "image": "https://lbl-corp.com/content/images/27/1800x1650l80mc0/copet-plastyk-dlia-3d-pryntera-3.0-kh-960-m-1.75-mm-hrafyt-82838060999200.webp",
+      "inStock": true,
+      "name": "CoPET (PETG) філамент Помаранчевий пластик для 3D принтера 3.0 кг / 960 м / 1.75 мм lbl_pet_3kg_Orange фото",
+      "checkedAt": "2026-05-08T15:50:37.881Z"
+    },
+    {
+      "store": "lbl-corp",
+      "storeType": "manufacturer",
+      "brand": "LBL",
+      "material": "PETG",
+      "color": "білий",
+      "weightKg": 3,
+      "lengthM": 960,
+      "diameterMm": 1.75,
+      "pricePerSpool": 1182,
+      "pricePerKg": 394,
+      "currency": "UAH",
+      "sku": "lbl_pet_3kg_White",
+      "url": "https://lbl-corp.com/petg-3-kh-bilyi/",
+      "image": "https://lbl-corp.com/content/images/28/1800x1671l80mc0/copet-plastyk-dlia-3d-pryntera-3.0-kh-960-m-1.75-mm-14360178494117.webp",
+      "inStock": true,
+      "name": "CoPET (PETG) філамент Білий пластик для 3D принтера 3.0 кг / 960 м / 1.75 мм lbl_pet_3kg_White фото",
+      "checkedAt": "2026-05-08T15:50:37.881Z"
+    },
+    {
+      "store": "lbl-corp",
+      "storeType": "manufacturer",
+      "brand": "LBL",
+      "material": "PETG",
+      "color": "чорний",
+      "weightKg": 0.8,
+      "lengthM": 260,
+      "diameterMm": 1.75,
+      "pricePerSpool": 360,
+      "pricePerKg": 450,
+      "currency": "UAH",
+      "sku": "lbl_pet_800_Black",
+      "url": "https://lbl-corp.com/copet-petg-plastyk-dlia-3d-pryntera-0.800-kh-260-m-1.75-mm-chornyi/",
+      "image": "https://lbl-corp.com/content/images/30/1800x1445l80mc0/copet-petg-plastyk-dlia-3d-pryntera-0.800-kh-260-m-1.75-mm-chornyi-42294004911663.webp",
+      "inStock": true,
+      "name": "CoPET (PETG) філамент Чорний пластик для 3D принтера 0.800 кг / 260 м / 1.75 мм lbl_pet_800_Black фото",
+      "checkedAt": "2026-05-08T15:50:37.881Z"
+    },
+    {
+      "store": "lbl-corp",
+      "storeType": "manufacturer",
+      "brand": "LBL",
+      "material": "PETG",
+      "color": "червоний",
+      "weightKg": 3,
+      "lengthM": 960,
+      "diameterMm": 1.75,
+      "pricePerSpool": 1182,
+      "pricePerKg": 394,
+      "currency": "UAH",
+      "sku": "lbl_pet_3kg_Red",
+      "url": "https://lbl-corp.com/petg-3-kh-chervonyi/",
+      "image": "https://lbl-corp.com/content/images/47/1800x1650l80mc0/copet-plastyk-dlia-3d-pryntera-3.0-kh-960-m-1.75-mm-chervonyi-95295923801839.webp",
+      "inStock": true,
+      "name": "CoPET (PETG) філамент Червоний пластик для 3D принтера 3.0 кг / 960 м / 1.75 мм lbl_pet_3kg_Red фото",
+      "checkedAt": "2026-05-08T15:50:37.881Z"
+    },
+    {
+      "store": "lbl-corp",
+      "storeType": "manufacturer",
+      "brand": "LBL",
+      "material": "PETG",
+      "color": "синій",
+      "weightKg": 3,
+      "lengthM": 960,
+      "diameterMm": 1.75,
+      "pricePerSpool": 1182,
+      "pricePerKg": 394,
+      "currency": "UAH",
+      "sku": "lbl_pet_3kg_Blue",
+      "url": "https://lbl-corp.com/copet-plastyk-synii-dlia-3d-pryntera-3.0-kh-960-m-1.75-mm/",
+      "image": "https://lbl-corp.com/content/images/2/1800x1653l80mc0/copet-plastyk-synii-dlia-3d-pryntera-3.0-kh-960-m-1.75-mm-27512373247827.webp",
+      "inStock": true,
+      "name": "CoPET (PETG) філамент Синій пластик для 3D принтера 3.0 кг / 960 м / 1.75 мм lbl_pet_3kg_Blue фото",
+      "checkedAt": "2026-05-08T15:50:37.881Z"
+    },
+    {
+      "store": "lbl-corp",
+      "storeType": "manufacturer",
+      "brand": "LBL",
+      "material": "PETG",
+      "color": "перехідний",
+      "weightKg": 3,
+      "lengthM": 960,
+      "diameterMm": 1.75,
+      "pricePerSpool": 999,
+      "pricePerKg": 333,
+      "currency": "UAH",
+      "sku": "lbl_pet_3kg_Perehidniy",
+      "url": "https://lbl-corp.com/copet-plastyk-perekhidnyi-dlia-3d-pryntera-3.0-kh-960-m-1.75-mm/",
+      "image": "https://lbl-corp.com/content/images/4/1800x1777l80mc0/copet-plastyk-perekhidnyi-dlia-3d-pryntera-3.0-kh-960-m-1.75-mm-90222389971646.webp",
+      "inStock": true,
+      "name": "CoPET (PETG) філамент Перехідний пластик для 3D принтера 3.0 кг / 960 м / 1.75 мм lbl_pet_3kg_Perehidniy фото",
+      "checkedAt": "2026-05-08T15:50:37.881Z"
+    },
+    {
+      "store": "lbl-corp",
+      "storeType": "manufacturer",
+      "brand": "LBL",
+      "material": "PETG",
+      "color": "помаранчевий",
+      "weightKg": 1,
+      "lengthM": 330,
+      "diameterMm": 1.75,
+      "pricePerSpool": 420,
+      "pricePerKg": 420,
+      "currency": "UAH",
+      "sku": "lbl_pet_1kg_Orange",
+      "url": "https://lbl-corp.com/petg-ws-1-kh-pomaranchevyi/",
+      "image": "https://lbl-corp.com/content/images/34/1800x1800l80mc0/75229876276500.webp",
+      "inStock": true,
+      "name": "CoPET (PETG) філамент Помаранчевий пластик для 3D принтера 1.0 кг / 330 м / 1.75 мм lbl_pet_1kg_Orange фото",
+      "checkedAt": "2026-05-08T15:50:37.881Z"
+    },
+    {
+      "store": "lbl-corp",
+      "storeType": "manufacturer",
+      "brand": "LBL",
+      "material": "PETG",
+      "color": "синій",
+      "weightKg": 1,
+      "lengthM": 330,
+      "diameterMm": 1.75,
+      "pricePerSpool": 420,
+      "pricePerKg": 420,
+      "currency": "UAH",
+      "sku": "lbl_pet_1kg_Blue",
+      "url": "https://lbl-corp.com/petg-ws-1-kh-synii/",
+      "image": "https://lbl-corp.com/content/images/40/1800x1800l80mc0/95452832458500.webp",
+      "inStock": true,
+      "name": "CoPET (PETG) філамент Синій пластик для 3D принтера 1.0 кг / 330 м / 1.75 мм lbl_pet_1kg_Blue фото",
+      "checkedAt": "2026-05-08T15:50:37.881Z"
+    },
+    {
+      "store": "lbl-corp",
+      "storeType": "manufacturer",
+      "brand": "LBL",
+      "material": "PLA",
+      "color": "мятний",
+      "weightKg": 0.8,
+      "lengthM": 260,
+      "diameterMm": 1.75,
+      "pricePerSpool": 384,
+      "pricePerKg": 480,
+      "currency": "UAH",
+      "sku": "lbl_pla_800_Mint",
+      "url": "https://lbl-corp.com/pla-pla-plastyk-miatnyi-dlia-3d-pryntera-0.800-kh-260-m-1.75-mm/",
+      "image": "https://lbl-corp.com/content/images/4/456x547l80mc0/pla-pla-plastyk-miatnyi-dlia-3d-pryntera-0.800-kh-260-m-1.75-mm-87941802583797.webp",
+      "inStock": true,
+      "name": "PLA філамент Мятний пластик для 3D принтера 0.800 кг / 260 м / 1.75 мм lbl_pla_800_Mint фото",
+      "checkedAt": "2026-05-08T15:50:37.881Z"
+    },
+    {
+      "store": "lbl-corp",
+      "storeType": "manufacturer",
+      "brand": "LBL",
+      "material": "PETG",
+      "color": "чорний",
+      "weightKg": 0.8,
+      "lengthM": 260,
+      "diameterMm": 1.75,
+      "pricePerSpool": 354,
+      "pricePerKg": 442.5,
+      "currency": "UAH",
+      "sku": "lbl_pet_WS_800_Black",
+      "url": "https://lbl-corp.com/copet-petg-plastyk-chornyi-dlia-3d-pryntera-0.800-kh-260-m-1.75-mm/",
+      "image": "https://lbl-corp.com/content/images/26/1800x1445l80mc0/97058982674015.webp",
+      "inStock": true,
+      "name": "PETG WS філамент Чорний пластик для 3D принтера 0.800 кг / 260 м / 1.75 мм lbl_pet_WS_800_Black фото",
+      "checkedAt": "2026-05-08T15:50:37.881Z"
+    },
+    {
+      "store": "lbl-corp",
+      "storeType": "manufacturer",
+      "brand": "LBL",
+      "material": "PETG",
+      "color": "пляшковий (прозорий)",
+      "weightKg": 1,
+      "lengthM": 330,
+      "diameterMm": 1.75,
+      "pricePerSpool": 411,
+      "pricePerKg": 411,
+      "currency": "UAH",
+      "sku": "lbl_pet_WS_1kg_Bottle",
+      "url": "https://lbl-corp.com/copy_copet-petg-filament-pliashkovyi-prozoryi-plastyk-dlia-3d-pryntera-1.0-kh-330-m-1.75-mm/",
+      "image": "https://lbl-corp.com/content/images/9/1800x1800l80mc0/93622166753016.webp",
+      "inStock": true,
+      "name": "PETG WS філамент Пляшковий (прозорий) пластик для 3D принтера 1.0 кг / 330 м / 1.75 мм lbl_pet_WS_1kg_Bottle фото",
+      "checkedAt": "2026-05-08T15:50:37.881Z"
+    },
+    {
+      "store": "lbl-corp",
+      "storeType": "manufacturer",
+      "brand": "LBL",
+      "material": "PETG",
+      "color": "зелений",
+      "weightKg": 1,
+      "lengthM": 330,
+      "diameterMm": 1.75,
+      "pricePerSpool": 411,
+      "pricePerKg": 411,
+      "currency": "UAH",
+      "sku": "lbl_pet_WS_1kg_Green",
+      "url": "https://lbl-corp.com/copy_copet-petg-filament-zelenyi-plastyk-dlia-3d-pryntera-1.0-kh-330-m-1.75-mm/",
+      "image": "https://lbl-corp.com/content/images/19/1800x1800l80mc0/39617737708720.webp",
+      "inStock": true,
+      "name": "PETG WS філамент Зелений пластик для 3D принтера 1.0 кг / 330 м / 1.75 мм lbl_pet_WS_1kg_Green фото",
+      "checkedAt": "2026-05-08T15:50:37.881Z"
+    },
+    {
+      "store": "lbl-corp",
+      "storeType": "manufacturer",
+      "brand": "LBL",
+      "material": "PLA",
+      "color": "сірий",
+      "weightKg": 0.8,
+      "lengthM": 260,
+      "diameterMm": 1.75,
+      "pricePerSpool": 384,
+      "pricePerKg": 480,
+      "currency": "UAH",
+      "sku": "lbl_pla_800_Gray",
+      "url": "https://lbl-corp.com/pla-plastyk-dlia-3d-pryntera-siryi-0.800-kh-230-m-1.75-mm/",
+      "image": "https://lbl-corp.com/content/images/50/1800x1460l80mc0/pla-plastyk-dlia-3d-pryntera-siryi-0.800-kh-230-m-1.75-mm-91024060647385.webp",
+      "inStock": false,
+      "name": "PLA філамент Сірий пластик для 3D принтера 0.800 кг / 260 м / 1.75 мм lbl_pla_800_Gray фото",
+      "checkedAt": "2026-05-08T15:50:37.881Z"
+    },
+    {
+      "store": "lbl-corp",
+      "storeType": "manufacturer",
+      "brand": "LBL",
+      "material": "PLA",
+      "color": "білий",
+      "weightKg": 0.8,
+      "lengthM": 260,
+      "diameterMm": 1.75,
+      "pricePerSpool": 384,
+      "pricePerKg": 480,
+      "currency": "UAH",
+      "sku": "lbl_pla_800_White",
+      "url": "https://lbl-corp.com/pla-plastyk-dlia-3d-pryntera-bilyi-0.800-kh-230-m-1.75-mm/",
+      "image": "https://lbl-corp.com/content/images/1/1800x1415l80mc0/pla-plastyk-dlia-3d-pryntera-bilyi-0.800-kh-230-m-1.75-mm-25846874659058.webp",
+      "inStock": false,
+      "name": "PLA філамент Білий пластик для 3D принтера 0.800 кг / 260 м / 1.75 мм lbl_pla_800_White фото",
+      "checkedAt": "2026-05-08T15:50:37.881Z"
+    },
+    {
+      "store": "lbl-corp",
+      "storeType": "manufacturer",
+      "brand": "LBL",
+      "material": "PLA",
+      "color": "синій",
+      "weightKg": 0.8,
+      "lengthM": 260,
+      "diameterMm": 1.75,
+      "pricePerSpool": 384,
+      "pricePerKg": 480,
+      "currency": "UAH",
+      "sku": "lbl_pla_800_Blue",
+      "url": "https://lbl-corp.com/pla-plastyk-dlia-3d-pryntera-synii-0.800-kh-230-m-1.75-mm/",
+      "image": "https://lbl-corp.com/content/images/2/1214x1800l80mc0/pla-plastyk-dlia-3d-pryntera-synii-0.800-kh-230-m-1.75-mm-96806085334333.webp",
+      "inStock": false,
+      "name": "PLA філамент Синій пластик для 3D принтера / 0.800 кг / 260 м / 1.75 мм lbl_pla_800_Blue фото",
+      "checkedAt": "2026-05-08T15:50:37.881Z"
+    },
+    {
+      "store": "lbl-corp",
+      "storeType": "manufacturer",
+      "brand": "LBL",
+      "material": "PLA",
+      "color": "червоний",
+      "weightKg": 0.8,
+      "lengthM": 260,
+      "diameterMm": 1.75,
+      "pricePerSpool": 384,
+      "pricePerKg": 480,
+      "currency": "UAH",
+      "sku": "lbl_pla_800_Red",
+      "url": "https://lbl-corp.com/pla-plastyk-dlia-3d-pryntera-chervonyi-0.800-kh-230-m-1.75-mm/",
+      "image": "https://lbl-corp.com/content/images/6/1800x1397l80mc0/pla-plastyk-dlia-3d-pryntera-chervonyi-0.800-kh-230-m-1.75-mm-86017173910116.webp",
+      "inStock": false,
+      "name": "PLA філамент Червоний пластик для 3D принтера 0.800 кг / 260 м / 1.75 мм lbl_pla_800_Red фото",
+      "checkedAt": "2026-05-08T15:50:37.881Z"
+    },
+    {
+      "store": "lbl-corp",
+      "storeType": "manufacturer",
+      "brand": "LBL",
+      "material": "PLA",
+      "color": "помаранчевий",
+      "weightKg": 0.8,
+      "lengthM": 260,
+      "diameterMm": 1.75,
+      "pricePerSpool": 384,
+      "pricePerKg": 480,
+      "currency": "UAH",
+      "sku": "lbl_pla_800_Orange",
+      "url": "https://lbl-corp.com/pla-plastyk-dlia-3d-pryntera-pomaranchevyi-0.800-kh-230-m-1.75-mm/",
+      "image": "https://lbl-corp.com/content/images/7/1800x1422l80mc0/pla-plastyk-dlia-3d-pryntera-pomaranchevyi-0.800-kh-230-m-1.75-mm-93102366704338.webp",
+      "inStock": false,
+      "name": "PLA філамент Помаранчевий пластик для 3D принтера 0.800 кг / 260 м / 1.75 мм lbl_pla_800_Orange фото",
+      "checkedAt": "2026-05-08T15:50:37.881Z"
+    },
+    {
+      "store": "lbl-corp",
+      "storeType": "manufacturer",
+      "brand": "LBL",
+      "material": "PLA",
+      "color": "хакі",
+      "weightKg": 0.8,
+      "lengthM": 260,
+      "diameterMm": 1.75,
+      "pricePerSpool": 384,
+      "pricePerKg": 480,
+      "currency": "UAH",
+      "sku": "lbl_pla_800_Hacks",
+      "url": "https://lbl-corp.com/pla-plastyk-dlia-3d-pryntera-khaki-0.800-kh-230-m-1.75-mm/",
+      "image": "https://lbl-corp.com/content/images/11/1800x1406l80mc0/pla-plastyk-dlia-3d-pryntera-khaki-0.800-kh-230-m-1.75-mm-96236447253623.webp",
+      "inStock": false,
+      "name": "PLA філамент Хакі пластик для 3D принтера 0.800 кг / 260 м / 1.75 мм lbl_pla_800_Hacks фото",
+      "checkedAt": "2026-05-08T15:50:37.881Z"
+    },
+    {
+      "store": "lbl-corp",
+      "storeType": "manufacturer",
+      "brand": "LBL",
+      "material": "PLA",
+      "color": "коричневий",
+      "weightKg": 0.8,
+      "lengthM": 260,
+      "diameterMm": 1.75,
+      "pricePerSpool": 384,
+      "pricePerKg": 480,
+      "currency": "UAH",
+      "sku": "lbl_pla_800_Brown",
+      "url": "https://lbl-corp.com/pla-plastyk-dlia-3d-pryntera-korychnevyi-0.800-kh-230-m-1.75-mm/",
+      "image": "https://lbl-corp.com/content/images/12/1800x1443l80mc0/pla-plastyk-dlia-3d-pryntera-korychnevyi-0.800-kh-230-m-1.75-mm-31166412922320.webp",
+      "inStock": false,
+      "name": "PLA філамент Коричневий пластик для 3D принтера 0.800 кг / 260 м / 1.75 мм lbl_pla_800_Brown фото",
+      "checkedAt": "2026-05-08T15:50:37.881Z"
     }
   ],
   "errors": []
