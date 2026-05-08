@@ -65,10 +65,21 @@ if (sameAs.length > 0) localBusiness.sameAs = sameAs;
 const typeLabel = company.type === 'manufacturer' ? 'Виробник' : 'Магазин';
 const title = `${company.name} — ${typeLabel} філаменту в ${company.city} | 3D Filament UA`;
 const description = `${company.name}: ${company.description} Матеріали: ${company.materials.join(', ')}. Місто: ${company.city}.`;
+
+const SITE = 'https://3d-filament.pages.dev';
+const breadcrumbs = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Головна', item: SITE + '/' },
+    { '@type': 'ListItem', position: 2, name: company.name, item: `${SITE}/company/${company.id}/` },
+  ],
+};
 ---
 
 <Layout title={title} description={description}>
   <script type="application/ld+json" set:html={JSON.stringify(localBusiness)} />
+  <script type="application/ld+json" set:html={JSON.stringify(breadcrumbs)} />
 
   <div style="margin-bottom: 20px;">
     <a href="/" class="back-link">← Назад до каталогу</a>
