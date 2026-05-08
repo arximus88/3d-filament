@@ -1,0 +1,691 @@
+---
+import Layout from '../layouts/Layout.astro';
+import productsData from '../data/products.json';
+
+interface Product {
+  store: string;
+  storeType: string;
+  brand: string;
+  material: string;
+  color: string | null;
+  weightKg: number | null;
+  lengthM: number | null;
+  diameterMm: number | null;
+  pricePerSpool: number | null;
+  pricePerKg: number | null;
+  currency: string;
+  sku: string | null;
+  url: string;
+  image: string | null;
+  inStock: boolean | null;
+  name: string | null;
+  checkedAt?: string;
+}
+
+const data = productsData as { lastChecked: string; products: Product[]; stats: Record<string, { products: number }> };
+const products = data.products;
+const lastChecked = data.lastChecked;
+
+const materials = [...new Set(products.map(p => p.material))].sort();
+const brands = [...new Set(products.map(p => p.brand))].sort();
+const colors = [...new Set(products.map(p => p.color).filter((c): c is string => !!c))].sort();
+const storeCount = Object.keys(data.stats ?? {}).length;
+
+// Hex map for Ukrainian colour names. Falls back to a neutral grey on miss.
+const COLOR_HEX: Record<string, string> = {
+  'білий': '#ffffff',
+  'натуральний': '#f5deb3',
+  'жовтий': '#ffd400',
+  'золото': '#d4af37',
+  'помаранчевий': '#ff8c00',
+  'червоний': '#d92020',
+  'бордовий': '#800020',
+  'рожевий': '#ff69b4',
+  'фіолетовий': '#7b2cbf',
+  'синій': '#1e3a8a',
+  'блакитний': '#5cb6e6',
+  'бірюзовий': '#1abc9c',
+  'зелений': '#2e8b57',
+  'салатовий': '#98e26b',
+  'хакі': '#5d6634',
+  'коричневий': '#8b4513',
+  'бронза': '#cd7f32',
+  'мідь': '#b87333',
+  'срібло': '#c0c0c0',
+  'сталь': '#71797e',
+  'сірий': '#808080',
+  'чорний': '#1a1a1a',
+};
+function colorHex(name: string): string {
+  return COLOR_HEX[name.toLowerCase()] ?? '#999';
+}
+
+function relativeTime(iso: string | null): string {
+  if (!iso) return 'дані ще не зібрано';
+  const diff = Date.now() - new Date(iso).getTime();
+  const hours = Math.round(diff / 3_600_000);
+  if (hours < 1) return 'оновлено щойно';
+  if (hours < 24) return `оновлено ${hours} год тому`;
+  const days = Math.round(hours / 24);
+  return `оновлено ${days} дн тому`;
+}
+---
+
+<Layout
+  title="Каталог філаменту — ціни і наявність по українських магазинах"
+  description="Агрегатор пластиків для 3D-друку: PLA, PETG, ABS та інші. Порівняння цін за катушку та за кг, фільтри за матеріалом, кольором, брендом."
+>
+  <header class="catalog-header">
+    <h1>Каталог філаменту</h1>
+    <p class="subtitle">{products.length} товарів від {storeCount} {storeCount === 1 ? 'магазину' : 'магазинів'} • {relativeTime(lastChecked)}</p>
+  </header>
+
+  <div class="filter-section">
+    <div class="filter-controls">
+      <div class="filter-group search-box">
+        <label for="search">Пошук</label>
+        <input type="text" id="search" placeholder="Назва, артикул, колір..." autocomplete="off" />
+      </div>
+      <div class="filter-group">
+        <label for="materialFilter">Матеріал</label>
+        <select id="materialFilter">
+          <option value="all">Всі</option>
+          {materials.map(m => <option value={m}>{m}</option>)}
+        </select>
+      </div>
+      <div class="filter-group">
+        <label for="brandFilter">Бренд</label>
+        <select id="brandFilter">
+          <option value="all">Всі</option>
+          {brands.map(b => <option value={b}>{b}</option>)}
+        </select>
+      </div>
+      <div class="filter-group">
+        <label for="colorFilter">Колір</label>
+        <details class="color-dropdown" id="colorDropdown">
+          <summary id="colorSummary">
+            <span class="swatch swatch-all" aria-hidden="true"></span>
+            <span class="color-label">Всі</span>
+          </summary>
+          <div class="color-menu">
+            <button type="button" class="color-option" data-value="all">
+              <span class="swatch swatch-all" aria-hidden="true"></span>
+              <span>Всі</span>
+            </button>
+            {colors.map(c => (
+              <button type="button" class="color-option" data-value={c}>
+                <span class="swatch" style={`background:${colorHex(c)}`} aria-hidden="true"></span>
+                <span>{c}</span>
+              </button>
+            ))}
+          </div>
+        </details>
+        <input type="hidden" id="colorFilter" value="all" />
+      </div>
+      <div class="filter-group">
+        <label for="sortFilter">Сортування</label>
+        <select id="sortFilter">
+          <option value="ppk_asc">Ціна за кг ↑</option>
+          <option value="ppk_desc">Ціна за кг ↓</option>
+          <option value="pps_asc">Ціна за катушку ↑</option>
+          <option value="pps_desc">Ціна за катушку ↓</option>
+          <option value="weight_desc">Вага ↓</option>
+        </select>
+      </div>
+      <div class="filter-group filter-stock">
+        <label for="inStockOnly" class="checkbox-label">
+          <input type="checkbox" id="inStockOnly" checked />
+          Тільки в наявності
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <div class="results-bar">
+    <div class="results-summary" id="resultsSummary"></div>
+    <div class="view-toggle" role="tablist" aria-label="Режим перегляду">
+      <button type="button" class="view-btn active" data-view="grid" aria-label="Сітка" title="Сітка">
+        <svg viewBox="0 0 16 16" width="16" height="16" fill="currentColor"><rect x="0" y="0" width="7" height="7" rx="1"/><rect x="9" y="0" width="7" height="7" rx="1"/><rect x="0" y="9" width="7" height="7" rx="1"/><rect x="9" y="9" width="7" height="7" rx="1"/></svg>
+        <span>Сітка</span>
+      </button>
+      <button type="button" class="view-btn" data-view="table" aria-label="Таблиця" title="Таблиця">
+        <svg viewBox="0 0 16 16" width="16" height="16" fill="currentColor"><rect x="0" y="2" width="16" height="2" rx="0.5"/><rect x="0" y="7" width="16" height="2" rx="0.5"/><rect x="0" y="12" width="16" height="2" rx="0.5"/></svg>
+        <span>Таблиця</span>
+      </button>
+    </div>
+  </div>
+
+  <table class="product-table" id="productTable" hidden>
+    <thead>
+      <tr>
+        <th>Колір</th>
+        <th>Матеріал</th>
+        <th>Бренд</th>
+        <th>Назва</th>
+        <th>Вага</th>
+        <th>Діам.</th>
+        <th class="num">Ціна, грн</th>
+        <th class="num">Грн/кг</th>
+        <th>Наявність</th>
+      </tr>
+    </thead>
+    <tbody id="productTableBody">
+      {products.map(p => (
+        <tr
+          class="product-row"
+          data-material={p.material}
+          data-brand={p.brand}
+          data-color={p.color ?? ''}
+          data-instock={p.inStock === false ? '0' : '1'}
+          data-ppk={p.pricePerKg ?? 0}
+          data-pps={p.pricePerSpool ?? 0}
+          data-weight={p.weightKg ?? 0}
+          data-search={`${p.name ?? ''} ${p.sku ?? ''} ${p.color ?? ''} ${p.brand}`.toLowerCase()}
+        >
+          <td>
+            <span class="row-color">
+              {p.color && <span class="swatch swatch-sm" style={`background:${colorHex(p.color)}`} aria-hidden="true"></span>}
+              <span>{p.color ?? '—'}</span>
+            </span>
+          </td>
+          <td><span class="tag tag-material">{p.material}</span></td>
+          <td>{p.brand}</td>
+          <td><a class="row-link" href={p.url} target="_blank" rel="noopener noreferrer">{p.name ?? '—'}</a></td>
+          <td>{p.weightKg ? `${p.weightKg} кг` : '—'}</td>
+          <td>{p.diameterMm ? `${p.diameterMm} мм` : '—'}</td>
+          <td class="num">{p.pricePerSpool ?? '—'}</td>
+          <td class="num">{p.pricePerKg ?? '—'}</td>
+          <td>{p.inStock === true ? <span class="tag tag-in">В наявн.</span> : p.inStock === false ? <span class="tag tag-out">Немає</span> : '—'}</td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+
+  <div class="product-grid" id="productGrid">
+    {products.map(p => (
+      <article
+        class="product-card"
+        data-material={p.material}
+        data-brand={p.brand}
+        data-color={p.color ?? ''}
+        data-instock={p.inStock === false ? '0' : '1'}
+        data-ppk={p.pricePerKg ?? 0}
+        data-pps={p.pricePerSpool ?? 0}
+        data-weight={p.weightKg ?? 0}
+        data-search={`${p.name ?? ''} ${p.sku ?? ''} ${p.color ?? ''} ${p.brand}`.toLowerCase()}
+      >
+        <a class="product-card-link" href={p.url} target="_blank" rel="noopener noreferrer">
+          {p.image && (
+            <div class="product-image">
+              <img src={p.image} alt={p.name ?? p.material} loading="lazy" width="240" height="240" />
+            </div>
+          )}
+          <div class="product-info">
+            <div class="product-tags">
+              <span class="tag tag-material">{p.material}</span>
+              {p.color && <span class="tag tag-color">{p.color}</span>}
+              {p.inStock === false && <span class="tag tag-out">Немає</span>}
+              {p.inStock === true && <span class="tag tag-in">В наявності</span>}
+            </div>
+            <h3 class="product-name">{p.name ?? `${p.material} ${p.color ?? ''}`}</h3>
+            <div class="product-meta">
+              <span>{p.brand}</span>
+              {p.weightKg && <span>{p.weightKg}кг</span>}
+              {p.diameterMm && <span>{p.diameterMm}мм</span>}
+            </div>
+            <div class="product-price">
+              {p.pricePerSpool && (
+                <span class="price-spool">{p.pricePerSpool} {p.currency === 'UAH' ? 'грн' : p.currency}</span>
+              )}
+              {p.pricePerKg && (
+                <span class="price-kg">{p.pricePerKg} грн/кг</span>
+              )}
+            </div>
+          </div>
+        </a>
+      </article>
+    ))}
+  </div>
+
+  <div class="no-results" id="noResults" style="display:none">
+    <h3>Нічого не знайдено</h3>
+    <p>Спробуйте змінити фільтри.</p>
+  </div>
+</Layout>
+
+<style>
+  .catalog-header {
+    margin-bottom: 24px;
+  }
+  .catalog-header h1 {
+    font-size: 2rem;
+    margin: 0 0 8px;
+    color: var(--color-text-primary);
+  }
+  .catalog-header .subtitle {
+    margin: 0;
+    color: var(--color-text-secondary);
+    font-size: 0.95rem;
+  }
+  .filter-section {
+    background: var(--color-bg-secondary);
+    padding: 20px;
+    border-radius: var(--radius-lg);
+    margin-bottom: 20px;
+    border: 1px solid var(--color-border);
+  }
+  .filter-controls {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    align-items: flex-end;
+  }
+  .filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+  .filter-group label {
+    font-size: 0.85rem;
+    color: var(--color-text-secondary);
+    font-weight: 500;
+  }
+  .search-box { flex: 1; min-width: 220px; }
+  .filter-stock { justify-content: flex-end; }
+  .checkbox-label {
+    display: inline-flex; align-items: center; gap: 8px;
+    cursor: pointer; user-select: none;
+    color: var(--color-text-primary);
+    font-size: 0.95rem;
+    padding: 8px 0;
+  }
+  select, input[type="text"] {
+    padding: 8px 12px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border);
+    background: var(--color-bg-card);
+    color: var(--color-text-primary);
+    font-size: 0.95rem;
+    min-width: 140px;
+  }
+  .results-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .results-summary {
+    color: var(--color-text-secondary);
+    font-size: 0.9rem;
+  }
+  .view-toggle {
+    display: inline-flex;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    background: var(--color-bg-secondary);
+  }
+  .view-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: transparent;
+    color: var(--color-text-secondary);
+    border: 0;
+    padding: 8px 14px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background 0.15s, color 0.15s;
+  }
+  .view-btn + .view-btn { border-left: 1px solid var(--color-border); }
+  .view-btn:hover { color: var(--color-text-primary); }
+  .view-btn.active {
+    background: var(--color-bg-card);
+    color: var(--color-accent);
+  }
+  /* Color dropdown */
+  .color-dropdown {
+    position: relative;
+    min-width: 140px;
+  }
+  .color-dropdown summary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border);
+    background: var(--color-bg-card);
+    color: var(--color-text-primary);
+    cursor: pointer;
+    list-style: none;
+    font-size: 0.95rem;
+  }
+  .color-dropdown summary::-webkit-details-marker { display: none; }
+  .color-dropdown summary::after {
+    content: '▾';
+    margin-left: auto;
+    color: var(--color-text-secondary);
+    font-size: 0.7rem;
+  }
+  .color-menu {
+    position: absolute;
+    top: calc(100% + 4px); left: 0;
+    z-index: 10;
+    min-width: 180px;
+    max-height: 320px;
+    overflow-y: auto;
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: 6px;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .color-option {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    background: transparent;
+    border: 0;
+    padding: 6px 8px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    color: var(--color-text-primary);
+    font-size: 0.9rem;
+    text-align: left;
+  }
+  .color-option:hover { background: var(--color-bg-secondary); }
+  .color-option.active { background: var(--color-info-bg); color: var(--color-info); }
+  .swatch {
+    display: inline-block;
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    border: 1px solid var(--color-border);
+    flex-shrink: 0;
+  }
+  .swatch-sm { width: 12px; height: 12px; }
+  .swatch-all {
+    background: conic-gradient(#d92020, #ffd400, #2e8b57, #1e3a8a, #7b2cbf, #d92020);
+  }
+  /* Table */
+  .product-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--color-bg-secondary);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    font-size: 0.9rem;
+  }
+  .product-table th, .product-table td {
+    padding: 10px 12px;
+    text-align: left;
+    border-bottom: 1px solid var(--color-border);
+  }
+  .product-table thead th {
+    background: var(--color-bg-card);
+    color: var(--color-text-secondary);
+    font-weight: 600;
+    font-size: 0.85rem;
+    position: sticky; top: 0;
+  }
+  .product-table tbody tr:hover { background: var(--color-bg-card); }
+  .product-table tbody tr:last-child td { border-bottom: 0; }
+  .product-table .num { text-align: right; font-variant-numeric: tabular-nums; }
+  .row-color {
+    display: inline-flex; align-items: center; gap: 8px;
+  }
+  .row-link {
+    color: var(--color-text-primary);
+    text-decoration: none;
+  }
+  .row-link:hover { color: var(--color-info); text-decoration: underline; }
+  .product-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 16px;
+  }
+  .product-card {
+    background: var(--color-bg-secondary);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    transition: transform 0.15s, border-color 0.15s;
+  }
+  .product-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--color-info);
+  }
+  .product-card-link {
+    display: block;
+    color: inherit;
+    text-decoration: none;
+    height: 100%;
+  }
+  .product-image {
+    aspect-ratio: 1 / 1;
+    background: var(--color-bg-card);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+  .product-image img {
+    width: 100%; height: 100%;
+    object-fit: contain;
+  }
+  .product-info {
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .product-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+  .tag {
+    font-size: 0.75rem;
+    padding: 2px 8px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--color-border);
+    background: var(--color-bg-card);
+    color: var(--color-text-secondary);
+  }
+  .tag-material {
+    background: var(--color-info-bg);
+    color: var(--color-info);
+    border-color: var(--color-info);
+    font-weight: 600;
+  }
+  .tag-in {
+    background: var(--color-success-bg);
+    color: var(--color-success);
+    border-color: var(--color-success);
+  }
+  .tag-out {
+    background: var(--color-danger-bg);
+    color: var(--color-danger);
+    border-color: var(--color-danger);
+  }
+  .product-name {
+    margin: 0;
+    font-size: 0.95rem;
+    color: var(--color-text-primary);
+    font-weight: 500;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    line-height: 1.3;
+    min-height: 2.6em;
+  }
+  .product-meta {
+    display: flex; flex-wrap: wrap; gap: 8px;
+    font-size: 0.8rem;
+    color: var(--color-text-secondary);
+  }
+  .product-price {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin-top: auto;
+    padding-top: 6px;
+    border-top: 1px solid var(--color-border);
+  }
+  .price-spool {
+    font-size: 1.1rem;
+    color: var(--color-text-primary);
+    font-weight: 600;
+  }
+  .price-kg {
+    font-size: 0.8rem;
+    color: var(--color-text-secondary);
+  }
+  .no-results {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--color-text-secondary);
+  }
+</style>
+
+<script>
+  const cards = Array.from(document.querySelectorAll<HTMLElement>('.product-card'));
+  const rows = Array.from(document.querySelectorAll<HTMLElement>('.product-row'));
+  const grid = document.getElementById('productGrid')!;
+  const table = document.getElementById('productTable') as HTMLTableElement;
+  const tableBody = document.getElementById('productTableBody')!;
+  const noResults = document.getElementById('noResults')!;
+  const summary = document.getElementById('resultsSummary')!;
+  const search = document.getElementById('search') as HTMLInputElement;
+  const materialF = document.getElementById('materialFilter') as HTMLSelectElement;
+  const brandF = document.getElementById('brandFilter') as HTMLSelectElement;
+  const colorF = document.getElementById('colorFilter') as HTMLInputElement;
+  const sortF = document.getElementById('sortFilter') as HTMLSelectElement;
+  const inStockOnly = document.getElementById('inStockOnly') as HTMLInputElement;
+  const colorDropdown = document.getElementById('colorDropdown') as HTMLDetailsElement;
+  const colorSummary = document.getElementById('colorSummary')!;
+  const viewBtns = document.querySelectorAll<HTMLButtonElement>('.view-btn');
+  let currentView: 'grid' | 'table' = (localStorage.getItem('catalogView') as 'grid' | 'table') || 'grid';
+
+  // Restore from URL
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('material')) materialF.value = params.get('material')!;
+  if (params.get('brand')) brandF.value = params.get('brand')!;
+  if (params.get('color')) {
+    colorF.value = params.get('color')!;
+    syncColorSummary();
+  }
+  if (params.get('sort')) sortF.value = params.get('sort')!;
+  if (params.get('q')) search.value = params.get('q')!;
+  if (params.get('instock') === '0') inStockOnly.checked = false;
+  if (params.get('view') === 'table') currentView = 'table';
+  applyView();
+
+  function applyView() {
+    grid.hidden = currentView !== 'grid';
+    table.hidden = currentView !== 'table';
+    viewBtns.forEach(b => b.classList.toggle('active', b.dataset.view === currentView));
+    localStorage.setItem('catalogView', currentView);
+  }
+  viewBtns.forEach(b => b.addEventListener('click', () => {
+    currentView = b.dataset.view as 'grid' | 'table';
+    applyView();
+    updateUrl();
+  }));
+
+  function syncColorSummary() {
+    const v = colorF.value;
+    const opt = colorDropdown.querySelector<HTMLButtonElement>(`.color-option[data-value="${CSS.escape(v)}"]`);
+    if (!opt) return;
+    colorSummary.innerHTML = opt.innerHTML;
+    colorDropdown.querySelectorAll('.color-option').forEach(o => o.classList.toggle('active', o === opt));
+  }
+
+  colorDropdown.querySelectorAll<HTMLButtonElement>('.color-option').forEach(opt => {
+    opt.addEventListener('click', () => {
+      colorF.value = opt.dataset.value!;
+      syncColorSummary();
+      colorDropdown.open = false;
+      apply();
+    });
+  });
+  syncColorSummary();
+  // Close dropdown when clicking outside
+  document.addEventListener('click', e => {
+    if (!colorDropdown.contains(e.target as Node)) colorDropdown.open = false;
+  });
+
+  function updateUrl() {
+    const p = new URLSearchParams();
+    if (materialF.value !== 'all') p.set('material', materialF.value);
+    if (brandF.value !== 'all') p.set('brand', brandF.value);
+    if (colorF.value !== 'all') p.set('color', colorF.value);
+    if (sortF.value !== 'ppk_asc') p.set('sort', sortF.value);
+    if (search.value) p.set('q', search.value);
+    if (!inStockOnly.checked) p.set('instock', '0');
+    if (currentView === 'table') p.set('view', 'table');
+    window.history.replaceState({}, '', window.location.pathname + (p.toString() ? '?' + p.toString() : ''));
+  }
+
+  function matches(el: HTMLElement, q: string, mat: string, brand: string, color: string, onlyInStock: boolean) {
+    if (mat !== 'all' && el.dataset.material !== mat) return false;
+    if (brand !== 'all' && el.dataset.brand !== brand) return false;
+    if (color !== 'all' && el.dataset.color !== color) return false;
+    if (onlyInStock && el.dataset.instock === '0') return false;
+    if (q && !(el.dataset.search ?? '').includes(q)) return false;
+    return true;
+  }
+
+  function compareFn(sortKey: string) {
+    return (a: HTMLElement, b: HTMLElement) => {
+      const va = (k: string) => Number(a.dataset[k] ?? 0);
+      const vb = (k: string) => Number(b.dataset[k] ?? 0);
+      switch (sortKey) {
+        case 'ppk_asc':  return (va('ppk') || 9e9) - (vb('ppk') || 9e9);
+        case 'ppk_desc': return (vb('ppk') || 0) - (va('ppk') || 0);
+        case 'pps_asc':  return (va('pps') || 9e9) - (vb('pps') || 9e9);
+        case 'pps_desc': return (vb('pps') || 0) - (va('pps') || 0);
+        case 'weight_desc': return vb('weight') - va('weight');
+        default: return 0;
+      }
+    };
+  }
+
+  function apply() {
+    const q = search.value.trim().toLowerCase();
+    const mat = materialF.value;
+    const brand = brandF.value;
+    const color = colorF.value;
+    const onlyInStock = inStockOnly.checked;
+    const cmp = compareFn(sortF.value);
+
+    const visibleCards = cards.filter(c => matches(c, q, mat, brand, color, onlyInStock)).sort(cmp);
+    cards.forEach(c => { c.style.display = 'none'; });
+    visibleCards.forEach(c => { c.style.display = ''; grid.appendChild(c); });
+
+    const visibleRows = rows.filter(r => matches(r, q, mat, brand, color, onlyInStock)).sort(cmp);
+    rows.forEach(r => { r.style.display = 'none'; });
+    visibleRows.forEach(r => { r.style.display = ''; tableBody.appendChild(r); });
+
+    const n = visibleCards.length;
+    summary.textContent = `Знайдено ${n} ${n === 1 ? 'товар' : n < 5 ? 'товари' : 'товарів'}`;
+    noResults.style.display = n === 0 ? '' : 'none';
+    if (n === 0) { grid.hidden = true; table.hidden = true; }
+    else applyView();
+    updateUrl();
+  }
+
+  search.addEventListener('input', apply);
+  materialF.addEventListener('change', apply);
+  brandF.addEventListener('change', apply);
+  colorF.addEventListener('change', apply);
+  sortF.addEventListener('change', apply);
+  inStockOnly.addEventListener('change', apply);
+  apply();
+</script>
