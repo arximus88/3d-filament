@@ -8,6 +8,8 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { crawlPlexiwire } from "./crawlers/plexiwire.mjs";
+import { crawlLblCorp } from "./crawlers/lbl-corp.mjs";
+import { crawlMonofilament } from "./crawlers/monofilament.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(__dirname, "..");
@@ -15,6 +17,8 @@ const out = path.join(root, "src/data/products.json");
 
 const STORES = [
   { id: "plexiwire", run: crawlPlexiwire },
+  { id: "lbl-corp", run: crawlLblCorp },
+  { id: "monofilament", run: crawlMonofilament },
 ];
 
 async function main() {

@@ -29,7 +29,68 @@ const lastChecked = data.lastChecked;
 const materials = [...new Set(products.map(p => p.material))].sort();
 const brands = [...new Set(products.map(p => p.brand))].sort();
 const colors = [...new Set(products.map(p => p.color).filter((c): c is string => !!c))].sort();
+const stores = [...new Set(products.map(p => p.store))].sort();
 const storeCount = Object.keys(data.stats ?? {}).length;
+
+// id → display name (best-effort: derived from companies.json convention)
+const STORE_NAMES: Record<string, string> = {
+  'plexiwire': 'Plexiwire',
+  'lbl-corp': 'LBL Corp',
+  'monofilament': 'Monofilament',
+};
+
+const SITE = 'https://3d-filament.pages.dev';
+
+// SEO: ItemList structured data lets Google surface product cards
+// with prices/availability in search results. We cap at 100 entries
+// (Google ignores more) and prioritise in-stock items.
+const seoProducts = products
+  .slice()
+  .sort((a, b) => Number(b.inStock === true) - Number(a.inStock === true))
+  .slice(0, 100);
+
+const itemList = {
+  '@context': 'https://schema.org',
+  '@type': 'ItemList',
+  name: 'Каталог філаменту',
+  numberOfItems: products.length,
+  itemListElement: seoProducts.map((p, i) => ({
+    '@type': 'ListItem',
+    position: i + 1,
+    item: {
+      '@type': 'Product',
+      name: p.name ?? `${p.material} ${p.color ?? ''}`.trim(),
+      url: p.url,
+      image: p.image ?? undefined,
+      sku: p.sku ?? undefined,
+      brand: { '@type': 'Brand', name: p.brand },
+      offers: {
+        '@type': 'Offer',
+        priceCurrency: p.currency,
+        price: p.pricePerSpool ?? undefined,
+        url: p.url,
+        availability:
+          p.inStock === true
+            ? 'https://schema.org/InStock'
+            : p.inStock === false
+              ? 'https://schema.org/OutOfStock'
+              : undefined,
+      },
+    },
+  })),
+};
+
+const breadcrumbs = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Головна', item: SITE + '/' },
+    { '@type': 'ListItem', position: 2, name: 'Каталог філаменту', item: SITE + '/catalog/' },
+  ],
+};
+
+const seoTitle = `Каталог філаменту України — ${products.length} товарів від ${storeCount} магазинів • ціни і наявність`;
+const seoDescription = `Агрегатор пластиків для 3D-друку: ${[...new Set(products.map(p => p.material))].slice(0, 8).join(', ')} та інші. ${products.length} товарів від ${[...new Set(products.map(p => p.brand))].join(', ')}. Сортування за ціною за катушку та за кг, фільтри за матеріалом, кольором, брендом.`;
 
 // Hex map for Ukrainian colour names. Falls back to a neutral grey on miss.
 const COLOR_HEX: Record<string, string> = {
@@ -71,13 +132,16 @@ function relativeTime(iso: string | null): string {
 }
 ---
 
-<Layout
-  title="Каталог філаменту — ціни і наявність по українських магазинах"
-  description="Агрегатор пластиків для 3D-друку: PLA, PETG, ABS та інші. Порівняння цін за катушку та за кг, фільтри за матеріалом, кольором, брендом."
->
+<Layout title={seoTitle} description={seoDescription}>
+  <script type="application/ld+json" set:html={JSON.stringify(itemList)} />
+  <script type="application/ld+json" set:html={JSON.stringify(breadcrumbs)} />
   <header class="catalog-header">
     <h1>Каталог філаменту</h1>
     <p class="subtitle">{products.length} товарів від {storeCount} {storeCount === 1 ? 'магазину' : 'магазинів'} • {relativeTime(lastChecked)}</p>
+    <div class="store-pill" id="storePill" hidden>
+      <span>Магазин: <strong id="storePillName"></strong></span>
+      <a href="/catalog" class="store-pill-clear" id="storePillClear" aria-label="Скинути фільтр магазину">✕</a>
+    </div>
   </header>
 
   <div class="filter-section">
@@ -175,6 +239,7 @@ function relativeTime(iso: string | null): string {
           class="product-row"
           data-material={p.material}
           data-brand={p.brand}
+          data-store={p.store}
           data-color={p.color ?? ''}
           data-instock={p.inStock === false ? '0' : '1'}
           data-ppk={p.pricePerKg ?? 0}
@@ -207,6 +272,7 @@ function relativeTime(iso: string | null): string {
         class="product-card"
         data-material={p.material}
         data-brand={p.brand}
+        data-store={p.store}
         data-color={p.color ?? ''}
         data-instock={p.inStock === false ? '0' : '1'}
         data-ppk={p.pricePerKg ?? 0}
@@ -251,6 +317,8 @@ function relativeTime(iso: string | null): string {
     <h3>Нічого не знайдено</h3>
     <p>Спробуйте змінити фільтри.</p>
   </div>
+
+  <script id="store-names-data" type="application/json" set:html={JSON.stringify(STORE_NAMES)}></script>
 </Layout>
 
 <style>
@@ -267,6 +335,32 @@ function relativeTime(iso: string | null): string {
     color: var(--color-text-secondary);
     font-size: 0.95rem;
   }
+  .store-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 12px;
+    padding: 6px 6px 6px 14px;
+    background: var(--color-info-bg);
+    border: 1px solid var(--color-info);
+    color: var(--color-info);
+    border-radius: 999px;
+    font-size: 0.9rem;
+  }
+  .store-pill[hidden] { display: none; }
+  .store-pill-clear {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: var(--color-info);
+    color: var(--color-bg-card);
+    text-decoration: none;
+    font-weight: 700;
+    line-height: 1;
+  }
+  .store-pill-clear:hover { opacity: 0.85; }
   .filter-section {
     background: var(--color-bg-secondary);
     padding: 20px;
@@ -449,6 +543,9 @@ function relativeTime(iso: string | null): string {
     grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
     gap: 16px;
   }
+  /* HTML [hidden] gets clobbered by display:grid/table on the class —
+     restore the visibility-control behaviour. */
+  .product-grid[hidden], .product-table[hidden] { display: none; }
   .product-card {
     background: var(--color-bg-secondary);
     border: 1px solid var(--color-border);
@@ -571,7 +668,11 @@ function relativeTime(iso: string | null): string {
   const colorDropdown = document.getElementById('colorDropdown') as HTMLDetailsElement;
   const colorSummary = document.getElementById('colorSummary')!;
   const viewBtns = document.querySelectorAll<HTMLButtonElement>('.view-btn');
+  const storePill = document.getElementById('storePill')!;
+  const storePillName = document.getElementById('storePillName')!;
   let currentView: 'grid' | 'table' = (localStorage.getItem('catalogView') as 'grid' | 'table') || 'grid';
+  let currentStore: string = 'all';
+  const storeDisplayNames: Record<string, string> = JSON.parse(document.getElementById('store-names-data')?.textContent ?? '{}');
 
   // Restore from URL
   const params = new URLSearchParams(window.location.search);
@@ -585,7 +686,20 @@ function relativeTime(iso: string | null): string {
   if (params.get('q')) search.value = params.get('q')!;
   if (params.get('instock') === '0') inStockOnly.checked = false;
   if (params.get('view') === 'table') currentView = 'table';
+  if (params.get('store')) {
+    currentStore = params.get('store')!;
+    syncStorePill();
+  }
   applyView();
+
+  function syncStorePill() {
+    if (currentStore === 'all') {
+      storePill.hidden = true;
+    } else {
+      storePill.hidden = false;
+      storePillName.textContent = storeDisplayNames[currentStore] ?? currentStore;
+    }
+  }
 
   function applyView() {
     grid.hidden = currentView !== 'grid';
@@ -630,13 +744,15 @@ function relativeTime(iso: string | null): string {
     if (search.value) p.set('q', search.value);
     if (!inStockOnly.checked) p.set('instock', '0');
     if (currentView === 'table') p.set('view', 'table');
+    if (currentStore !== 'all') p.set('store', currentStore);
     window.history.replaceState({}, '', window.location.pathname + (p.toString() ? '?' + p.toString() : ''));
   }
 
-  function matches(el: HTMLElement, q: string, mat: string, brand: string, color: string, onlyInStock: boolean) {
+  function matches(el: HTMLElement, q: string, mat: string, brand: string, color: string, store: string, onlyInStock: boolean) {
     if (mat !== 'all' && el.dataset.material !== mat) return false;
     if (brand !== 'all' && el.dataset.brand !== brand) return false;
     if (color !== 'all' && el.dataset.color !== color) return false;
+    if (store !== 'all' && el.dataset.store !== store) return false;
     if (onlyInStock && el.dataset.instock === '0') return false;
     if (q && !(el.dataset.search ?? '').includes(q)) return false;
     return true;
@@ -665,11 +781,11 @@ function relativeTime(iso: string | null): string {
     const onlyInStock = inStockOnly.checked;
     const cmp = compareFn(sortF.value);
 
-    const visibleCards = cards.filter(c => matches(c, q, mat, brand, color, onlyInStock)).sort(cmp);
+    const visibleCards = cards.filter(c => matches(c, q, mat, brand, color, currentStore, onlyInStock)).sort(cmp);
     cards.forEach(c => { c.style.display = 'none'; });
     visibleCards.forEach(c => { c.style.display = ''; grid.appendChild(c); });
 
-    const visibleRows = rows.filter(r => matches(r, q, mat, brand, color, onlyInStock)).sort(cmp);
+    const visibleRows = rows.filter(r => matches(r, q, mat, brand, color, currentStore, onlyInStock)).sort(cmp);
     rows.forEach(r => { r.style.display = 'none'; });
     visibleRows.forEach(r => { r.style.display = ''; tableBody.appendChild(r); });
 
@@ -687,5 +803,11 @@ function relativeTime(iso: string | null): string {
   colorF.addEventListener('change', apply);
   sortF.addEventListener('change', apply);
   inStockOnly.addEventListener('change', apply);
+  document.getElementById('storePillClear')?.addEventListener('click', e => {
+    e.preventDefault();
+    currentStore = 'all';
+    syncStorePill();
+    apply();
+  });
   apply();
 </script>

@@ -3,6 +3,7 @@ import Layout from '../layouts/Layout.astro';
 import CompanyCard from '../components/CompanyCard.astro';
 import { getCollection } from 'astro:content';
 import stockData from '../data/stock.json';
+import productsData from '../data/products.json';
 
 const allCompanies = await getCollection('companies');
 const companies = allCompanies.map(c => c.data);
@@ -14,6 +15,10 @@ const manufacturerCount = companies.filter(c => c.type === 'manufacturer').lengt
 const shopCount = companies.filter(c => c.type === 'shop').length;
 
 const stockByCompany = (stockData.companies ?? {}) as Record<string, Record<string, string> & { checkedAt?: string | null; _error?: string }>;
+const productCountByStore: Record<string, number> = {};
+for (const p of (productsData.products ?? []) as Array<{ store: string }>) {
+  productCountByStore[p.store] = (productCountByStore[p.store] ?? 0) + 1;
+}
 const lastChecked = stockData.lastChecked ?? null;
 
 function relativeTime(iso: string | null): string {
@@ -100,7 +105,7 @@ const structuredData = {
   <!-- Grid — server-rendered, all cards present in HTML for SEO -->
   <div class="grid" id="catalog">
     {companies.map(company => (
-      <CompanyCard company={company} stock={stockByCompany[company.id]} />
+      <CompanyCard company={company} stock={stockByCompany[company.id]} productCount={productCountByStore[company.id] ?? 0} />
     ))}
   </div>
 

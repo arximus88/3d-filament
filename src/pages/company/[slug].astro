@@ -3,6 +3,7 @@ import Layout from '../../layouts/Layout.astro';
 import CompanyCard from '../../components/CompanyCard.astro';
 import { getCollection } from 'astro:content';
 import stockData from '../../data/stock.json';
+import productsData from '../../data/products.json';
 
 interface Company {
   id: string;
@@ -35,6 +36,7 @@ const { company } = Astro.props;
 const stockByCompany = (stockData.companies ?? {}) as Record<string, Record<string, string> & { checkedAt?: string | null; _error?: string }>;
 const stock = stockByCompany[company.id];
 const checkedAt = stock?.checkedAt ?? stockData.lastChecked ?? null;
+const productCount = (productsData.products as Array<{ store: string }> ?? []).filter(p => p.store === company.id).length;
 
 // LocalBusiness structured data — only real data from companies.json, no hallucinations
 const localBusiness: Record<string, unknown> = {
@@ -63,17 +65,28 @@ if (sameAs.length > 0) localBusiness.sameAs = sameAs;
 const typeLabel = company.type === 'manufacturer' ? 'Виробник' : 'Магазин';
 const title = `${company.name} — ${typeLabel} філаменту в ${company.city} | 3D Filament UA`;
 const description = `${company.name}: ${company.description} Матеріали: ${company.materials.join(', ')}. Місто: ${company.city}.`;
+
+const SITE = 'https://3d-filament.pages.dev';
+const breadcrumbs = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Головна', item: SITE + '/' },
+    { '@type': 'ListItem', position: 2, name: company.name, item: `${SITE}/company/${company.id}/` },
+  ],
+};
 ---
 
 <Layout title={title} description={description}>
   <script type="application/ld+json" set:html={JSON.stringify(localBusiness)} />
+  <script type="application/ld+json" set:html={JSON.stringify(breadcrumbs)} />
 
   <div style="margin-bottom: 20px;">
     <a href="/" class="back-link">← Назад до каталогу</a>
   </div>
 
   <div class="company-page">
-    <CompanyCard company={company} stock={stock} showLink={false} />
+    <CompanyCard company={company} stock={stock} productCount={productCount} showLink={false} />
 
     <div class="company-details">
       <h2>Деталі</h2>
