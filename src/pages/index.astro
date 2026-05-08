@@ -2,6 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 import CompanyCard from '../components/CompanyCard.astro';
 import { getCollection } from 'astro:content';
+import stockData from '../data/stock.json';
 
 const allCompanies = await getCollection('companies');
 const companies = allCompanies.map(c => c.data);
@@ -11,6 +12,22 @@ const materials = [...new Set(companies.flatMap(c => c.materials))].sort();
 
 const manufacturerCount = companies.filter(c => c.type === 'manufacturer').length;
 const shopCount = companies.filter(c => c.type === 'shop').length;
+
+const stockByCompany = (stockData.companies ?? {}) as Record<string, Record<string, string> & { checkedAt?: string | null; _error?: string }>;
+const lastChecked = stockData.lastChecked ?? null;
+
+function relativeTime(iso: string | null): string {
+  if (!iso) return 'дані ще не зібрано';
+  const then = new Date(iso).getTime();
+  if (Number.isNaN(then)) return 'дані ще не зібрано';
+  const diff = Date.now() - then;
+  const hours = Math.round(diff / 3_600_000);
+  if (hours < 1) return 'оновлено щойно';
+  if (hours < 24) return `оновлено ${hours} год тому`;
+  const days = Math.round(hours / 24);
+  return `оновлено ${days} дн тому`;
+}
+const freshnessLabel = relativeTime(lastChecked);
 
 // Structured data: ItemList with all companies
 const structuredData = {
@@ -63,7 +80,14 @@ const structuredData = {
           <option value="name_desc">За алфавітом (Я-А)</option>
         </select>
       </div>
+      <div class="filter-group filter-stock">
+        <label for="inStockOnly" class="checkbox-label">
+          <input type="checkbox" id="inStockOnly" />
+          Тільки в наявності
+        </label>
+      </div>
     </div>
+    <p class="freshness" title={lastChecked ?? ''}>{freshnessLabel}</p>
   </div>
 
   <!-- Tabs -->
@@ -76,7 +100,7 @@ const structuredData = {
   <!-- Grid — server-rendered, all cards present in HTML for SEO -->
   <div class="grid" id="catalog">
     {companies.map(company => (
-      <CompanyCard company={company} />
+      <CompanyCard company={company} stock={stockByCompany[company.id]} />
     ))}
   </div>
 
@@ -114,6 +138,24 @@ const structuredData = {
     font-weight: 500;
   }
   .search-box { flex: 1; min-width: 250px; }
+  .filter-stock { justify-content: flex-end; }
+  .checkbox-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    user-select: none;
+    color: var(--color-text-primary);
+    font-size: 0.95rem;
+    padding: 8px 0;
+  }
+  .checkbox-label input { cursor: pointer; }
+  .freshness {
+    margin-top: 12px;
+    font-size: 0.85rem;
+    color: var(--color-text-secondary);
+    font-style: italic;
+  }
   select, input {
     padding: 8px 12px;
     border-radius: var(--radius-md);
@@ -179,6 +221,7 @@ const structuredData = {
   const cityFilter = document.getElementById('cityFilter') as HTMLSelectElement;
   const materialFilter = document.getElementById('materialFilter') as HTMLSelectElement;
   const sortFilter = document.getElementById('sortFilter') as HTMLSelectElement;
+  const inStockOnly = document.getElementById('inStockOnly') as HTMLInputElement;
   const tabs = document.querySelectorAll<HTMLElement>('.tab');
   const catalog = document.getElementById('catalog')!;
   const noResults = document.getElementById('noResults')!;
@@ -192,6 +235,7 @@ const structuredData = {
   if (params.get('material')) materialFilter.value = params.get('material')!;
   if (params.get('sort')) sortFilter.value = params.get('sort')!;
   if (params.get('q')) searchInput.value = params.get('q')!;
+  if (params.get('instock') === '1') inStockOnly.checked = true;
   tabs.forEach(t => t.classList.toggle('active', t.dataset.type === currentType));
 
   function updateUrl() {
@@ -201,6 +245,7 @@ const structuredData = {
     if (materialFilter.value !== 'all') p.set('material', materialFilter.value);
     if (sortFilter.value !== 'default') p.set('sort', sortFilter.value);
     if (searchInput.value) p.set('q', searchInput.value);
+    if (inStockOnly.checked) p.set('instock', '1');
     window.history.replaceState({}, '', window.location.pathname + (p.toString() ? '?' + p.toString() : ''));
   }
 
@@ -209,14 +254,16 @@ const structuredData = {
     const city = cityFilter.value;
     const material = materialFilter.value;
     const sort = sortFilter.value;
+    const onlyInStock = inStockOnly.checked;
 
     let visible = cards.filter(card => {
       const typeMatch = currentType === 'all' || card.dataset.type === currentType;
       const cityMatch = city === 'all' || card.dataset.city === city;
       const matMatch = material === 'all' || (card.dataset.materials || '').split(',').includes(material.toLowerCase());
+      const stockMatch = !onlyInStock || card.dataset.stock === 'in' || card.dataset.stock === 'partial';
       const textContent = (card.querySelector('.card-title')?.textContent || '') + ' ' + (card.querySelector('.card-description')?.textContent || '');
       const queryMatch = !query || textContent.toLowerCase().includes(query);
-      return typeMatch && cityMatch && matMatch && queryMatch;
+      return typeMatch && cityMatch && matMatch && stockMatch && queryMatch;
     });
 
     // Sort
@@ -254,6 +301,7 @@ const structuredData = {
   cityFilter.addEventListener('change', filterAndSort);
   materialFilter.addEventListener('change', filterAndSort);
   sortFilter.addEventListener('change', filterAndSort);
+  inStockOnly.addEventListener('change', filterAndSort);
 
   // Apply initial state from URL
   filterAndSort();

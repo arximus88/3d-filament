@@ -1,0 +1,24 @@
+{
+  "lastChecked": null,
+  "companies": {
+    "lbl-corp":          { "PLA": "unknown", "PETG": "unknown", "checkedAt": null },
+    "monofilament":      { "PLA": "unknown", "PETG": "unknown", "ABS": "unknown", "checkedAt": null },
+    "u3df":              { "PLA": "unknown", "PETG": "unknown", "ABS": "unknown", "TPU": "unknown", "checkedAt": null },
+    "plexiwire":         { "PLA": "unknown", "PETG": "unknown", "ABS": "unknown", "TPU": "unknown", "checkedAt": null },
+    "3dfilament":        { "PLA": "unknown", "ABS": "unknown", "PETG": "unknown", "checkedAt": null },
+    "3dplast":           { "ABS": "unknown", "HIPS": "unknown", "checkedAt": null },
+    "petg-3dbro":        { "PETG": "unknown", "checkedAt": null },
+    "3d-bro":            { "PETG": "unknown", "checkedAt": null },
+    "pochatok-filament": { "PLA": "unknown", "PETG": "unknown", "checkedAt": null },
+    "fainyi-3d":         { "PLA": "unknown", "PETG": "unknown", "ABS": "unknown", "checkedAt": null },
+    "all3dp-ua":         { "PLA": "unknown", "PETG": "unknown", "ABS": "unknown", "TPU": "unknown", "Nylon": "unknown", "Carbon": "unknown", "checkedAt": null },
+    "polydream":         { "ABS": "unknown", "PLA": "unknown", "PETG": "unknown", "checkedAt": null },
+    "edge-filaments":    { "PLA": "unknown", "PETG": "unknown", "ABS": "unknown", "TPU": "unknown", "checkedAt": null },
+    "3d4u":              { "PLA": "unknown", "PETG": "unknown", "ABS": "unknown", "TPU": "unknown", "checkedAt": null },
+    "artline":           { "PLA": "unknown", "PETG": "unknown", "ABS": "unknown", "checkedAt": null },
+    "3ddevice":          { "PETG": "unknown", "PLA": "unknown", "ABS": "unknown", "checkedAt": null },
+    "3d-prostir":        { "PLA": "unknown", "PETG": "unknown", "ABS": "unknown", "checkedAt": null },
+    "techfil":           { "PLA": "unknown", "PETG": "unknown", "ABS": "unknown", "checkedAt": null },
+    "ua3d":              { "PLA": "unknown", "PETG": "unknown", "ABS": "unknown", "checkedAt": null }
+  }
+}
