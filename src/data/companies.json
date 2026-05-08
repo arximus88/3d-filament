@@ -197,7 +197,7 @@
     "name": "UA3D",
     "type": "shop",
     "city": "Київ",
-    "url": "https://ua3d.com.ua/product-category/filamenti_i_smoli/",
+    "url": "https://ua3d.com.ua/",
     "materials": ["PLA", "PETG", "ABS"],
     "phone": "+380 50 648-37-17",
     "socials": { "telegram": "https://t.me/ua3dpro" },

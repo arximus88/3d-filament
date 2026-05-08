@@ -91,7 +91,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   const res = await fetch(url, {
     headers: {
       "User-Agent":
-        "Mozilla/5.0 (compatible; 3d-filament-stock-bot/1.0; +https://3d-filament.pages.dev)",
+        "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
       "Accept-Language": "uk,en;q=0.8",
     },
   });

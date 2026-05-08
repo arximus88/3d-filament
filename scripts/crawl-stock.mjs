@@ -19,24 +19,44 @@ const companiesPath = path.join(root, "src/data/companies.json");
 const stockPath = path.join(root, "src/data/stock.json");
 
 const UA =
-  "Mozilla/5.0 (compatible; 3d-filament-stock-bot/1.0; +https://3d-filament.pages.dev)";
+  "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36";
 const TIMEOUT_MS = 15_000;
-const DELAY_MS = 1500;
+const DELAY_MIN_MS = 1500;
+const DELAY_MAX_MS = 3000;
+const RETRY_DELAY_MS = 5000;
 
-async function fetchHtml(url) {
+function jitter() {
+  return DELAY_MIN_MS + Math.random() * (DELAY_MAX_MS - DELAY_MIN_MS);
+}
+
+async function fetchOnce(url) {
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), TIMEOUT_MS);
   try {
     const res = await fetch(url, {
-      headers: { "User-Agent": UA, "Accept-Language": "uk,en;q=0.8" },
+      headers: {
+        "User-Agent": UA,
+        "Accept-Language": "uk,en;q=0.8",
+        Accept:
+          "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+      },
       signal: ctrl.signal,
       redirect: "follow",
     });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    return await res.text();
+    return res;
   } finally {
     clearTimeout(timer);
   }
+}
+
+async function fetchHtml(url) {
+  let res = await fetchOnce(url);
+  if (res.status === 429) {
+    await new Promise((r) => setTimeout(r, RETRY_DELAY_MS));
+    res = await fetchOnce(url);
+  }
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return await res.text();
 }
 
 async function main() {
@@ -56,7 +76,7 @@ async function main() {
         checkedAt,
       };
     }
-    await new Promise((r) => setTimeout(r, DELAY_MS));
+    await new Promise((r) => setTimeout(r, jitter()));
   }
 
   await fs.writeFile(stockPath, JSON.stringify(out, null, 2) + "\n");
