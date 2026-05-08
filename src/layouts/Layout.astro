@@ -111,6 +111,28 @@ const { title, description, canonicalURL } = Astro.props;
         font-size: 1.1rem;
         color: var(--color-text-secondary);
       }
+      .primary-nav {
+        margin-top: 20px;
+        display: flex;
+        gap: 24px;
+        justify-content: center;
+      }
+      .primary-nav a {
+        color: var(--color-text-secondary);
+        text-decoration: none;
+        padding: 8px 16px;
+        border-radius: var(--radius-md);
+        font-weight: 500;
+        transition: background 0.15s, color 0.15s;
+      }
+      .primary-nav a:hover {
+        color: var(--color-text-primary);
+        background: var(--color-bg-secondary);
+      }
+      .primary-nav a.active {
+        color: var(--color-accent);
+        background: var(--color-bg-secondary);
+      }
       .theme-toggle {
         position: absolute;
         right: 0;
@@ -164,6 +186,10 @@ const { title, description, canonicalURL } = Astro.props;
           <h1>🇺🇦 Каталог 3D Філаменту України</h1>
         </a>
         <p class="subtitle">Виробники та магазини матеріалів для 3D друку</p>
+        <nav class="primary-nav">
+          <a href="/" class={Astro.url.pathname === '/' ? 'active' : ''}>Магазини</a>
+          <a href="/catalog" class={Astro.url.pathname.startsWith('/catalog') ? 'active' : ''}>Каталог філаменту</a>
+        </nav>
       </header>
 
       <slot />
