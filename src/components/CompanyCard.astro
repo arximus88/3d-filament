@@ -134,7 +134,7 @@ const phones = company.phone ? company.phone.split(',').map(p => p.trim()).filte
 
   <div class="card-footer">
     {productCount > 0
-      ? <a href={`/catalog?store=${company.id}`} class="btn">До каталогу →</a>
+      ? <a href={`/?store=${company.id}`} class="btn">До каталогу →</a>
       : <a href={company.url} target="_blank" rel="noopener noreferrer" class="btn">Перейти на сайт →</a>
     }
     {showLink && (

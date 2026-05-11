@@ -1,0 +1,5 @@
+# Cloudflare Pages redirects.
+# After the home/catalog swap, preserve any existing /catalog links and
+# bookmarks by sending them to the new home (which now is the catalog).
+/catalog          /  301
+/catalog/*        /:splat  301
