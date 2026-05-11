@@ -198,6 +198,24 @@ function colorHex(name: string): string {
         <input type="hidden" id="colorFilter" value="all" />
       </div>
       <div class="filter-group">
+        <label for="diameterFilter">Діаметр нитки</label>
+        <select id="diameterFilter">
+          <option value="all">Всі</option>
+          <option value="1.75" selected>1.75 мм</option>
+          <option value="2.9">2.9 мм</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label for="weightFilter">Вага котушки</label>
+        <select id="weightFilter">
+          <option value="all">Всі</option>
+          <option value="lt05">До 0.5 кг</option>
+          <option value="05to1">0.5–1 кг</option>
+          <option value="1">1 кг</option>
+          <option value="2plus">2+ кг</option>
+        </select>
+      </div>
+      <div class="filter-group">
         <label for="sortFilter">Сортування</label>
         <select id="sortFilter">
           <option value="ppk_asc">Ціна за кг ↑</option>
@@ -319,11 +337,14 @@ function colorHex(name: string): string {
         data-search={`${p.name ?? ''} ${p.sku ?? ''} ${p.color ?? ''} ${p.brand}`.toLowerCase()}
       >
         <a class="product-card-link" href={p.url} target="_blank" rel="noopener noreferrer">
-          {p.image && (
-            <div class="product-image">
-              <img src={resizedImg(p.image, 240, 240) ?? p.image} alt={p.name ?? p.material} loading="lazy" decoding="async" width="240" height="240" />
+          <div class="product-image" style={`color:${colorHex(p.color ?? '')}`}>
+            <div class="product-image-fallback" aria-hidden="true">
+              <svg viewBox="0 0 162 209"><use href="#icon-filament"></use></svg>
             </div>
-          )}
+            {p.image && (
+              <img src={resizedImg(p.image, 240, 240) ?? p.image} alt={p.name ?? p.material} loading="lazy" decoding="async" width="240" height="240" onerror="this.remove()" />
+            )}
+          </div>
           <div class="product-info">
             <div class="product-tags">
               <span class="tag tag-material">{p.material}</span>
@@ -688,6 +709,7 @@ function colorHex(name: string): string {
     height: 100%;
   }
   .product-image {
+    position: relative;
     aspect-ratio: 1 / 1;
     background: var(--color-bg-card);
     display: flex;
@@ -695,7 +717,25 @@ function colorHex(name: string): string {
     justify-content: center;
     overflow: hidden;
   }
+  /* Spool placeholder sits at the bottom layer; when <img> fails it
+     removes itself via onerror and the placeholder shows through. */
+  .product-image-fallback {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 18%;
+  }
+  .product-image-fallback svg {
+    width: 100%;
+    height: 100%;
+    /* `currentColor` on the thread path inherits from .product-image's
+       inline `color:` style, which is set to the filament colour hex. */
+  }
   .product-image img {
+    position: relative;
+    z-index: 1;
     width: 100%; height: 100%;
     object-fit: contain;
   }
@@ -800,6 +840,8 @@ function colorHex(name: string): string {
   const search = document.getElementById('search') as HTMLInputElement;
   const materialF = document.getElementById('materialFilter') as HTMLSelectElement;
   const brandF = document.getElementById('brandFilter') as HTMLSelectElement;
+  const diameterF = document.getElementById('diameterFilter') as HTMLSelectElement;
+  const weightF = document.getElementById('weightFilter') as HTMLSelectElement;
   const colorF = document.getElementById('colorFilter') as HTMLInputElement;
   const sortF = document.getElementById('sortFilter') as HTMLSelectElement;
   const inStockOnly = document.getElementById('inStockOnly') as HTMLInputElement;
@@ -816,6 +858,8 @@ function colorHex(name: string): string {
   const params = new URLSearchParams(window.location.search);
   if (params.get('material')) materialF.value = params.get('material')!;
   if (params.get('brand')) brandF.value = params.get('brand')!;
+  if (params.get('diameter')) diameterF.value = params.get('diameter')!;
+  if (params.get('weight')) weightF.value = params.get('weight')!;
   if (params.get('color')) {
     colorF.value = params.get('color')!;
     syncColorSummary();
@@ -877,6 +921,8 @@ function colorHex(name: string): string {
     const p = new URLSearchParams();
     if (materialF.value !== 'all') p.set('material', materialF.value);
     if (brandF.value !== 'all') p.set('brand', brandF.value);
+    if (diameterF.value !== '1.75') p.set('diameter', diameterF.value);
+    if (weightF.value !== 'all') p.set('weight', weightF.value);
     if (colorF.value !== 'all') p.set('color', colorF.value);
     if (sortF.value !== 'ppk_asc') p.set('sort', sortF.value);
     if (search.value) p.set('q', search.value);
@@ -886,11 +932,23 @@ function colorHex(name: string): string {
     window.history.replaceState({}, '', window.location.pathname + (p.toString() ? '?' + p.toString() : ''));
   }
 
-  function matches(el: HTMLElement, q: string, mat: string, brand: string, color: string, store: string, onlyInStock: boolean) {
+  // Map a weight in kg to the user-facing bucket id used by the filter.
+  // Keep in sync with the <option value="…"> values on #weightFilter.
+  function weightBucket(w: number): 'lt05' | '05to1' | '1' | '2plus' | '' {
+    if (!w) return '';
+    if (w < 0.5) return 'lt05';
+    if (w < 1) return '05to1';
+    if (w < 2) return '1';
+    return '2plus';
+  }
+
+  function matches(el: HTMLElement, q: string, mat: string, brand: string, color: string, store: string, diameter: string, weight: string, onlyInStock: boolean) {
     if (mat !== 'all' && el.dataset.material !== mat) return false;
     if (brand !== 'all' && el.dataset.brand !== brand) return false;
     if (color !== 'all' && el.dataset.color !== color) return false;
     if (store !== 'all' && el.dataset.store !== store) return false;
+    if (diameter !== 'all' && el.dataset.diameter !== diameter) return false;
+    if (weight !== 'all' && weightBucket(Number(el.dataset.weight ?? 0)) !== weight) return false;
     // Strict: "Тільки в наявності" shows only confirmed in-stock items
     // (data-instock === '1'). Unknown ('2') and confirmed OOS ('0') hide.
     if (onlyInStock && el.dataset.instock !== '1') return false;
@@ -941,11 +999,13 @@ function colorHex(name: string): string {
     const onlyInStock = inStockOnly.checked;
     const cmp = compareFn(sortF.value);
 
-    const visibleCards = cards.filter(c => matches(c, q, mat, brand, color, currentStore, onlyInStock)).sort(cmp);
+    const diameter = diameterF.value;
+    const weight = weightF.value;
+    const visibleCards = cards.filter(c => matches(c, q, mat, brand, color, currentStore, diameter, weight, onlyInStock)).sort(cmp);
     cards.forEach(c => { c.style.display = 'none'; });
     visibleCards.forEach(c => { c.style.display = ''; grid.appendChild(c); });
 
-    const visibleRows = rows.filter(r => matches(r, q, mat, brand, color, currentStore, onlyInStock)).sort(cmp);
+    const visibleRows = rows.filter(r => matches(r, q, mat, brand, color, currentStore, diameter, weight, onlyInStock)).sort(cmp);
     rows.forEach(r => { r.style.display = 'none'; });
     visibleRows.forEach(r => { r.style.display = ''; tableBody.appendChild(r); });
 
@@ -994,6 +1054,8 @@ function colorHex(name: string): string {
   materialF.addEventListener('change', apply);
   brandF.addEventListener('change', apply);
   colorF.addEventListener('change', apply);
+  diameterF.addEventListener('change', apply);
+  weightF.addEventListener('change', apply);
   sortF.addEventListener('change', apply);
   inStockOnly.addEventListener('change', apply);
   document.getElementById('storePillClear')?.addEventListener('click', e => {
