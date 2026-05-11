@@ -1,6 +1,8 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import productsData from '../data/products.json';
+import { relativeTime } from '../utils/relativeTime';
+import { resizedImg } from '../utils/imgProxy';
 
 interface Product {
   store: string;
@@ -28,9 +30,30 @@ const lastChecked = data.lastChecked;
 
 const materials = [...new Set(products.map(p => p.material))].sort();
 const brands = [...new Set(products.map(p => p.brand))].sort();
-const colors = [...new Set(products.map(p => p.color).filter((c): c is string => !!c))].sort();
-const stores = [...new Set(products.map(p => p.store))].sort();
+// Colours are sorted by how many products carry them (popular ones first),
+// then alphabetically as a stable secondary key.
+const colorCounts = new Map<string, number>();
+for (const p of products) if (p.color) colorCounts.set(p.color, (colorCounts.get(p.color) ?? 0) + 1);
+const colors = [...colorCounts.entries()]
+  .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], 'uk'))
+  .map(([c]) => c);
 const storeCount = Object.keys(data.stats ?? {}).length;
+
+// Strict-stock encoding: '1' = confirmed in-stock, '0' = confirmed OOS,
+// '2' = unknown. The catalog hides anything other than '1' when the
+// "Тільки в наявності" filter is on.
+function stockCode(inStock: boolean | null): '0' | '1' | '2' {
+  if (inStock === true) return '1';
+  if (inStock === false) return '0';
+  return '2';
+}
+
+// Show prices only when we have confirmed availability — otherwise the
+// number may be stale (e.g. Monofilament keeps a historical price in
+// JSON-LD on out-of-stock pages where the UI hides it).
+function visiblePrice<T>(inStock: boolean | null, price: T): T | null {
+  return inStock === true ? price : null;
+}
 
 // id → display name (best-effort: derived from companies.json convention)
 const STORE_NAMES: Record<string, string> = {
@@ -42,18 +65,16 @@ const STORE_NAMES: Record<string, string> = {
 const SITE = 'https://3d-filament.pages.dev';
 
 // SEO: ItemList structured data lets Google surface product cards
-// with prices/availability in search results. We cap at 100 entries
-// (Google ignores more) and prioritise in-stock items.
-const seoProducts = products
-  .slice()
-  .sort((a, b) => Number(b.inStock === true) - Number(a.inStock === true))
-  .slice(0, 100);
+// with prices/availability in search results. Only emit entries we can
+// fully back with confirmed in-stock + price — otherwise Google will
+// flag stale prices and we don't want to mislead crawlers.
+const seoProducts = products.filter(p => p.inStock === true && p.pricePerSpool).slice(0, 100);
 
 const itemList = {
   '@context': 'https://schema.org',
   '@type': 'ItemList',
   name: 'Каталог філаменту',
-  numberOfItems: products.length,
+  numberOfItems: seoProducts.length,
   itemListElement: seoProducts.map((p, i) => ({
     '@type': 'ListItem',
     position: i + 1,
@@ -67,14 +88,9 @@ const itemList = {
       offers: {
         '@type': 'Offer',
         priceCurrency: p.currency,
-        price: p.pricePerSpool ?? undefined,
+        price: p.pricePerSpool,
         url: p.url,
-        availability:
-          p.inStock === true
-            ? 'https://schema.org/InStock'
-            : p.inStock === false
-              ? 'https://schema.org/OutOfStock'
-              : undefined,
+        availability: 'https://schema.org/InStock',
       },
     },
   })),
@@ -120,16 +136,6 @@ const COLOR_HEX: Record<string, string> = {
 function colorHex(name: string): string {
   return COLOR_HEX[name.toLowerCase()] ?? '#999';
 }
-
-function relativeTime(iso: string | null): string {
-  if (!iso) return 'дані ще не зібрано';
-  const diff = Date.now() - new Date(iso).getTime();
-  const hours = Math.round(diff / 3_600_000);
-  if (hours < 1) return 'оновлено щойно';
-  if (hours < 24) return `оновлено ${hours} год тому`;
-  const days = Math.round(hours / 24);
-  return `оновлено ${days} дн тому`;
-}
 ---
 
 <Layout title={seoTitle} description={seoDescription}>
@@ -138,15 +144,19 @@ function relativeTime(iso: string | null): string {
   <header class="catalog-header">
     <h1>Каталог філаменту</h1>
     <p class="subtitle">{products.length} товарів від {storeCount} {storeCount === 1 ? 'магазину' : 'магазинів'} • {relativeTime(lastChecked)}</p>
-    <div class="store-pill" id="storePill" hidden>
-      <span>Магазин: <strong id="storePillName"></strong></span>
-      <a href="/catalog" class="store-pill-clear" id="storePillClear" aria-label="Скинути фільтр магазину">✕</a>
-    </div>
   </header>
 
-  <div class="filter-section">
-    <div class="filter-controls">
-      <div class="filter-group search-box">
+  <div class="catalog-layout" id="catalogLayout">
+    <aside class="catalog-sidebar" id="catalogSidebar" aria-label="Фільтри">
+      <div class="sidebar-header">
+        <h2 class="sidebar-title">Фільтри</h2>
+        <button type="button" class="sidebar-close" id="sidebarClose" aria-label="Закрити фільтри">✕</button>
+      </div>
+      <div class="store-pill" id="storePill" hidden>
+        <span>Магазин: <strong id="storePillName"></strong></span>
+        <a href="/catalog" class="store-pill-clear" id="storePillClear" aria-label="Скинути фільтр магазину">✕</a>
+      </div>
+      <div class="filter-group">
         <label for="search">Пошук</label>
         <input type="text" id="search" placeholder="Назва, артикул, колір..." autocomplete="off" />
       </div>
@@ -174,12 +184,13 @@ function relativeTime(iso: string | null): string {
           <div class="color-menu">
             <button type="button" class="color-option" data-value="all">
               <span class="swatch swatch-all" aria-hidden="true"></span>
-              <span>Всі</span>
+              <span class="color-name">Всі</span>
             </button>
             {colors.map(c => (
               <button type="button" class="color-option" data-value={c}>
                 <span class="swatch" style={`background:${colorHex(c)}`} aria-hidden="true"></span>
-                <span>{c}</span>
+                <span class="color-name">{c}</span>
+                <span class="color-count">{colorCounts.get(c)}</span>
               </button>
             ))}
           </div>
@@ -193,7 +204,14 @@ function relativeTime(iso: string | null): string {
           <option value="ppk_desc">Ціна за кг ↓</option>
           <option value="pps_asc">Ціна за катушку ↑</option>
           <option value="pps_desc">Ціна за катушку ↓</option>
+          <option value="weight_asc">Вага ↑</option>
           <option value="weight_desc">Вага ↓</option>
+          <option value="diameter_asc">Діаметр ↑</option>
+          <option value="diameter_desc">Діаметр ↓</option>
+          <option value="name_asc">Назва А→Я</option>
+          <option value="name_desc">Назва Я→А</option>
+          <option value="material_asc">Матеріал А→Я</option>
+          <option value="brand_asc">Бренд А→Я</option>
         </select>
       </div>
       <div class="filter-group filter-stock">
@@ -202,8 +220,11 @@ function relativeTime(iso: string | null): string {
           Тільки в наявності
         </label>
       </div>
-    </div>
-  </div>
+    </aside>
+
+    <div class="sidebar-backdrop" id="sidebarBackdrop" hidden></div>
+
+    <div class="catalog-main">
 
   <div class="results-bar">
     <div class="results-summary" id="resultsSummary"></div>
@@ -223,28 +244,34 @@ function relativeTime(iso: string | null): string {
     <thead>
       <tr>
         <th>Колір</th>
-        <th>Матеріал</th>
-        <th>Бренд</th>
-        <th>Назва</th>
-        <th>Вага</th>
-        <th>Діам.</th>
-        <th class="num">Ціна, грн</th>
-        <th class="num">Грн/кг</th>
+        <th class="sortable" data-sort="material">Матеріал</th>
+        <th class="sortable" data-sort="brand">Бренд</th>
+        <th class="sortable" data-sort="name">Назва</th>
+        <th class="sortable num" data-sort="weight">Вага</th>
+        <th class="sortable num" data-sort="diameter">Діам.</th>
+        <th class="sortable num" data-sort="pps">Ціна, грн</th>
+        <th class="sortable num" data-sort="ppk">Грн/кг</th>
         <th>Наявність</th>
       </tr>
     </thead>
     <tbody id="productTableBody">
-      {products.map(p => (
+      {products.map(p => {
+        const code = stockCode(p.inStock);
+        const pps = visiblePrice(p.inStock, p.pricePerSpool);
+        const ppk = visiblePrice(p.inStock, p.pricePerKg);
+        return (
         <tr
           class="product-row"
           data-material={p.material}
           data-brand={p.brand}
           data-store={p.store}
           data-color={p.color ?? ''}
-          data-instock={p.inStock === false ? '0' : '1'}
-          data-ppk={p.pricePerKg ?? 0}
-          data-pps={p.pricePerSpool ?? 0}
+          data-instock={code}
+          data-name={(p.name ?? '').toLowerCase()}
+          data-ppk={ppk ?? 0}
+          data-pps={pps ?? 0}
           data-weight={p.weightKg ?? 0}
+          data-diameter={p.diameterMm ?? 0}
           data-search={`${p.name ?? ''} ${p.sku ?? ''} ${p.color ?? ''} ${p.brand}`.toLowerCase()}
         >
           <td>
@@ -258,40 +285,52 @@ function relativeTime(iso: string | null): string {
           <td><a class="row-link" href={p.url} target="_blank" rel="noopener noreferrer">{p.name ?? '—'}</a></td>
           <td>{p.weightKg ? `${p.weightKg} кг` : '—'}</td>
           <td>{p.diameterMm ? `${p.diameterMm} мм` : '—'}</td>
-          <td class="num">{p.pricePerSpool ?? '—'}</td>
-          <td class="num">{p.pricePerKg ?? '—'}</td>
-          <td>{p.inStock === true ? <span class="tag tag-in">В наявн.</span> : p.inStock === false ? <span class="tag tag-out">Немає</span> : '—'}</td>
+          <td class="num">{pps ?? '—'}</td>
+          <td class="num">{ppk ?? '—'}</td>
+          <td>
+            {code === '1' && <span class="tag tag-in">В наявн.</span>}
+            {code === '0' && <span class="tag tag-out">Немає</span>}
+            {code === '2' && <span class="tag tag-unknown">Уточнюйте</span>}
+          </td>
         </tr>
-      ))}
+        );
+      })}
     </tbody>
   </table>
 
   <div class="product-grid" id="productGrid">
-    {products.map(p => (
+    {products.map(p => {
+      const code = stockCode(p.inStock);
+      const pps = visiblePrice(p.inStock, p.pricePerSpool);
+      const ppk = visiblePrice(p.inStock, p.pricePerKg);
+      return (
       <article
         class="product-card"
         data-material={p.material}
         data-brand={p.brand}
         data-store={p.store}
         data-color={p.color ?? ''}
-        data-instock={p.inStock === false ? '0' : '1'}
-        data-ppk={p.pricePerKg ?? 0}
-        data-pps={p.pricePerSpool ?? 0}
+        data-instock={code}
+        data-name={(p.name ?? '').toLowerCase()}
+        data-ppk={ppk ?? 0}
+        data-pps={pps ?? 0}
         data-weight={p.weightKg ?? 0}
+        data-diameter={p.diameterMm ?? 0}
         data-search={`${p.name ?? ''} ${p.sku ?? ''} ${p.color ?? ''} ${p.brand}`.toLowerCase()}
       >
         <a class="product-card-link" href={p.url} target="_blank" rel="noopener noreferrer">
           {p.image && (
             <div class="product-image">
-              <img src={p.image} alt={p.name ?? p.material} loading="lazy" width="240" height="240" />
+              <img src={resizedImg(p.image, 240, 240) ?? p.image} alt={p.name ?? p.material} loading="lazy" decoding="async" width="240" height="240" />
             </div>
           )}
           <div class="product-info">
             <div class="product-tags">
               <span class="tag tag-material">{p.material}</span>
               {p.color && <span class="tag tag-color">{p.color}</span>}
-              {p.inStock === false && <span class="tag tag-out">Немає</span>}
-              {p.inStock === true && <span class="tag tag-in">В наявності</span>}
+              {code === '0' && <span class="tag tag-out">Немає</span>}
+              {code === '1' && <span class="tag tag-in">В наявності</span>}
+              {code === '2' && <span class="tag tag-unknown">Уточнюйте</span>}
             </div>
             <h3 class="product-name">{p.name ?? `${p.material} ${p.color ?? ''}`}</h3>
             <div class="product-meta">
@@ -300,23 +339,30 @@ function relativeTime(iso: string | null): string {
               {p.diameterMm && <span>{p.diameterMm}мм</span>}
             </div>
             <div class="product-price">
-              {p.pricePerSpool && (
-                <span class="price-spool">{p.pricePerSpool} {p.currency === 'UAH' ? 'грн' : p.currency}</span>
-              )}
-              {p.pricePerKg && (
-                <span class="price-kg">{p.pricePerKg} грн/кг</span>
-              )}
+              {pps !== null
+                ? <span class="price-spool">{pps} {p.currency === 'UAH' ? 'грн' : p.currency}</span>
+                : <span class="price-spool price-unknown">—</span>
+              }
+              {ppk !== null && <span class="price-kg">{ppk} грн/кг</span>}
             </div>
           </div>
         </a>
       </article>
-    ))}
+      );
+    })}
   </div>
 
   <div class="no-results" id="noResults" style="display:none">
     <h3>Нічого не знайдено</h3>
     <p>Спробуйте змінити фільтри.</p>
   </div>
+    </div><!-- /.catalog-main -->
+  </div><!-- /.catalog-layout -->
+
+  <button type="button" class="filter-fab" id="filterFab" aria-label="Відкрити фільтри">
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"/></svg>
+    <span>Фільтри</span>
+  </button>
 
   <script id="store-names-data" type="application/json" set:html={JSON.stringify(STORE_NAMES)}></script>
 </Layout>
@@ -361,37 +407,104 @@ function relativeTime(iso: string | null): string {
     line-height: 1;
   }
   .store-pill-clear:hover { opacity: 0.85; }
-  .filter-section {
+  /* Two-column page layout with sticky filter sidebar.
+     <1024px collapses to a single column; sidebar becomes a drawer. */
+  .catalog-layout {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    gap: 24px;
+    align-items: start;
+  }
+  .catalog-sidebar {
+    position: sticky;
+    top: calc(var(--header-height) + 16px);
+    align-self: start;
+    max-height: calc(100vh - var(--header-height) - 32px);
+    overflow-y: auto;
     background: var(--color-bg-secondary);
-    padding: 20px;
-    border-radius: var(--radius-lg);
-    margin-bottom: 20px;
     border: 1px solid var(--color-border);
-  }
-  .filter-controls {
+    border-radius: var(--radius-lg);
+    padding: 18px;
     display: flex;
-    gap: 15px;
-    flex-wrap: wrap;
-    align-items: flex-end;
+    flex-direction: column;
+    gap: 14px;
   }
+  .sidebar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .sidebar-title { font-size: 1rem; color: var(--color-text-primary); margin: 0; }
+  .sidebar-close {
+    display: none; /* visible only on mobile drawer */
+    background: transparent;
+    border: 1px solid var(--color-border);
+    color: var(--color-text-secondary);
+    width: 32px; height: 32px;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    font-size: 1rem;
+  }
+  .sidebar-close:hover { color: var(--color-text-primary); }
+  .catalog-main { min-width: 0; /* enables shrink so the table can scroll */ }
   .filter-group {
     display: flex;
     flex-direction: column;
-    gap: 5px;
+    gap: 6px;
   }
   .filter-group label {
     font-size: 0.85rem;
     color: var(--color-text-secondary);
     font-weight: 500;
   }
-  .search-box { flex: 1; min-width: 220px; }
-  .filter-stock { justify-content: flex-end; }
+  .filter-stock { margin-top: 4px; }
   .checkbox-label {
     display: inline-flex; align-items: center; gap: 8px;
     cursor: pointer; user-select: none;
     color: var(--color-text-primary);
     font-size: 0.95rem;
-    padding: 8px 0;
+    padding: 4px 0;
+  }
+  .sidebar-backdrop {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    z-index: 60;
+  }
+  .filter-fab {
+    display: none; /* visible only on mobile */
+    position: fixed; right: 18px; bottom: 18px;
+    z-index: 55;
+    align-items: center; gap: 8px;
+    padding: 12px 18px;
+    background: var(--color-accent);
+    color: var(--color-bg-primary);
+    border: none;
+    border-radius: 999px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+    cursor: pointer;
+  }
+  .filter-fab:hover { transform: translateY(-1px); }
+  @media (max-width: 1023px) {
+    .catalog-layout { grid-template-columns: 1fr; }
+    .catalog-sidebar {
+      position: fixed;
+      top: 0; left: 0;
+      width: min(320px, 88vw);
+      height: 100dvh;
+      max-height: 100dvh;
+      border-radius: 0;
+      border-right: 1px solid var(--color-border);
+      transform: translateX(-100%);
+      transition: transform 0.25s ease;
+      z-index: 70;
+    }
+    .catalog-layout.is-drawer-open .catalog-sidebar { transform: translateX(0); }
+    .catalog-layout.is-drawer-open .sidebar-backdrop { display: block; }
+    .sidebar-close { display: inline-flex; align-items: center; justify-content: center; }
+    .filter-fab { display: inline-flex; }
   }
   select, input[type="text"] {
     padding: 8px 12px;
@@ -438,12 +551,11 @@ function relativeTime(iso: string | null): string {
     color: var(--color-accent);
   }
   /* Color dropdown */
-  .color-dropdown {
-    position: relative;
-    min-width: 140px;
-  }
+  /* Colour selector lives inline inside the sidebar — the menu flows below
+     the summary as a static accordion instead of overflowing the column. */
+  .color-dropdown { width: 100%; }
   .color-dropdown summary {
-    display: inline-flex;
+    display: flex;
     align-items: center;
     gap: 8px;
     padding: 8px 12px;
@@ -462,12 +574,10 @@ function relativeTime(iso: string | null): string {
     color: var(--color-text-secondary);
     font-size: 0.7rem;
   }
+  .color-dropdown[open] summary::after { transform: rotate(180deg); }
   .color-menu {
-    position: absolute;
-    top: calc(100% + 4px); left: 0;
-    z-index: 10;
-    min-width: 180px;
-    max-height: 320px;
+    margin-top: 6px;
+    max-height: 280px;
     overflow-y: auto;
     background: var(--color-bg-card);
     border: 1px solid var(--color-border);
@@ -527,6 +637,20 @@ function relativeTime(iso: string | null): string {
     font-size: 0.85rem;
     position: sticky; top: 0;
   }
+  .product-table th.sortable {
+    cursor: pointer;
+    user-select: none;
+    white-space: nowrap;
+  }
+  .product-table th.sortable:hover { color: var(--color-text-primary); }
+  .product-table th.sortable::after {
+    content: '⇅';
+    margin-left: 6px;
+    opacity: 0.35;
+    font-size: 0.85em;
+  }
+  .product-table th.is-sorted-asc::after { content: '↑'; opacity: 1; color: var(--color-accent); }
+  .product-table th.is-sorted-desc::after { content: '↓'; opacity: 1; color: var(--color-accent); }
   .product-table tbody tr:hover { background: var(--color-bg-card); }
   .product-table tbody tr:last-child td { border-bottom: 0; }
   .product-table .num { text-align: right; font-variant-numeric: tabular-nums; }
@@ -610,6 +734,20 @@ function relativeTime(iso: string | null): string {
     color: var(--color-danger);
     border-color: var(--color-danger);
   }
+  .tag-unknown {
+    background: var(--color-bg-card);
+    color: var(--color-text-secondary);
+    border-color: var(--color-border);
+    font-style: italic;
+  }
+  .price-unknown { color: var(--color-text-secondary); font-weight: 500; }
+  .color-name { flex: 1; }
+  .color-count {
+    color: var(--color-text-secondary);
+    font-size: 0.75rem;
+    font-variant-numeric: tabular-nums;
+  }
+  .color-option.active .color-count { color: inherit; opacity: 0.7; }
   .product-name {
     margin: 0;
     font-size: 0.95rem;
@@ -753,23 +891,45 @@ function relativeTime(iso: string | null): string {
     if (brand !== 'all' && el.dataset.brand !== brand) return false;
     if (color !== 'all' && el.dataset.color !== color) return false;
     if (store !== 'all' && el.dataset.store !== store) return false;
-    if (onlyInStock && el.dataset.instock === '0') return false;
+    // Strict: "Тільки в наявності" shows only confirmed in-stock items
+    // (data-instock === '1'). Unknown ('2') and confirmed OOS ('0') hide.
+    if (onlyInStock && el.dataset.instock !== '1') return false;
     if (q && !(el.dataset.search ?? '').includes(q)) return false;
     return true;
   }
 
+  // Numeric sort keys map to a dataset attribute; price sorts push "no
+  // visible price" entries (0) to the bottom of ascending lists via 9e9.
+  const NUMERIC_KEYS: Record<string, string> = {
+    pps: 'pps', ppk: 'ppk', weight: 'weight', diameter: 'diameter',
+  };
+  const STRING_KEYS: Record<string, string> = {
+    name: 'name', material: 'material', brand: 'brand', color: 'color',
+  };
+
   function compareFn(sortKey: string) {
     return (a: HTMLElement, b: HTMLElement) => {
-      const va = (k: string) => Number(a.dataset[k] ?? 0);
-      const vb = (k: string) => Number(b.dataset[k] ?? 0);
-      switch (sortKey) {
-        case 'ppk_asc':  return (va('ppk') || 9e9) - (vb('ppk') || 9e9);
-        case 'ppk_desc': return (vb('ppk') || 0) - (va('ppk') || 0);
-        case 'pps_asc':  return (va('pps') || 9e9) - (vb('pps') || 9e9);
-        case 'pps_desc': return (vb('pps') || 0) - (va('pps') || 0);
-        case 'weight_desc': return vb('weight') - va('weight');
-        default: return 0;
+      const m = sortKey.match(/^(.+)_(asc|desc)$/);
+      if (!m) return 0;
+      const [, key, dir] = m;
+      const sign = dir === 'asc' ? 1 : -1;
+
+      if (key in NUMERIC_KEYS) {
+        const ds = NUMERIC_KEYS[key];
+        const av = Number(a.dataset[ds] ?? 0);
+        const bv = Number(b.dataset[ds] ?? 0);
+        // Push 0 (== missing/masked) to the end regardless of direction
+        if (av === 0 && bv !== 0) return 1;
+        if (bv === 0 && av !== 0) return -1;
+        return sign * (av - bv);
       }
+      if (key in STRING_KEYS) {
+        const ds = STRING_KEYS[key];
+        const av = a.dataset[ds] ?? '';
+        const bv = b.dataset[ds] ?? '';
+        return sign * av.localeCompare(bv, 'uk');
+      }
+      return 0;
     };
   }
 
@@ -794,8 +954,41 @@ function relativeTime(iso: string | null): string {
     noResults.style.display = n === 0 ? '' : 'none';
     if (n === 0) { grid.hidden = true; table.hidden = true; }
     else applyView();
+    syncSortIndicators();
     updateUrl();
   }
+
+  // Update the ↑/↓ glyph on the sortable table headers to mirror sortF.value.
+  function syncSortIndicators() {
+    const m = sortF.value.match(/^(.+)_(asc|desc)$/);
+    const activeKey = m ? m[1] : null;
+    const activeDir = m ? m[2] : null;
+    document.querySelectorAll<HTMLElement>('th.sortable').forEach(th => {
+      const k = th.dataset.sort;
+      th.classList.toggle('is-sorted-asc', k === activeKey && activeDir === 'asc');
+      th.classList.toggle('is-sorted-desc', k === activeKey && activeDir === 'desc');
+    });
+  }
+
+  // Click on a sortable <th> toggles its column's direction in sortF; the
+  // select stays the canonical source of truth.
+  document.querySelectorAll<HTMLElement>('th.sortable').forEach(th => {
+    th.addEventListener('click', () => {
+      const k = th.dataset.sort;
+      if (!k) return;
+      const cur = sortF.value;
+      const [curKey, curDir] = cur.split('_');
+      const nextDir = curKey === k && curDir === 'asc' ? 'desc' : 'asc';
+      const candidate = `${k}_${nextDir}`;
+      // Only switch if option exists; otherwise pick the default direction
+      // we wrote into the select for that column.
+      const exists = [...sortF.options].some(o => o.value === candidate);
+      sortF.value = exists ? candidate : (
+        [...sortF.options].find(o => o.value.startsWith(k + '_'))?.value ?? cur
+      );
+      apply();
+    });
+  });
 
   search.addEventListener('input', apply);
   materialF.addEventListener('change', apply);
@@ -809,5 +1002,28 @@ function relativeTime(iso: string | null): string {
     syncStorePill();
     apply();
   });
+
+  // Mobile drawer: FAB opens, backdrop / close button / ESC closes.
+  const layout = document.getElementById('catalogLayout')!;
+  const fab = document.getElementById('filterFab');
+  const closeBtn = document.getElementById('sidebarClose');
+  const backdrop = document.getElementById('sidebarBackdrop')!;
+  function openDrawer() {
+    layout.classList.add('is-drawer-open');
+    backdrop.hidden = false;
+    document.body.style.overflow = 'hidden';
+  }
+  function closeDrawer() {
+    layout.classList.remove('is-drawer-open');
+    backdrop.hidden = true;
+    document.body.style.overflow = '';
+  }
+  fab?.addEventListener('click', openDrawer);
+  closeBtn?.addEventListener('click', closeDrawer);
+  backdrop.addEventListener('click', closeDrawer);
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && layout.classList.contains('is-drawer-open')) closeDrawer();
+  });
+
   apply();
 </script>

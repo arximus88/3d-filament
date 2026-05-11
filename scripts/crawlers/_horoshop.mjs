@@ -75,6 +75,16 @@ function pickFirst(html, re) {
   return m ? m[1] : null;
 }
 
+// Known UK spelling corrections for colours that source stores emit
+// without an apostrophe or with a single-letter typo. Keep this list
+// minimal — full RU→UK translation belongs to monofilament.mjs.
+const HOROSHOP_COLOR_FIX = {
+  "мятний": "м'ятний",
+};
+function normaliseHoroshopColor(color) {
+  return HOROSHOP_COLOR_FIX[color] ?? color;
+}
+
 // Parse colour/length/weight/diameter from the canonical product name.
 // Tolerant of two formats seen in the wild:
 //   "PLA пластик для 3D принтера натуральний 400м / 1.185кг / 1.75мм"   (Plexiwire)
@@ -95,6 +105,10 @@ export function parseName(name) {
   }
   // Strip trailing tokens that are not real colours.
   if (color) color = color.replace(/^\(.*?\)\s*/u, "").toLowerCase();
+  // Source-side spelling cleanups that aren't full RU→UK translation
+  // (those live in monofilament.mjs). Just fix the few known typos
+  // / dropped apostrophes that leak through unmodified from store data.
+  if (color) color = normaliseHoroshopColor(color);
   return {
     color: color || null,
     weightKg: weight ? Number(weight.replace(",", ".")) : null,

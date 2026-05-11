@@ -2,6 +2,9 @@
 stats/
 .plan/
 .cline/
+.gemini/
+.skills/
+.claude/
 .mcp.json
 
 # Astro / Node

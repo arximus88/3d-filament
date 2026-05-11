@@ -33,7 +33,9 @@ interface Props {
 }
 
 const { company } = Astro.props;
-const stockByCompany = (stockData.companies ?? {}) as Record<string, Record<string, string> & { checkedAt?: string | null; _error?: string }>;
+type StockStatus = 'in' | 'out' | 'unknown';
+type CompanyStock = Partial<Record<string, StockStatus>> & { checkedAt?: string | null; _error?: string };
+const stockByCompany = (stockData.companies ?? {}) as Record<string, CompanyStock>;
 const stock = stockByCompany[company.id];
 const checkedAt = stock?.checkedAt ?? stockData.lastChecked ?? null;
 const productCount = (productsData.products as Array<{ store: string }> ?? []).filter(p => p.store === company.id).length;

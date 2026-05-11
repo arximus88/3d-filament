@@ -4,6 +4,7 @@ import CompanyCard from '../components/CompanyCard.astro';
 import { getCollection } from 'astro:content';
 import stockData from '../data/stock.json';
 import productsData from '../data/products.json';
+import { relativeTime } from '../utils/relativeTime';
 
 const allCompanies = await getCollection('companies');
 const companies = allCompanies.map(c => c.data);
@@ -14,24 +15,14 @@ const materials = [...new Set(companies.flatMap(c => c.materials))].sort();
 const manufacturerCount = companies.filter(c => c.type === 'manufacturer').length;
 const shopCount = companies.filter(c => c.type === 'shop').length;
 
-const stockByCompany = (stockData.companies ?? {}) as Record<string, Record<string, string> & { checkedAt?: string | null; _error?: string }>;
+type StockStatus = 'in' | 'out' | 'unknown';
+type CompanyStock = Partial<Record<string, StockStatus>> & { checkedAt?: string | null; _error?: string };
+const stockByCompany = (stockData.companies ?? {}) as Record<string, CompanyStock>;
 const productCountByStore: Record<string, number> = {};
 for (const p of (productsData.products ?? []) as Array<{ store: string }>) {
   productCountByStore[p.store] = (productCountByStore[p.store] ?? 0) + 1;
 }
 const lastChecked = stockData.lastChecked ?? null;
-
-function relativeTime(iso: string | null): string {
-  if (!iso) return 'дані ще не зібрано';
-  const then = new Date(iso).getTime();
-  if (Number.isNaN(then)) return 'дані ще не зібрано';
-  const diff = Date.now() - then;
-  const hours = Math.round(diff / 3_600_000);
-  if (hours < 1) return 'оновлено щойно';
-  if (hours < 24) return `оновлено ${hours} год тому`;
-  const days = Math.round(hours / 24);
-  return `оновлено ${days} дн тому`;
-}
 const freshnessLabel = relativeTime(lastChecked);
 
 // Structured data: ItemList with all companies
@@ -55,6 +46,11 @@ const structuredData = {
   description="Найповніший каталог українських виробників та магазинів філаменту для 3D друку. PLA, PETG, ABS, TPU та інші матеріали з доставкою по Україні."
 >
   <script type="application/ld+json" set:html={JSON.stringify(structuredData)} />
+
+  <section class="page-hero">
+    <h1>Каталог 3D Філаменту України</h1>
+    <p class="hero-sub">Виробники та магазини матеріалів для 3D друку. Уся актуальна інформація — в одному місці.</p>
+  </section>
 
   <!-- Filter Section -->
   <div class="filter-section">
@@ -119,6 +115,23 @@ const structuredData = {
 </Layout>
 
 <style>
+  .page-hero {
+    margin-bottom: 24px;
+  }
+  .page-hero h1 {
+    font-size: 2rem;
+    margin: 0 0 8px;
+    color: var(--color-text-primary);
+  }
+  .page-hero .hero-sub {
+    color: var(--color-text-secondary);
+    font-size: 1rem;
+    max-width: 720px;
+  }
+  @media (max-width: 640px) {
+    .page-hero h1 { font-size: 1.5rem; }
+    .page-hero .hero-sub { font-size: 0.95rem; }
+  }
   .filter-section {
     background: var(--color-bg-secondary);
     padding: 20px;

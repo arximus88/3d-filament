@@ -73,6 +73,7 @@ const { title, description, canonicalURL } = Astro.props;
           --color-danger-bg: rgba(217, 32, 32, 0.1);
         }
       }
+      :root { --header-height: 56px; }
       * {
         margin: 0;
         padding: 0;
@@ -85,44 +86,57 @@ const { title, description, canonicalURL } = Astro.props;
         background: var(--color-bg-primary);
         color: var(--color-text-primary);
         line-height: 1.6;
-        padding: 20px;
-        transition:
-          background 0.3s,
-          color 0.3s;
+        transition: background 0.3s, color 0.3s;
       }
+      .site-header {
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        height: var(--header-height);
+        background: color-mix(in srgb, var(--color-bg-primary) 88%, transparent);
+        backdrop-filter: saturate(160%) blur(12px);
+        -webkit-backdrop-filter: saturate(160%) blur(12px);
+        border-bottom: 1px solid var(--color-border);
+      }
+      .site-header-inner {
+        max-width: 1400px;
+        margin: 0 auto;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 24px;
+        gap: 16px;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        text-decoration: none;
+        color: var(--color-text-primary);
+        font-weight: 600;
+        font-size: 1.05rem;
+        white-space: nowrap;
+      }
+      .brand-flag { font-size: 1.3rem; line-height: 1; }
+      .brand-name-accent { color: var(--color-accent); }
       .container {
         max-width: 1400px;
         margin: 0 auto;
-        position: relative;
-      }
-      header {
-        text-align: center;
-        margin-bottom: 40px;
-        padding-bottom: 20px;
-        border-bottom: 2px solid var(--color-border);
-        position: relative;
-      }
-      h1 {
-        font-size: 2.5rem;
-        margin-bottom: 10px;
-        color: var(--color-accent);
-      }
-      .subtitle {
-        font-size: 1.1rem;
-        color: var(--color-text-secondary);
+        padding: 28px 24px 40px;
       }
       .primary-nav {
-        margin-top: 20px;
         display: flex;
-        gap: 24px;
-        justify-content: center;
+        gap: 6px;
+        margin-left: auto;
       }
       .primary-nav a {
         color: var(--color-text-secondary);
         text-decoration: none;
-        padding: 8px 16px;
+        padding: 7px 14px;
         border-radius: var(--radius-md);
         font-weight: 500;
+        font-size: 0.95rem;
         transition: background 0.15s, color 0.15s;
       }
       .primary-nav a:hover {
@@ -134,9 +148,6 @@ const { title, description, canonicalURL } = Astro.props;
         background: var(--color-bg-secondary);
       }
       .theme-toggle {
-        position: absolute;
-        right: 0;
-        top: 0;
         background: var(--color-bg-secondary);
         border: 1px solid var(--color-border);
         color: var(--color-text-primary);
@@ -148,6 +159,7 @@ const { title, description, canonicalURL } = Astro.props;
         align-items: center;
         justify-content: center;
         transition: all 0.2s;
+        flex-shrink: 0;
       }
       .theme-toggle:hover {
         border-color: var(--color-accent);
@@ -164,40 +176,41 @@ const { title, description, canonicalURL } = Astro.props;
         padding: 40px 20px;
         color: var(--color-text-secondary);
         border-top: 1px solid var(--color-border);
-        margin-top: 40px;
+        margin-top: 60px;
       }
-      @media (max-width: 768px) {
-        h1 {
-          font-size: 2rem;
-        }
+      @media (max-width: 640px) {
+        .brand-name { display: none; }
+        .primary-nav a { padding: 6px 10px; font-size: 0.9rem; }
+        .site-header-inner { padding: 0 12px; gap: 8px; }
+        .container { padding: 18px 12px 32px; }
       }
     </style>
   </head>
   <body>
     <Icons />
-    <div class="container">
-      <header>
-        <button class="theme-toggle" id="themeToggle" aria-label="Змінити тему">
-          <svg class="info-icon" id="themeIcon"
-            ><use href="#icon-moon"></use></svg
-          >
-        </button>
-        <a href="/" style="text-decoration:none">
-          <h1>🇺🇦 Каталог 3D Філаменту України</h1>
+    <header class="site-header">
+      <div class="site-header-inner">
+        <a href="/" class="brand">
+          <span class="brand-flag" aria-hidden="true">🇺🇦</span>
+          <span class="brand-name">3D Філамент <span class="brand-name-accent">UA</span></span>
         </a>
-        <p class="subtitle">Виробники та магазини матеріалів для 3D друку</p>
         <nav class="primary-nav">
           <a href="/" class={Astro.url.pathname === '/' ? 'active' : ''}>Магазини</a>
           <a href="/catalog" class={Astro.url.pathname.startsWith('/catalog') ? 'active' : ''}>Каталог філаменту</a>
         </nav>
-      </header>
+        <button class="theme-toggle" id="themeToggle" aria-label="Змінити тему">
+          <svg class="info-icon" id="themeIcon"><use href="#icon-moon"></use></svg>
+        </button>
+      </div>
+    </header>
 
+    <main class="container">
       <slot />
+    </main>
 
-      <footer>
-        <p>Дані актуальні станом на березень 2026 року</p>
-      </footer>
-    </div>
+    <footer>
+      <p>Дані актуальні станом на березень 2026 року</p>
+    </footer>
 
     <script>
       // Theme toggle
