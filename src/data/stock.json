@@ -1,114 +1,110 @@
 {
-  "lastChecked": "2026-05-08T10:38:07.883Z",
+  "lastChecked": "2026-05-11T07:48:57.159Z",
   "companies": {
     "lbl-corp": {
       "PLA": "unknown",
       "PETG": "unknown",
-      "checkedAt": "2026-05-08T10:38:07.885Z"
+      "checkedAt": "2026-05-11T07:48:57.159Z"
     },
     "monofilament": {
       "PLA": "unknown",
       "PETG": "unknown",
       "ABS": "unknown",
-      "checkedAt": "2026-05-08T10:38:10.272Z"
+      "checkedAt": "2026-05-11T07:48:59.851Z"
     },
     "u3df": {
-      "PLA": "unknown",
-      "PETG": "unknown",
-      "ABS": "unknown",
-      "TPU": "unknown",
-      "checkedAt": "2026-05-08T10:38:13.624Z"
+      "_error": "Request failed with status code 429",
+      "checkedAt": "2026-05-11T07:49:01.712Z"
     },
     "plexiwire": {
       "PLA": "unknown",
       "PETG": "unknown",
       "ABS": "unknown",
       "TPU": "unknown",
-      "checkedAt": "2026-05-08T10:38:15.995Z"
+      "checkedAt": "2026-05-11T07:49:08.868Z"
     },
     "3dfilament": {
-      "PLA": "unknown",
-      "ABS": "unknown",
-      "PETG": "unknown",
-      "checkedAt": "2026-05-08T10:38:18.951Z"
+      "_error": "Request failed with status code 429",
+      "checkedAt": "2026-05-11T07:49:11.429Z"
     },
     "3dplast": {
-      "ABS": "unknown",
-      "HIPS": "unknown",
-      "checkedAt": "2026-05-08T10:38:22.625Z"
+      "_error": "Request failed with status code 429",
+      "checkedAt": "2026-05-11T07:49:19.763Z"
     },
     "petg-3dbro": {
-      "_error": "HTTP 429",
-      "checkedAt": "2026-05-08T10:38:25.688Z"
+      "PETG": "unknown",
+      "checkedAt": "2026-05-11T07:49:27.508Z"
     },
     "3d-bro": {
-      "_error": "HTTP 429",
-      "checkedAt": "2026-05-08T10:38:32.926Z"
+      "PETG": "out",
+      "checkedAt": "2026-05-11T07:49:30.131Z"
     },
     "pochatok-filament": {
-      "PLA": "unknown",
-      "PETG": "unknown",
-      "checkedAt": "2026-05-08T10:38:40.956Z"
+      "_error": "Request failed with status code 429",
+      "checkedAt": "2026-05-11T07:49:33.897Z"
     },
     "fainyi-3d": {
-      "PLA": "unknown",
-      "PETG": "unknown",
-      "ABS": "unknown",
-      "checkedAt": "2026-05-08T10:38:43.841Z"
+      "_error": "Request failed with status code 429",
+      "checkedAt": "2026-05-11T07:49:41.536Z"
     },
     "all3dp-ua": {
-      "_error": "HTTP 429",
-      "checkedAt": "2026-05-08T10:38:46.880Z"
+      "PLA": "in",
+      "PETG": "in",
+      "ABS": "unknown",
+      "TPU": "unknown",
+      "Nylon": "unknown",
+      "Carbon": "unknown",
+      "checkedAt": "2026-05-11T07:49:48.640Z"
     },
     "polydream": {
       "ABS": "unknown",
       "PLA": "unknown",
       "PETG": "in",
-      "checkedAt": "2026-05-08T10:38:54.582Z"
+      "checkedAt": "2026-05-11T07:49:52.169Z"
     },
     "edge-filaments": {
       "PLA": "unknown",
       "PETG": "unknown",
       "ABS": "unknown",
       "TPU": "unknown",
-      "checkedAt": "2026-05-08T10:38:56.631Z"
+      "checkedAt": "2026-05-11T07:49:53.945Z"
     },
     "3d4u": {
       "PLA": "unknown",
       "PETG": "unknown",
       "ABS": "unknown",
       "TPU": "unknown",
-      "checkedAt": "2026-05-08T10:38:59.705Z"
+      "checkedAt": "2026-05-11T07:49:56.135Z"
     },
     "artline": {
       "PLA": "unknown",
       "PETG": "unknown",
       "ABS": "unknown",
-      "checkedAt": "2026-05-08T10:39:03.309Z"
+      "checkedAt": "2026-05-11T07:49:59.380Z"
     },
     "3ddevice": {
       "PETG": "unknown",
       "PLA": "unknown",
       "ABS": "unknown",
-      "checkedAt": "2026-05-08T10:39:06.191Z"
+      "checkedAt": "2026-05-11T07:50:01.868Z"
     },
     "3d-prostir": {
       "PLA": "unknown",
       "PETG": "unknown",
       "ABS": "unknown",
-      "checkedAt": "2026-05-08T10:39:08.661Z"
+      "checkedAt": "2026-05-11T07:50:04.347Z"
     },
     "techfil": {
       "PLA": "unknown",
       "PETG": "unknown",
       "ABS": "unknown",
-      "checkedAt": "2026-05-08T10:39:13.035Z"
+      "checkedAt": "2026-05-11T07:50:07.755Z"
     },
     "ua3d": {
       "PLA": "out",
       "PETG": "unknown",
       "ABS": "unknown",
-      "checkedAt": "2026-05-08T10:39:15.924Z"
+      "checkedAt": "2026-05-11T07:50:10.916Z"
     }
   }
 }
