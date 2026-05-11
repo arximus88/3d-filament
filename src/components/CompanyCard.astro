@@ -81,7 +81,7 @@ const phones = company.phone ? company.phone.split(',').map(p => p.trim()).filte
   <div class="card-info">
     {company.city && (
       <div class="info-row">
-        <svg class="info-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><use href="#icon-location"></use></svg>
+        <svg class="info-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-location"></use></svg>
         <span>{company.city}</span>
       </div>
     )}
@@ -89,8 +89,8 @@ const phones = company.phone ? company.phone.split(',').map(p => p.trim()).filte
     {phones.length > 0 && (
       <div class="phones-container">
         {phones.map(phone => (
-          <a href={`tel:${phone.replace(/\s/g, '')}`} class="phone-item">
-            <svg class="info-icon"><use href={getOperatorIcon(phone)}></use></svg>
+          <a href={`tel:${phone.replace(/\s/g, '')}`} class="phone-item" aria-label={`Телефон ${phone}`}>
+            <svg class="info-icon" aria-hidden="true"><use href={getOperatorIcon(phone)}></use></svg>
             <span>{phone}</span>
           </a>
         ))}
@@ -100,13 +100,13 @@ const phones = company.phone ? company.phone.split(',').map(p => p.trim()).filte
     {company.socials && Object.values(company.socials).some(Boolean) && (
       <div class="socials-container">
         {company.socials.telegram && (
-          <a href={company.socials.telegram} target="_blank" rel="noopener noreferrer" class="social-link" title="Telegram">
-            <svg class="social-icon"><use href="#icon-telegram"></use></svg>
+          <a href={company.socials.telegram} target="_blank" rel="noopener noreferrer" class="social-link" aria-label={`${company.name} у Telegram`} title="Telegram">
+            <svg class="social-icon" aria-hidden="true"><use href="#icon-telegram"></use></svg>
           </a>
         )}
         {company.socials.instagram && (
-          <a href={company.socials.instagram} target="_blank" rel="noopener noreferrer" class="social-link" title="Instagram">
-            <svg class="social-icon"><use href="#icon-instagram"></use></svg>
+          <a href={company.socials.instagram} target="_blank" rel="noopener noreferrer" class="social-link" aria-label={`${company.name} в Instagram`} title="Instagram">
+            <svg class="social-icon" aria-hidden="true"><use href="#icon-instagram"></use></svg>
           </a>
         )}
       </div>

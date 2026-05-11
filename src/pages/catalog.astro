@@ -2,6 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 import productsData from '../data/products.json';
 import { relativeTime } from '../utils/relativeTime';
+import { resizedImg } from '../utils/imgProxy';
 
 interface Product {
   store: string;
@@ -320,7 +321,7 @@ function colorHex(name: string): string {
         <a class="product-card-link" href={p.url} target="_blank" rel="noopener noreferrer">
           {p.image && (
             <div class="product-image">
-              <img src={p.image} alt={p.name ?? p.material} loading="lazy" width="240" height="240" />
+              <img src={resizedImg(p.image, 240, 240) ?? p.image} alt={p.name ?? p.material} loading="lazy" decoding="async" width="240" height="240" />
             </div>
           )}
           <div class="product-info">

@@ -15,7 +15,9 @@ const materials = [...new Set(companies.flatMap(c => c.materials))].sort();
 const manufacturerCount = companies.filter(c => c.type === 'manufacturer').length;
 const shopCount = companies.filter(c => c.type === 'shop').length;
 
-const stockByCompany = (stockData.companies ?? {}) as Record<string, Record<string, string> & { checkedAt?: string | null; _error?: string }>;
+type StockStatus = 'in' | 'out' | 'unknown';
+type CompanyStock = Partial<Record<string, StockStatus>> & { checkedAt?: string | null; _error?: string };
+const stockByCompany = (stockData.companies ?? {}) as Record<string, CompanyStock>;
 const productCountByStore: Record<string, number> = {};
 for (const p of (productsData.products ?? []) as Array<{ store: string }>) {
   productCountByStore[p.store] = (productCountByStore[p.store] ?? 0) + 1;
