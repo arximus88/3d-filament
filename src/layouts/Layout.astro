@@ -195,8 +195,8 @@ const { title, description, canonicalURL } = Astro.props;
           <span class="brand-name">3D Філамент <span class="brand-name-accent">UA</span></span>
         </a>
         <nav class="primary-nav">
-          <a href="/" class={Astro.url.pathname === '/' ? 'active' : ''}>Магазини</a>
-          <a href="/catalog" class={Astro.url.pathname.startsWith('/catalog') ? 'active' : ''}>Каталог філаменту</a>
+          <a href="/" class={Astro.url.pathname === '/' ? 'active' : ''}>Каталог філаменту</a>
+          <a href="/shops" class={Astro.url.pathname.startsWith('/shops') ? 'active' : ''}>Магазини</a>
         </nav>
         <button class="theme-toggle" id="themeToggle" aria-label="Змінити тему">
           <svg class="info-icon" id="themeIcon"><use href="#icon-moon"></use></svg>
