@@ -1,6 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import productsData from '../data/products.json';
+import companies from '../data/companies.json';
 import { relativeTime } from '../utils/relativeTime';
 import { resizedImg } from '../utils/imgProxy';
 
@@ -37,7 +38,7 @@ for (const p of products) if (p.color) colorCounts.set(p.color, (colorCounts.get
 const colors = [...colorCounts.entries()]
   .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], 'uk'))
   .map(([c]) => c);
-const storeCount = Object.keys(data.stats ?? {}).length;
+const storeCount = new Set(products.map(p => p.store)).size;
 
 // Strict-stock encoding: '1' = confirmed in-stock, '0' = confirmed OOS,
 // '2' = unknown. The catalog hides anything other than '1' when the
@@ -55,12 +56,12 @@ function visiblePrice<T>(inStock: boolean | null, price: T): T | null {
   return inStock === true ? price : null;
 }
 
-// id → display name (best-effort: derived from companies.json convention)
-const STORE_NAMES: Record<string, string> = {
-  'plexiwire': 'Plexiwire',
-  'lbl-corp': 'LBL Corp',
-  'monofilament': 'Monofilament',
-};
+// Store id → display name, for every store that has products.
+const STORE_NAMES: Record<string, string> = Object.fromEntries(
+  (companies as Array<{ id: string; name: string }>)
+    .filter(c => products.some(p => p.store === c.id))
+    .map(c => [c.id, c.name]),
+);
 
 const SITE = 'https://3d-filament.pages.dev';
 

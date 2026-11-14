@@ -6,7 +6,9 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "sync": "astro sync"
+    "sync": "astro sync",
+    "scrape": "bun scripts/scrape.mjs",
+    "test": "bun test"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.2",
