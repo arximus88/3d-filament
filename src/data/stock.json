@@ -1,110 +1,59 @@
 {
-  "lastChecked": "2026-05-11T07:48:57.159Z",
+  "lastChecked": "2026-11-14T12:40:11.046Z",
   "companies": {
     "lbl-corp": {
-      "PLA": "unknown",
-      "PETG": "unknown",
-      "checkedAt": "2026-05-11T07:48:57.159Z"
+      "PLA": "out",
+      "PETG": "in",
+      "checkedAt": "2026-11-14T12:40:11.046Z"
     },
     "monofilament": {
-      "PLA": "unknown",
-      "PETG": "unknown",
-      "ABS": "unknown",
-      "checkedAt": "2026-05-11T07:48:59.851Z"
+      "PLA": "in",
+      "PETG": "in",
+      "ABS": "in",
+      "checkedAt": "2026-11-14T12:38:11.668Z"
     },
     "u3df": {
-      "_error": "Request failed with status code 429",
-      "checkedAt": "2026-05-11T07:49:01.712Z"
+      "PLA": "in",
+      "PETG": "in",
+      "ABS": "out",
+      "TPU": "unknown",
+      "checkedAt": "2026-11-14T12:40:11.046Z"
     },
     "plexiwire": {
-      "PLA": "unknown",
-      "PETG": "unknown",
-      "ABS": "unknown",
-      "TPU": "unknown",
-      "checkedAt": "2026-05-11T07:49:08.868Z"
+      "PLA": "in",
+      "PETG": "in",
+      "ABS": "in",
+      "TPU": "in",
+      "checkedAt": "2026-11-14T12:40:11.046Z"
     },
     "3dfilament": {
-      "_error": "Request failed with status code 429",
-      "checkedAt": "2026-05-11T07:49:11.429Z"
-    },
-    "3dplast": {
-      "_error": "Request failed with status code 429",
-      "checkedAt": "2026-05-11T07:49:19.763Z"
-    },
-    "petg-3dbro": {
-      "PETG": "unknown",
-      "checkedAt": "2026-05-11T07:49:27.508Z"
-    },
-    "3d-bro": {
-      "PETG": "out",
-      "checkedAt": "2026-05-11T07:49:30.131Z"
+      "PLA": "in",
+      "ABS": "out",
+      "PETG": "in",
+      "checkedAt": "2026-11-14T12:40:11.046Z"
     },
     "pochatok-filament": {
-      "_error": "Request failed with status code 429",
-      "checkedAt": "2026-05-11T07:49:33.897Z"
+      "PLA": "in",
+      "PETG": "in",
+      "checkedAt": "2026-11-14T12:40:11.046Z"
     },
     "fainyi-3d": {
-      "_error": "Request failed with status code 429",
-      "checkedAt": "2026-05-11T07:49:41.536Z"
-    },
-    "all3dp-ua": {
       "PLA": "in",
       "PETG": "in",
       "ABS": "unknown",
-      "TPU": "unknown",
-      "Nylon": "unknown",
-      "Carbon": "unknown",
-      "checkedAt": "2026-05-11T07:49:48.640Z"
+      "checkedAt": "2026-11-14T12:40:11.046Z"
     },
     "polydream": {
-      "ABS": "unknown",
-      "PLA": "unknown",
+      "ABS": "out",
+      "PLA": "in",
       "PETG": "in",
-      "checkedAt": "2026-05-11T07:49:52.169Z"
-    },
-    "edge-filaments": {
-      "PLA": "unknown",
-      "PETG": "unknown",
-      "ABS": "unknown",
-      "TPU": "unknown",
-      "checkedAt": "2026-05-11T07:49:53.945Z"
-    },
-    "3d4u": {
-      "PLA": "unknown",
-      "PETG": "unknown",
-      "ABS": "unknown",
-      "TPU": "unknown",
-      "checkedAt": "2026-05-11T07:49:56.135Z"
-    },
-    "artline": {
-      "PLA": "unknown",
-      "PETG": "unknown",
-      "ABS": "unknown",
-      "checkedAt": "2026-05-11T07:49:59.380Z"
-    },
-    "3ddevice": {
-      "PETG": "unknown",
-      "PLA": "unknown",
-      "ABS": "unknown",
-      "checkedAt": "2026-05-11T07:50:01.868Z"
-    },
-    "3d-prostir": {
-      "PLA": "unknown",
-      "PETG": "unknown",
-      "ABS": "unknown",
-      "checkedAt": "2026-05-11T07:50:04.347Z"
+      "checkedAt": "2026-11-14T12:40:11.046Z"
     },
     "techfil": {
       "PLA": "unknown",
-      "PETG": "unknown",
-      "ABS": "unknown",
-      "checkedAt": "2026-05-11T07:50:07.755Z"
-    },
-    "ua3d": {
-      "PLA": "out",
-      "PETG": "unknown",
-      "ABS": "unknown",
-      "checkedAt": "2026-05-11T07:50:10.916Z"
+      "PETG": "in",
+      "ABS": "in",
+      "checkedAt": "2026-11-14T12:40:11.046Z"
     }
   }
 }
