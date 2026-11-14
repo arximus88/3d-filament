@@ -4,7 +4,7 @@ import sitemap from '@astrojs/sitemap';
 // The site's public origin. Everything that needs an absolute URL
 // (canonical, sitemap, robots.txt, llms.txt, structured data) derives it
 // from here, so moving to another domain is this one line.
-const SITE = 'https://3d-filament.pages.dev';
+const SITE = 'https://filaments.borys.app';
 
 export default defineConfig({
   site: SITE,
