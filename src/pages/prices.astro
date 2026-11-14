@@ -1,0 +1,124 @@
+---
+import Layout from '../layouts/Layout.astro';
+import {
+  products,
+  dataDate,
+  lastChecked,
+  materialSummaries,
+  trackedCompanies,
+  priceStats,
+  plural,
+  uah,
+} from '../utils/catalog';
+
+const inStockTotal = products.filter(p => p.inStock === true).length;
+const priced = materialSummaries.filter(m => m.stats);
+
+// Per seller: catalog size and what PLA and PETG — the two materials nearly
+// everyone carries — cost there.
+const sellers = trackedCompanies
+  .map(c => {
+    const items = products.filter(p => p.store === c.id);
+    return {
+      ...c,
+      total: items.length,
+      inStock: items.filter(p => p.inStock === true).length,
+      pla: priceStats(items.filter(p => p.material === 'PLA')),
+      petg: priceStats(items.filter(p => p.material === 'PETG')),
+    };
+  })
+  .sort((a, b) => b.total - a.total);
+
+const pla = materialSummaries.find(m => m.material === 'PLA')?.stats;
+const petg = materialSummaries.find(m => m.material === 'PETG')?.stats;
+
+const title = 'Ціни на філамент для 3D-друку в Україні — зведення за матеріалами';
+const description = `Скільки коштує пластик для 3D-принтера: PLA${pla ? ` від ${uah(pla.min)}/кг` : ''}, PETG${petg ? ` від ${uah(petg.min)}/кг` : ''} та інші. ${products.length} товарів від ${trackedCompanies.length} українських продавців, оновлено ${dataDate}.`;
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Каталог філаменту', item: Astro.site!.href },
+    { '@type': 'ListItem', position: 2, name: 'Ціни', item: new URL('/prices/', Astro.site).href },
+  ],
+};
+---
+
+<Layout title={title} description={description}>
+  <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+
+  <article class="prose">
+    <h1>Ціни на філамент в Україні</h1>
+    <p class="updated">Дані зібрано з сайтів продавців <time datetime={lastChecked}>{dataDate}</time>.</p>
+
+    <p>
+      У каталозі {plural(products.length, 'товар', 'товари', 'товарів')} від {plural(trackedCompanies.length, 'українського продавця', 'українських продавців', 'українських продавців')},
+      з них {inStockTotal} зараз у наявності.
+      {pla && <>PLA коштує від {uah(pla.min)} за кілограм (медіана {uah(pla.median)}/кг)</>}{pla && petg && ', '}
+      {petg && <>PETG — від {uah(petg.min)} (медіана {uah(petg.median)}/кг)</>}.
+      Ціни рахуються за котушками від 0,5 кг, що є в наявності.
+    </p>
+
+    <section>
+      <h2>Ціни за матеріалами</h2>
+      <div class="table-wrap" tabindex="0" role="region" aria-label="Ціни за матеріалами">
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">Матеріал</th>
+              <th scope="col" class="num">Від, грн/кг</th>
+              <th scope="col" class="num">Медіана, грн/кг</th>
+              <th scope="col" class="num">У наявності</th>
+              <th scope="col" class="num">Продавців</th>
+            </tr>
+          </thead>
+          <tbody>
+            {priced.map(m => (
+              <tr>
+                <td><a href={`/material/${m.slug}/`}><strong>{m.material}</strong></a></td>
+                <td class="num">{Math.round(m.stats!.min)}</td>
+                <td class="num">{Math.round(m.stats!.median)}</td>
+                <td class="num">{m.inStock} з {m.total}</td>
+                <td class="num">{m.brands.length}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section>
+      <h2>Ціни за продавцями</h2>
+      <p>Найнижча ціна за кілограм PLA та PETG у кожного продавця.</p>
+      <div class="table-wrap" tabindex="0" role="region" aria-label="Ціни за продавцями">
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">Продавець</th>
+              <th scope="col">Місто</th>
+              <th scope="col" class="num">Товарів</th>
+              <th scope="col" class="num">У наявності</th>
+              <th scope="col" class="num">PLA від</th>
+              <th scope="col" class="num">PETG від</th>
+            </tr>
+          </thead>
+          <tbody>
+            {sellers.map(s => (
+              <tr>
+                <td><a href={`/company/${s.id}/`}><strong>{s.name}</strong></a></td>
+                <td>{s.city}</td>
+                <td class="num">{s.total}</td>
+                <td class="num">{s.inStock}</td>
+                <td class="num">{s.pla ? `${uah(s.pla.min)}/кг` : '—'}</td>
+                <td class="num">{s.petg ? `${uah(s.petg.min)}/кг` : '—'}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <p class="muted">Як збираються й рахуються ці дані — на сторінці <a href="/about/">«Про каталог»</a>.</p>
+  </article>
+</Layout>

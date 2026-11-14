@@ -1,0 +1,196 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { MATERIAL_INFO } from '../../utils/materials';
+import {
+  products,
+  dataDate,
+  lastChecked,
+  materialSummaries,
+  plural,
+  uah,
+  type MaterialSummary,
+} from '../../utils/catalog';
+
+export function getStaticPaths() {
+  return materialSummaries.map(summary => ({ params: { slug: summary.slug }, props: { summary } }));
+}
+
+interface Props {
+  summary: MaterialSummary;
+}
+const { summary } = Astro.props;
+const { material, stats } = summary;
+const info = MATERIAL_INFO[material];
+const items = products.filter(p => p.material === material);
+
+const cheapest = stats?.offers.slice(0, 15) ?? [];
+const best = cheapest[0];
+const kg = (n: number) => `${String(n).replace('.', ',')} кг`;
+
+// Cheapest in-stock offer per brand, cheapest brand first.
+const byBrand = stats
+  ? [...Map.groupBy(stats.offers, o => o.brand)]
+      .map(([brand, offers]) => ({ brand, count: offers.length, from: offers[0].pricePerKg }))
+      .sort((a, b) => a.from - b.from)
+  : [];
+
+const catalogUrl = `/?material=${encodeURIComponent(material)}`;
+const pageUrl = new URL(`/material/${summary.slug}/`, Astro.site).href;
+
+// Question → answer pairs: shown on the page and mirrored as FAQPage data.
+// Every number comes from the current catalog snapshot.
+const faq: Array<{ q: string; a: string }> = [];
+if (stats && best) {
+  faq.push({
+    q: `Скільки коштує ${material} філамент в Україні?`,
+    a: `Станом на ${dataDate} ${material} у наявності коштує від ${uah(stats.min)} до ${uah(stats.max)} за кілограм, медіанна ціна — ${uah(stats.median)}/кг. Це ${plural(stats.offers.length, 'пропозиція', 'пропозиції', 'пропозицій')} котушок від 0,5 кг у ${plural(stats.brands.length, 'продавця', 'продавців', 'продавців')}.`,
+  });
+  faq.push({
+    q: `Де купити найдешевший ${material}?`,
+    a: `Найнижча ціна за кілограм зараз у ${best.brand}: ${best.name} — ${uah(best.pricePerSpool)} за котушку ${kg(best.weightKg)}, тобто ${uah(best.pricePerKg)}/кг. Великі котушки (2–3 кг) зазвичай вигідніші за кілограмові.`,
+  });
+}
+faq.push({
+  q: `Хто продає ${material} філамент в Україні?`,
+  a: `У каталозі ${material} є у ${plural(summary.brands.length, 'продавця', 'продавців', 'продавців')}: ${summary.brands.join(', ')}. Усього ${plural(summary.total, 'товар', 'товари', 'товарів')}, з них у наявності — ${summary.inStock}.`,
+});
+if (info?.nozzle && info.bed) {
+  faq.push({
+    q: `За якої температури друкувати ${material}?`,
+    a: `Типові налаштування для ${material}: сопло ${info.nozzle}, стіл ${info.bed}. Точні значення залежать від виробника — орієнтуйтеся на етикетку котушки.`,
+  });
+}
+
+const title = stats
+  ? `${material} філамент: ціни від ${uah(stats.min)}/кг, де купити в Україні`
+  : `${material} філамент в Україні: де купити, наявність`;
+const description = stats
+  ? `${material} пластик для 3D-друку: ${plural(stats.offers.length, 'пропозиція', 'пропозиції', 'пропозицій')} в наявності від ${stats.brands.length} українських продавців, ${uah(stats.min)}–${uah(stats.max)} за кг. Ціни оновлено ${dataDate}.`
+  : `${material} пластик для 3D-друку: ${plural(summary.total, 'товар', 'товари', 'товарів')} від українських продавців. Наявність перевірено ${dataDate}.`;
+
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Каталог філаменту', item: Astro.site!.href },
+      { '@type': 'ListItem', position: 2, name: 'Ціни', item: new URL('/prices/', Astro.site).href },
+      { '@type': 'ListItem', position: 3, name: material, item: pageUrl },
+    ],
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    dateModified: lastChecked,
+    mainEntity: faq.map(({ q, a }) => ({
+      '@type': 'Question',
+      name: q,
+      acceptedAnswer: { '@type': 'Answer', text: a },
+    })),
+  },
+];
+---
+
+<Layout title={title} description={description}>
+  {jsonLd.map(data => <script type="application/ld+json" set:html={JSON.stringify(data)} />)}
+
+  <article class="prose">
+    <nav class="crumbs" aria-label="Навігаційний ланцюжок">
+      <a href="/">Каталог</a> / <a href="/prices/">Ціни</a> / <span>{material}</span>
+    </nav>
+    <h1>{material} філамент: ціни та наявність в Україні</h1>
+    <p class="updated">Дані зібрано з сайтів продавців <time datetime={lastChecked}>{dataDate}</time>.</p>
+
+    {stats && (
+      <dl class="stat-row">
+        <div><dt>Найнижча ціна</dt><dd>{uah(stats.min)}/кг</dd></div>
+        <div><dt>Медіанна ціна</dt><dd>{uah(stats.median)}/кг</dd></div>
+        <div><dt>У наявності</dt><dd>{summary.inStock} з {summary.total}</dd></div>
+        <div><dt>Продавців</dt><dd>{summary.brands.length}</dd></div>
+      </dl>
+    )}
+
+    {info && <p>{info.summary}</p>}
+    <p><a class="cta" href={catalogUrl}>Дивитися {material} у каталозі ({items.length}) →</a></p>
+
+    {cheapest.length > 0 && (
+      <section>
+        <h2>Найдешевший {material} у наявності</h2>
+        <p>Котушки від 0,5 кг, відсортовані за ціною за кілограм.</p>
+        <div class="table-wrap" tabindex="0" role="region" aria-label={`Найдешевший ${material} у наявності`}>
+          <table>
+            <thead>
+              <tr><th scope="col">Товар</th><th scope="col">Продавець</th><th scope="col" class="num">Котушка</th><th scope="col" class="num">Ціна</th><th scope="col" class="num">За кг</th></tr>
+            </thead>
+            <tbody>
+              {cheapest.map(o => (
+                <tr>
+                  <td><a href={o.url} target="_blank" rel="noopener noreferrer">{o.name}</a></td>
+                  <td>{o.brand}</td>
+                  <td class="num">{kg(o.weightKg)}</td>
+                  <td class="num">{uah(o.pricePerSpool)}</td>
+                  <td class="num"><strong>{uah(o.pricePerKg)}</strong></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+    )}
+
+    {byBrand.length > 1 && (
+      <section>
+        <h2>Ціни на {material} за продавцями</h2>
+        <div class="table-wrap" tabindex="0" role="region" aria-label={`Ціни на ${material} за продавцями`}>
+          <table>
+            <thead>
+              <tr><th scope="col">Продавець</th><th scope="col" class="num">Пропозицій у наявності</th><th scope="col" class="num">Ціна від</th></tr>
+            </thead>
+            <tbody>
+              {byBrand.map(b => (
+                <tr>
+                  <td><a href={`${catalogUrl}&brand=${encodeURIComponent(b.brand)}`}>{b.brand}</a></td>
+                  <td class="num">{b.count}</td>
+                  <td class="num">{uah(b.from)}/кг</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+    )}
+
+    {info && (
+      <section>
+        <h2>Як друкувати {material}</h2>
+        {info.nozzle && info.bed && (
+          <dl class="stat-row">
+            <div><dt>Сопло</dt><dd>{info.nozzle}</dd></div>
+            <div><dt>Стіл</dt><dd>{info.bed}</dd></div>
+          </dl>
+        )}
+        <ul>{info.notes.map(note => <li>{note}</li>)}</ul>
+        <p class="muted">{material} — {info.fullName}. Наведено типові значення; точні режими дивіться на етикетці котушки.</p>
+      </section>
+    )}
+
+    <section>
+      <h2>Часті запитання</h2>
+      {faq.map(({ q, a }) => (
+        <div class="faq-item">
+          <h3>{q}</h3>
+          <p>{a}</p>
+        </div>
+      ))}
+    </section>
+
+    <section>
+      <h2>Інші матеріали</h2>
+      <ul class="chips">
+        {materialSummaries.filter(m => m.material !== material).map(m => (
+          <li><a href={`/material/${m.slug}/`}>{m.material}</a></li>
+        ))}
+      </ul>
+    </section>
+  </article>
+</Layout>

@@ -3,7 +3,7 @@ import Layout from '../../layouts/Layout.astro';
 import CompanyCard from '../../components/CompanyCard.astro';
 import { getCollection } from 'astro:content';
 import stockData from '../../data/stock.json';
-import productsData from '../../data/products.json';
+import { products, priceStats, materialSlug, materialSummaries, dataDate, plural, uah } from '../../utils/catalog';
 
 interface Company {
   id: string;
@@ -38,7 +38,6 @@ type CompanyStock = Partial<Record<string, StockStatus>> & { checkedAt?: string 
 const stockByCompany = (stockData.companies ?? {}) as Record<string, CompanyStock>;
 const stock = stockByCompany[company.id];
 const checkedAt = stock?.checkedAt ?? stockData.lastChecked ?? null;
-const productCount = (productsData.products as Array<{ store: string }> ?? []).filter(p => p.store === company.id).length;
 
 // LocalBusiness structured data — only real data from companies.json, no hallucinations
 const localBusiness: Record<string, unknown> = {
@@ -64,17 +63,36 @@ if (company.socials?.telegram) sameAs.push(company.socials.telegram);
 if (company.socials?.instagram) sameAs.push(company.socials.instagram);
 if (sameAs.length > 0) localBusiness.sameAs = sameAs;
 
-const typeLabel = company.type === 'manufacturer' ? 'Виробник' : 'Магазин';
-const title = `${company.name} — ${typeLabel} філаменту в ${company.city} | 3D Filament UA`;
-const description = `${company.name}: ${company.description} Матеріали: ${company.materials.join(', ')}. Місто: ${company.city}.`;
+// What this seller has in the catalog, per material, cheapest first.
+const ownProducts = products.filter(p => p.store === company.id);
+const materialPages = new Set(materialSummaries.map(m => m.material));
+const range = [...Map.groupBy(ownProducts, p => p.material)]
+  .map(([material, items]) => ({
+    material,
+    total: items.length,
+    inStock: items.filter(p => p.inStock === true).length,
+    stats: priceStats(items),
+  }))
+  .sort((a, b) => b.total - a.total);
+const inStockCount = ownProducts.filter(p => p.inStock === true).length;
+const overall = priceStats(ownProducts);
 
-const SITE = 'https://3d-filament.pages.dev';
+const typeLabel = company.type === 'manufacturer' ? 'Виробник' : 'Магазин';
+const title = overall
+  ? `${company.name}: ціни на філамент від ${uah(overall.min)}/кг, наявність — ${company.city}`
+  : `${company.name} — ${typeLabel.toLowerCase()} філаменту, ${company.city}: контакти й асортимент`;
+const description = ownProducts.length
+  ? `${company.name} (${company.city}): ${plural(ownProducts.length, 'товар', 'товари', 'товарів')} у каталозі, ${inStockCount} у наявності${overall ? `, ціни від ${uah(overall.min)} за кг` : ''}. Матеріали: ${range.map(r => r.material).slice(0, 6).join(', ')}. Оновлено ${dataDate}.`
+  : `${company.name}: ${company.description} Матеріали: ${company.materials.join(', ')}. Місто: ${company.city}.`;
+
+const SITE = Astro.site!.origin;
 const breadcrumbs = {
   '@context': 'https://schema.org',
   '@type': 'BreadcrumbList',
   itemListElement: [
-    { '@type': 'ListItem', position: 1, name: 'Головна', item: SITE + '/' },
-    { '@type': 'ListItem', position: 2, name: company.name, item: `${SITE}/company/${company.id}/` },
+    { '@type': 'ListItem', position: 1, name: 'Каталог філаменту', item: SITE + '/' },
+    { '@type': 'ListItem', position: 2, name: 'Магазини', item: `${SITE}/shops/` },
+    { '@type': 'ListItem', position: 3, name: company.name, item: `${SITE}/company/${company.id}/` },
   ],
 };
 ---
@@ -88,7 +106,7 @@ const breadcrumbs = {
   </div>
 
   <div class="company-page">
-    <CompanyCard company={company} stock={stock} productCount={productCount} showLink={false} />
+    <CompanyCard company={company} stock={stock} productCount={ownProducts.length} showLink={false} />
 
     <div class="company-details">
       <h2>Деталі</h2>
@@ -124,6 +142,38 @@ const breadcrumbs = {
       </div>
     </div>
   </div>
+
+  {range.length > 0 && (
+    <section class="prose company-range">
+      <h2>Асортимент і ціни {company.name}</h2>
+      <p>
+        У каталозі {plural(ownProducts.length, 'товар', 'товари', 'товарів')} цього продавця, з них {inStockCount} у наявності
+        станом на {dataDate}. Ціна «від» — найнижча за кілограм серед котушок від 0,5 кг у наявності.
+      </p>
+      <div class="table-wrap" tabindex="0" role="region" aria-label={`Асортимент ${company.name}`}>
+        <table>
+          <thead>
+            <tr><th scope="col">Матеріал</th><th scope="col" class="num">Товарів</th><th scope="col" class="num">У наявності</th><th scope="col" class="num">Ціна від</th></tr>
+          </thead>
+          <tbody>
+            {range.map(r => (
+              <tr>
+                <td>
+                  {materialPages.has(r.material)
+                    ? <a href={`/material/${materialSlug(r.material)}/`}><strong>{r.material}</strong></a>
+                    : <strong>{r.material}</strong>}
+                </td>
+                <td class="num">{r.total}</td>
+                <td class="num">{r.inStock}</td>
+                <td class="num">{r.stats ? `${uah(r.stats.min)}/кг` : '—'}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p><a class="cta" href={`/?store=${company.id}`}>Усі товари {company.name} у каталозі →</a></p>
+    </section>
+  )}
 </Layout>
 
 <style>
@@ -134,6 +184,7 @@ const breadcrumbs = {
     transition: opacity 0.2s;
   }
   .back-link:hover { opacity: 0.8; }
+  .company-range { max-width: none; }
   .company-page {
     display: grid;
     grid-template-columns: 1fr 1fr;
