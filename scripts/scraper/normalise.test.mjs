@@ -182,6 +182,7 @@ describe("Monofilament", () => {
   test("colour from card title", () => {
     expect(colorFromTitle("PLA Білий")).toBe("білий");
     expect(colorFromTitle("ABS PRO Чорний")).toBe("чорний");
+    expect(colorFromTitle("CoPET Чорний")).toBe("чорний");
     expect(colorFromTitle("PLA Wood Ø1,75мм Вага:0,75кг")).toBe("wood");
   });
 

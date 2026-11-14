@@ -15,6 +15,14 @@ const {
 ---
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="color-scheme" content="light dark" />
+<!-- Apply a saved theme before first paint (a deferred script would flash). -->
+<script is:inline>
+  try {
+    var t = localStorage.getItem("theme");
+    if (t === "light" || t === "dark") document.documentElement.dataset.theme = t;
+  } catch (e) {}
+</script>
 <meta name="description" content={description} />
 <meta name="robots" content="index, follow" />
 <meta name="google-site-verification" content="slJLO9GaKVDmRiOxSvPvAm18dNTYtaEtseAMWu4qMEs" />
@@ -41,3 +49,9 @@ const {
 <link rel="manifest" href="/site.webmanifest" />
 
 <title>{title}</title>
+
+<!-- Prefetch same-site pages the visitor is about to open (hover / touch).
+     Browsers without Speculation Rules ignore this. -->
+<script type="speculationrules" is:inline>
+  { "prefetch": [{ "where": { "href_matches": "/*" }, "eagerness": "moderate" }] }
+</script>

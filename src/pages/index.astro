@@ -27,8 +27,19 @@ interface Product {
 }
 
 const data = productsData as { lastChecked: string; products: Product[]; stats: Record<string, { products: number }> };
-const products = data.products;
 const lastChecked = data.lastChecked;
+
+// Cards are rendered in the order the page opens with (price per kg, cheapest
+// first, unpriced last), so the client doesn't reshuffle 1000+ nodes on load.
+const sortKey = (p: Product) => (p.inStock === true && p.pricePerKg) || Infinity;
+const products = [...data.products].sort((a, b) => sortKey(a) - sortKey(b));
+
+// The cards visible under the default filters (in stock, 1.75 mm) without
+// scrolling: their photos load eagerly, the first two with high priority —
+// one of them is the LCP element. Everything else is lazy.
+const firstScreen = products.filter(p => p.inStock === true && p.diameterMm === 1.75).slice(0, 8);
+const eager = new Set(firstScreen.map(p => p.url));
+const highPriority = new Set(firstScreen.slice(0, 2).map(p => p.url));
 
 const materials = [...new Set(products.map(p => p.material))].sort();
 const brands = [...new Set(products.map(p => p.brand))].sort();
@@ -112,6 +123,7 @@ const seoDescription = `Агрегатор пластиків для 3D-друк
 ---
 
 <Layout title={seoTitle} description={seoDescription}>
+  <link slot="head" rel="preconnect" href="https://images.weserv.nl" />
   <script type="application/ld+json" set:html={JSON.stringify(itemList)} />
   <script type="application/ld+json" set:html={JSON.stringify(breadcrumbs)} />
   <header class="catalog-header">
@@ -148,13 +160,13 @@ const seoDescription = `Агрегатор пластиків для 3D-друк
         </select>
       </div>
       <div class="filter-group">
-        <label for="colorFilter">Колір</label>
+        <span class="filter-label" id="colorLabel">Колір</span>
         <details class="color-dropdown" id="colorDropdown">
-          <summary id="colorSummary">
+          <summary id="colorSummary" aria-labelledby="colorLabel colorSummary">
             <span class="swatch swatch-all" aria-hidden="true"></span>
             <span class="color-label">Всі</span>
           </summary>
-          <div class="color-menu">
+          <div class="color-menu" role="group" aria-labelledby="colorLabel">
             <button type="button" class="color-option" data-value="all">
               <span class="swatch swatch-all" aria-hidden="true"></span>
               <span class="color-name">Всі</span>
@@ -218,76 +230,52 @@ const seoDescription = `Агрегатор пластиків для 3D-друк
     <div class="catalog-main">
 
   <div class="results-bar">
-    <div class="results-summary" id="resultsSummary"></div>
-    <div class="view-toggle" role="tablist" aria-label="Режим перегляду">
-      <button type="button" class="view-btn active" data-view="grid" aria-label="Сітка" title="Сітка">
-        <svg viewBox="0 0 16 16" width="16" height="16" fill="currentColor"><rect x="0" y="0" width="7" height="7" rx="1"/><rect x="9" y="0" width="7" height="7" rx="1"/><rect x="0" y="9" width="7" height="7" rx="1"/><rect x="9" y="9" width="7" height="7" rx="1"/></svg>
+    <div class="results-summary" id="resultsSummary" role="status"></div>
+    <div class="view-toggle" role="group" aria-label="Режим перегляду">
+      <button type="button" class="view-btn active" data-view="grid" aria-pressed="true">
+        <svg viewBox="0 0 16 16" width="16" height="16" fill="currentColor" aria-hidden="true"><rect x="0" y="0" width="7" height="7" rx="1"/><rect x="9" y="0" width="7" height="7" rx="1"/><rect x="0" y="9" width="7" height="7" rx="1"/><rect x="9" y="9" width="7" height="7" rx="1"/></svg>
         <span>Сітка</span>
       </button>
-      <button type="button" class="view-btn" data-view="table" aria-label="Таблиця" title="Таблиця">
-        <svg viewBox="0 0 16 16" width="16" height="16" fill="currentColor"><rect x="0" y="2" width="16" height="2" rx="0.5"/><rect x="0" y="7" width="16" height="2" rx="0.5"/><rect x="0" y="12" width="16" height="2" rx="0.5"/></svg>
+      <button type="button" class="view-btn" data-view="table" aria-pressed="false">
+        <svg viewBox="0 0 16 16" width="16" height="16" fill="currentColor" aria-hidden="true"><rect x="0" y="2" width="16" height="2" rx="0.5"/><rect x="0" y="7" width="16" height="2" rx="0.5"/><rect x="0" y="12" width="16" height="2" rx="0.5"/></svg>
         <span>Таблиця</span>
       </button>
     </div>
   </div>
 
-  <table class="product-table" id="productTable" hidden>
-    <thead>
-      <tr>
-        <th>Колір</th>
-        <th class="sortable" data-sort="material">Матеріал</th>
-        <th class="sortable" data-sort="brand">Бренд</th>
-        <th class="sortable" data-sort="name">Назва</th>
-        <th class="sortable num" data-sort="weight">Вага</th>
-        <th class="sortable num" data-sort="diameter">Діам.</th>
-        <th class="sortable num" data-sort="pps">Ціна, грн</th>
-        <th class="sortable num" data-sort="ppk">Грн/кг</th>
-        <th>Наявність</th>
-      </tr>
-    </thead>
-    <tbody id="productTableBody">
-      {products.map(p => {
-        const code = stockCode(p.inStock);
-        const pps = visiblePrice(p.inStock, p.pricePerSpool);
-        const ppk = visiblePrice(p.inStock, p.pricePerKg);
-        return (
-        <tr
-          class="product-row"
-          data-material={p.material}
-          data-brand={p.brand}
-          data-store={p.store}
-          data-color={p.color ?? ''}
-          data-instock={code}
-          data-name={(p.name ?? '').toLowerCase()}
-          data-ppk={ppk ?? 0}
-          data-pps={pps ?? 0}
-          data-weight={p.weightKg ?? 0}
-          data-diameter={p.diameterMm ?? 0}
-          data-search={`${p.name ?? ''} ${p.sku ?? ''} ${p.color ?? ''} ${p.brand}`.toLowerCase()}
-        >
-          <td>
-            <span class="row-color">
-              {p.color && <span class="swatch swatch-sm" style={`background:${colorHex(p.color)}`} aria-hidden="true"></span>}
-              <span>{p.color ?? '—'}</span>
-            </span>
-          </td>
-          <td><span class="tag tag-material">{p.material}</span></td>
-          <td>{p.brand}</td>
-          <td><a class="row-link" href={p.url} target="_blank" rel="noopener noreferrer">{p.name ?? '—'}</a></td>
-          <td>{p.weightKg ? `${p.weightKg} кг` : '—'}</td>
-          <td>{p.diameterMm ? `${p.diameterMm} мм` : '—'}</td>
-          <td class="num">{pps ?? '—'}</td>
-          <td class="num">{ppk ?? '—'}</td>
-          <td>
-            {code === '1' && <span class="tag tag-in">В наявн.</span>}
-            {code === '0' && <span class="tag tag-out">Немає</span>}
-            {code === '2' && <span class="tag tag-unknown">Уточнюйте</span>}
-          </td>
+  <!-- Rows are built in the browser from the cards when the table view is
+       first opened (see buildRow), so the product data isn't shipped twice. -->
+  <div class="table-scroll" id="tableScroll" role="region" aria-label="Таблиця товарів" tabindex="0" hidden>
+    <table class="product-table">
+      <thead>
+        <tr>
+          <th scope="col">Колір</th>
+          <th scope="col" data-sort="material"><button type="button" class="sort-btn">Матеріал</button></th>
+          <th scope="col" data-sort="brand"><button type="button" class="sort-btn">Бренд</button></th>
+          <th scope="col" data-sort="name"><button type="button" class="sort-btn">Назва</button></th>
+          <th scope="col" class="num" data-sort="weight"><button type="button" class="sort-btn">Вага</button></th>
+          <th scope="col" class="num" data-sort="diameter"><button type="button" class="sort-btn">Діам.</button></th>
+          <th scope="col" class="num" data-sort="pps"><button type="button" class="sort-btn">Ціна, грн</button></th>
+          <th scope="col" class="num" data-sort="ppk"><button type="button" class="sort-btn">Грн/кг</button></th>
+          <th scope="col">Наявність</th>
         </tr>
-        );
-      })}
-    </tbody>
-  </table>
+      </thead>
+      <tbody id="productTableBody"></tbody>
+    </table>
+  </div>
+  <template id="rowTemplate">
+    <tr class="product-row">
+      <td><span class="row-color"><span class="swatch swatch-sm" aria-hidden="true"></span><span data-cell="color"></span></span></td>
+      <td><span class="tag tag-material" data-cell="material"></span></td>
+      <td data-cell="brand"></td>
+      <td><a class="row-link" data-cell="name" target="_blank" rel="noopener noreferrer"></a></td>
+      <td class="num" data-cell="weight"></td>
+      <td class="num" data-cell="diameter"></td>
+      <td class="num" data-cell="pps"></td>
+      <td class="num" data-cell="ppk"></td>
+      <td><span class="tag" data-cell="stock"></span></td>
+    </tr>
+  </template>
 
   <div class="product-grid" id="productGrid">
     {products.map(p => {
@@ -315,7 +303,14 @@ const seoDescription = `Агрегатор пластиків для 3D-друк
               <svg viewBox="0 0 162 209"><use href="#icon-filament"></use></svg>
             </div>
             {p.image && (
-              <img src={resizedImg(p.image, 240, 240) ?? p.image} alt={p.name ?? p.material} loading="lazy" decoding="async" width="240" height="240" onerror="this.remove()" />
+              <img
+                src={resizedImg(p.image, 240, 240) ?? p.image}
+                srcset={`${resizedImg(p.image, 240, 240) ?? p.image} 1x, ${resizedImg(p.image, 480, 480) ?? p.image} 2x`}
+                alt=""
+                loading={eager.has(p.url) ? 'eager' : 'lazy'}
+                fetchpriority={highPriority.has(p.url) ? 'high' : undefined}
+                decoding="async" width="240" height="240" onerror="this.remove()"
+              />
             )}
           </div>
           <div class="product-info">
@@ -450,7 +445,7 @@ const seoDescription = `Агрегатор пластиків для 3D-друк
     flex-direction: column;
     gap: 6px;
   }
-  .filter-group label {
+  .filter-group label, .filter-label {
     font-size: 0.85rem;
     color: var(--color-text-secondary);
     font-weight: 500;
@@ -491,8 +486,8 @@ const seoDescription = `Агрегатор пластиків для 3D-друк
       position: fixed;
       top: 0; left: 0;
       width: min(320px, 88vw);
-      height: 100dvh;
-      max-height: 100dvh;
+      height: 100svh;
+      max-height: 100svh;
       border-radius: 0;
       border-right: 1px solid var(--color-border);
       transform: translateX(-100%);
@@ -614,13 +609,16 @@ const seoDescription = `Агрегатор пластиків для 3D-друк
     background: conic-gradient(#d92020, #ffd400, #2e9b4f, #1f4fbf, #7b2cbf, #d92020);
   }
   /* Table */
+  .table-scroll {
+    overflow-x: auto;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+  }
+  .table-scroll:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
   .product-table {
     width: 100%;
     border-collapse: collapse;
     background: var(--color-bg-secondary);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-lg);
-    overflow: hidden;
     font-size: 0.9rem;
   }
   .product-table th, .product-table td {
@@ -633,22 +631,25 @@ const seoDescription = `Агрегатор пластиків для 3D-друк
     color: var(--color-text-secondary);
     font-weight: 600;
     font-size: 0.85rem;
-    position: sticky; top: 0;
-  }
-  .product-table th.sortable {
-    cursor: pointer;
-    user-select: none;
     white-space: nowrap;
   }
-  .product-table th.sortable:hover { color: var(--color-text-primary); }
-  .product-table th.sortable::after {
+  .sort-btn {
+    background: none;
+    border: 0;
+    padding: 0;
+    font: inherit;
+    color: inherit;
+    cursor: pointer;
+  }
+  .sort-btn:hover { color: var(--color-text-primary); }
+  .sort-btn::after {
     content: '⇅';
     margin-left: 6px;
     opacity: 0.35;
     font-size: 0.85em;
   }
-  .product-table th.is-sorted-asc::after { content: '↑'; opacity: 1; color: var(--color-accent); }
-  .product-table th.is-sorted-desc::after { content: '↓'; opacity: 1; color: var(--color-accent); }
+  th[aria-sort="ascending"] .sort-btn::after { content: '↑'; opacity: 1; color: var(--color-accent); }
+  th[aria-sort="descending"] .sort-btn::after { content: '↓'; opacity: 1; color: var(--color-accent); }
   .product-table tbody tr:hover { background: var(--color-bg-card); }
   .product-table tbody tr:last-child td { border-bottom: 0; }
   .product-table .num { text-align: right; font-variant-numeric: tabular-nums; }
@@ -667,13 +668,16 @@ const seoDescription = `Агрегатор пластиків для 3D-друк
   }
   /* HTML [hidden] gets clobbered by display:grid/table on the class —
      restore the visibility-control behaviour. */
-  .product-grid[hidden], .product-table[hidden] { display: none; }
+  .product-grid[hidden] { display: none; }
   .product-card {
     background: var(--color-bg-secondary);
     border: 1px solid var(--color-border);
     border-radius: var(--radius-lg);
     overflow: hidden;
     transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
+    /* Skip layout and paint of off-screen cards (there are 1000+). */
+    content-visibility: auto;
+    contain-intrinsic-size: auto 340px;
   }
   .product-card:hover {
     transform: translateY(-2px);
@@ -846,11 +850,13 @@ const seoDescription = `Агрегатор пластиків для 3D-друк
 </style>
 
 <script>
+  // All cards, kept in the current sort order (which is also their DOM order).
   const cards = Array.from(document.querySelectorAll<HTMLElement>('.product-card'));
-  const rows = Array.from(document.querySelectorAll<HTMLElement>('.product-row'));
   const grid = document.getElementById('productGrid')!;
-  const table = document.getElementById('productTable') as HTMLTableElement;
+  const tableScroll = document.getElementById('tableScroll')!;
   const tableBody = document.getElementById('productTableBody')!;
+  const rowTemplate = document.getElementById('rowTemplate') as HTMLTemplateElement;
+  const sortHeaders = document.querySelectorAll<HTMLElement>('th[data-sort]');
   const noResults = document.getElementById('noResults')!;
   const summary = document.getElementById('resultsSummary')!;
   const search = document.getElementById('search') as HTMLInputElement;
@@ -870,16 +876,20 @@ const seoDescription = `Агрегатор пластиків для 3D-друк
   let currentStore: string = 'all';
   const storeDisplayNames: Record<string, string> = JSON.parse(document.getElementById('store-names-data')?.textContent ?? '{}');
 
+  // The sort the cards are currently in; the server renders them in the
+  // default one, so nothing moves until the user picks another.
+  let domSort = 'ppk_asc';
+  // Cards passing the current filters, in sort order.
+  let visible: HTMLElement[] = [];
+  const rowCache = new Map<HTMLElement, HTMLTableRowElement>();
+
   // Restore from URL
   const params = new URLSearchParams(window.location.search);
   if (params.get('material')) materialF.value = params.get('material')!;
   if (params.get('brand')) brandF.value = params.get('brand')!;
   if (params.get('diameter')) diameterF.value = params.get('diameter')!;
   if (params.get('weight')) weightF.value = params.get('weight')!;
-  if (params.get('color')) {
-    colorF.value = params.get('color')!;
-    syncColorSummary();
-  }
+  if (params.get('color')) colorF.value = params.get('color')!;
   if (params.get('sort')) sortF.value = params.get('sort')!;
   if (params.get('q')) search.value = params.get('q')!;
   if (params.get('instock') === '0') inStockOnly.checked = false;
@@ -888,7 +898,6 @@ const seoDescription = `Агрегатор пластиків для 3D-друк
     currentStore = params.get('store')!;
     syncStorePill();
   }
-  applyView();
 
   function syncStorePill() {
     if (currentStore === 'all') {
@@ -899,10 +908,56 @@ const seoDescription = `Агрегатор пластиків для 3D-друк
     }
   }
 
+  // A table row for a card, cloned from #rowTemplate (so it carries the
+  // page's scoped-style attributes) and filled from the card's data.
+  function buildRow(card: HTMLElement): HTMLTableRowElement {
+    const row = rowTemplate.content.firstElementChild!.cloneNode(true) as HTMLTableRowElement;
+    const cell = (name: string) => row.querySelector<HTMLElement>(`[data-cell="${name}"]`)!;
+    const d = card.dataset;
+    const orDash = (value: string | undefined, unit = '') => (Number(value) ? `${value}${unit}` : '—');
+
+    const swatch = row.querySelector<HTMLElement>('.swatch')!;
+    const cardSwatch = card.querySelector<HTMLElement>('.meta-color .swatch');
+    if (cardSwatch) swatch.style.background = cardSwatch.style.background;
+    else swatch.remove();
+    cell('color').textContent = d.color || '—';
+    cell('material').textContent = d.material ?? '';
+    cell('brand').textContent = d.brand ?? '';
+    const link = cell('name') as HTMLAnchorElement;
+    link.href = card.querySelector<HTMLAnchorElement>('.product-card-link')!.href;
+    link.textContent = card.querySelector('.product-name')?.textContent ?? '—';
+    cell('weight').textContent = orDash(d.weight, ' кг');
+    cell('diameter').textContent = orDash(d.diameter, ' мм');
+    cell('pps').textContent = orDash(d.pps);
+    cell('ppk').textContent = Number(d.ppk) ? String(Math.round(Number(d.ppk))) : '—';
+    const stock = cell('stock');
+    stock.classList.add(d.instock === '1' ? 'tag-in' : d.instock === '0' ? 'tag-out' : 'tag-unknown');
+    stock.textContent = d.instock === '1' ? 'В наявн.' : d.instock === '0' ? 'Немає' : 'Уточнюйте';
+    return row;
+  }
+
+  function renderTable() {
+    tableBody.replaceChildren(
+      ...visible.map(card => {
+        let row = rowCache.get(card);
+        if (!row) rowCache.set(card, (row = buildRow(card)));
+        return row;
+      }),
+    );
+  }
+
+  // Show the active view (or neither when nothing matches). Only the
+  // active view is ever updated.
   function applyView() {
-    grid.hidden = currentView !== 'grid';
-    table.hidden = currentView !== 'table';
-    viewBtns.forEach(b => b.classList.toggle('active', b.dataset.view === currentView));
+    const empty = visible.length === 0;
+    grid.hidden = empty || currentView !== 'grid';
+    tableScroll.hidden = empty || currentView !== 'table';
+    if (!tableScroll.hidden) renderTable();
+    viewBtns.forEach(b => {
+      const active = b.dataset.view === currentView;
+      b.classList.toggle('active', active);
+      b.setAttribute('aria-pressed', String(active));
+    });
     localStorage.setItem('catalogView', currentView);
   }
   viewBtns.forEach(b => b.addEventListener('click', () => {
@@ -928,10 +983,6 @@ const seoDescription = `Агрегатор пластиків для 3D-друк
     });
   });
   syncColorSummary();
-  // Close dropdown when clicking outside
-  document.addEventListener('click', e => {
-    if (!colorDropdown.contains(e.target as Node)) colorDropdown.open = false;
-  });
 
   function updateUrl() {
     const p = new URLSearchParams();
@@ -972,96 +1023,87 @@ const seoDescription = `Агрегатор пластиків для 3D-друк
     return true;
   }
 
-  // Numeric sort keys map to a dataset attribute; price sorts push "no
-  // visible price" entries (0) to the bottom of ascending lists via 9e9.
-  const NUMERIC_KEYS: Record<string, string> = {
-    pps: 'pps', ppk: 'ppk', weight: 'weight', diameter: 'diameter',
-  };
-  const STRING_KEYS: Record<string, string> = {
-    name: 'name', material: 'material', brand: 'brand', color: 'color',
-  };
+  const NUMERIC_KEYS = new Set(['pps', 'ppk', 'weight', 'diameter']);
+  const STRING_KEYS = new Set(['name', 'material', 'brand', 'color']);
 
   function compareFn(sortKey: string) {
-    return (a: HTMLElement, b: HTMLElement) => {
-      const m = sortKey.match(/^(.+)_(asc|desc)$/);
-      if (!m) return 0;
-      const [, key, dir] = m;
-      const sign = dir === 'asc' ? 1 : -1;
-
-      if (key in NUMERIC_KEYS) {
-        const ds = NUMERIC_KEYS[key];
-        const av = Number(a.dataset[ds] ?? 0);
-        const bv = Number(b.dataset[ds] ?? 0);
-        // Push 0 (== missing/masked) to the end regardless of direction
+    const m = sortKey.match(/^(.+)_(asc|desc)$/);
+    if (!m) return () => 0;
+    const [, key, dir] = m;
+    const sign = dir === 'asc' ? 1 : -1;
+    if (NUMERIC_KEYS.has(key)) {
+      return (a: HTMLElement, b: HTMLElement) => {
+        const av = Number(a.dataset[key] ?? 0);
+        const bv = Number(b.dataset[key] ?? 0);
+        // 0 means missing (or a price hidden for an unavailable item):
+        // those go last in either direction.
         if (av === 0 && bv !== 0) return 1;
         if (bv === 0 && av !== 0) return -1;
         return sign * (av - bv);
-      }
-      if (key in STRING_KEYS) {
-        const ds = STRING_KEYS[key];
-        const av = a.dataset[ds] ?? '';
-        const bv = b.dataset[ds] ?? '';
-        return sign * av.localeCompare(bv, 'uk');
-      }
-      return 0;
-    };
+      };
+    }
+    if (STRING_KEYS.has(key)) {
+      return (a: HTMLElement, b: HTMLElement) =>
+        sign * (a.dataset[key] ?? '').localeCompare(b.dataset[key] ?? '', 'uk');
+    }
+    return () => 0;
   }
+
+  const plural = new Intl.PluralRules('uk');
+  const PRODUCT_WORD: Record<string, string> = { one: 'товар', few: 'товари', many: 'товарів', other: 'товару' };
 
   function apply() {
     const q = search.value.trim().toLowerCase();
     const mat = materialF.value;
     const brand = brandF.value;
     const color = colorF.value;
-    const onlyInStock = inStockOnly.checked;
-    const cmp = compareFn(sortF.value);
-
     const diameter = diameterF.value;
     const weight = weightF.value;
-    const visibleCards = cards.filter(c => matches(c, q, mat, brand, color, currentStore, diameter, weight, onlyInStock)).sort(cmp);
-    cards.forEach(c => { c.style.display = 'none'; });
-    visibleCards.forEach(c => { c.style.display = ''; grid.appendChild(c); });
+    const onlyInStock = inStockOnly.checked;
 
-    const visibleRows = rows.filter(r => matches(r, q, mat, brand, color, currentStore, diameter, weight, onlyInStock)).sort(cmp);
-    rows.forEach(r => { r.style.display = 'none'; });
-    visibleRows.forEach(r => { r.style.display = ''; tableBody.appendChild(r); });
+    // Filtering never changes the relative order, so the DOM is reordered
+    // only when the sort itself changes.
+    if (sortF.value !== domSort) {
+      cards.sort(compareFn(sortF.value));
+      grid.append(...cards);
+      domSort = sortF.value;
+    }
+    visible = [];
+    for (const card of cards) {
+      const show = matches(card, q, mat, brand, color, currentStore, diameter, weight, onlyInStock);
+      card.style.display = show ? '' : 'none';
+      if (show) visible.push(card);
+    }
 
-    const n = visibleCards.length;
-    summary.textContent = `Знайдено ${n} ${n === 1 ? 'товар' : n < 5 ? 'товари' : 'товарів'}`;
+    const n = visible.length;
+    summary.textContent = `Знайдено ${n} ${PRODUCT_WORD[plural.select(n)]}`;
     noResults.style.display = n === 0 ? '' : 'none';
-    if (n === 0) { grid.hidden = true; table.hidden = true; }
-    else applyView();
+    applyView();
     syncSortIndicators();
     updateUrl();
   }
 
-  // Update the ↑/↓ glyph on the sortable table headers to mirror sortF.value.
+  // Mirror sortF.value onto the table headers (aria-sort drives the arrow).
   function syncSortIndicators() {
-    const m = sortF.value.match(/^(.+)_(asc|desc)$/);
-    const activeKey = m ? m[1] : null;
-    const activeDir = m ? m[2] : null;
-    document.querySelectorAll<HTMLElement>('th.sortable').forEach(th => {
-      const k = th.dataset.sort;
-      th.classList.toggle('is-sorted-asc', k === activeKey && activeDir === 'asc');
-      th.classList.toggle('is-sorted-desc', k === activeKey && activeDir === 'desc');
+    const [, activeKey, activeDir] = sortF.value.match(/^(.+)_(asc|desc)$/) ?? [];
+    sortHeaders.forEach(th => {
+      if (th.dataset.sort === activeKey) th.setAttribute('aria-sort', activeDir === 'asc' ? 'ascending' : 'descending');
+      else th.removeAttribute('aria-sort');
     });
   }
 
-  // Click on a sortable <th> toggles its column's direction in sortF; the
-  // select stays the canonical source of truth.
-  document.querySelectorAll<HTMLElement>('th.sortable').forEach(th => {
-    th.addEventListener('click', () => {
-      const k = th.dataset.sort;
-      if (!k) return;
-      const cur = sortF.value;
-      const [curKey, curDir] = cur.split('_');
-      const nextDir = curKey === k && curDir === 'asc' ? 'desc' : 'asc';
-      const candidate = `${k}_${nextDir}`;
-      // Only switch if option exists; otherwise pick the default direction
-      // we wrote into the select for that column.
-      const exists = [...sortF.options].some(o => o.value === candidate);
-      sortF.value = exists ? candidate : (
-        [...sortF.options].find(o => o.value.startsWith(k + '_'))?.value ?? cur
-      );
+  // A header button toggles its column's direction in sortF; the select
+  // stays the single source of truth.
+  sortHeaders.forEach(th => {
+    th.querySelector('button')?.addEventListener('click', () => {
+      const k = th.dataset.sort!;
+      const [curKey, curDir] = sortF.value.split('_');
+      const candidate = `${k}_${curKey === k && curDir === 'asc' ? 'desc' : 'asc'}`;
+      // Not every column has both directions in the select.
+      const options = [...sortF.options].map(o => o.value);
+      sortF.value = options.includes(candidate)
+        ? candidate
+        : options.find(v => v.startsWith(k + '_')) ?? sortF.value;
       apply();
     });
   });
@@ -1069,7 +1111,6 @@ const seoDescription = `Агрегатор пластиків для 3D-друк
   search.addEventListener('input', apply);
   materialF.addEventListener('change', apply);
   brandF.addEventListener('change', apply);
-  colorF.addEventListener('change', apply);
   diameterF.addEventListener('change', apply);
   weightF.addEventListener('change', apply);
   sortF.addEventListener('change', apply);
@@ -1081,23 +1122,40 @@ const seoDescription = `Агрегатор пластиків для 3D-друк
     apply();
   });
 
-  // Mobile drawer: FAB opens, backdrop / close button / ESC closes.
+  // Mobile drawer: FAB opens; backdrop / close button / Esc closes. On
+  // narrow screens the sidebar is an off-canvas dialog: while closed it is
+  // inert (out of the tab order), while open the rest of the page is.
   const layout = document.getElementById('catalogLayout')!;
-  const fab = document.getElementById('filterFab');
-  const closeBtn = document.getElementById('sidebarClose');
+  const sidebar = document.getElementById('catalogSidebar')!;
+  const fab = document.getElementById('filterFab')!;
+  const closeBtn = document.getElementById('sidebarClose')!;
   const backdrop = document.getElementById('sidebarBackdrop')!;
-  function openDrawer() {
-    layout.classList.add('is-drawer-open');
-    backdrop.hidden = false;
-    document.body.style.overflow = 'hidden';
+  const drawerMode = window.matchMedia('(max-width: 1023px)');
+  const behindDrawer = [
+    document.querySelector<HTMLElement>('.site-header'),
+    document.querySelector<HTMLElement>('.catalog-header'),
+    document.querySelector<HTMLElement>('.catalog-main'),
+    document.querySelector<HTMLElement>('footer'),
+    fab,
+  ];
+  function setDrawer(open: boolean) {
+    layout.classList.toggle('is-drawer-open', open);
+    backdrop.hidden = !open;
+    document.body.style.overflow = open ? 'hidden' : '';
+    sidebar.inert = drawerMode.matches && !open;
+    behindDrawer.forEach(el => { if (el) el.inert = open; });
   }
+  setDrawer(false);
+  drawerMode.addEventListener('change', () => setDrawer(false));
+  fab.addEventListener('click', () => {
+    setDrawer(true);
+    closeBtn.focus();
+  });
   function closeDrawer() {
-    layout.classList.remove('is-drawer-open');
-    backdrop.hidden = true;
-    document.body.style.overflow = '';
+    setDrawer(false);
+    fab.focus();
   }
-  fab?.addEventListener('click', openDrawer);
-  closeBtn?.addEventListener('click', closeDrawer);
+  closeBtn.addEventListener('click', closeDrawer);
   backdrop.addEventListener('click', closeDrawer);
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape' && layout.classList.contains('is-drawer-open')) closeDrawer();
