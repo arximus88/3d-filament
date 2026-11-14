@@ -4,6 +4,7 @@ import productsData from '../data/products.json';
 import companies from '../data/companies.json';
 import { relativeTime } from '../utils/relativeTime';
 import { resizedImg } from '../utils/imgProxy';
+import { colorHex, solidColorHex } from '../utils/colorHex';
 
 interface Product {
   store: string;
@@ -108,34 +109,6 @@ const breadcrumbs = {
 const seoTitle = `Каталог філаменту України — ${products.length} товарів від ${storeCount} магазинів • ціни і наявність`;
 const seoDescription = `Агрегатор пластиків для 3D-друку: ${[...new Set(products.map(p => p.material))].slice(0, 8).join(', ')} та інші. ${products.length} товарів від ${[...new Set(products.map(p => p.brand))].join(', ')}. Сортування за ціною за катушку та за кг, фільтри за матеріалом, кольором, брендом.`;
 
-// Hex map for Ukrainian colour names. Falls back to a neutral grey on miss.
-const COLOR_HEX: Record<string, string> = {
-  'білий': '#ffffff',
-  'натуральний': '#f5deb3',
-  'жовтий': '#ffd400',
-  'золото': '#d4af37',
-  'помаранчевий': '#ff8c00',
-  'червоний': '#d92020',
-  'бордовий': '#800020',
-  'рожевий': '#ff69b4',
-  'фіолетовий': '#7b2cbf',
-  'синій': '#1e3a8a',
-  'блакитний': '#5cb6e6',
-  'бірюзовий': '#1abc9c',
-  'зелений': '#2e8b57',
-  'салатовий': '#98e26b',
-  'хакі': '#5d6634',
-  'коричневий': '#8b4513',
-  'бронза': '#cd7f32',
-  'мідь': '#b87333',
-  'срібло': '#c0c0c0',
-  'сталь': '#71797e',
-  'сірий': '#808080',
-  'чорний': '#1a1a1a',
-};
-function colorHex(name: string): string {
-  return COLOR_HEX[name.toLowerCase()] ?? '#999';
-}
 ---
 
 <Layout title={seoTitle} description={seoDescription}>
@@ -337,7 +310,7 @@ function colorHex(name: string): string {
         data-search={`${p.name ?? ''} ${p.sku ?? ''} ${p.color ?? ''} ${p.brand}`.toLowerCase()}
       >
         <a class="product-card-link" href={p.url} target="_blank" rel="noopener noreferrer">
-          <div class="product-image" style={`color:${colorHex(p.color ?? '')}`}>
+          <div class="product-image" style={`color:${solidColorHex(p.color)}`}>
             <div class="product-image-fallback" aria-hidden="true">
               <svg viewBox="0 0 162 209"><use href="#icon-filament"></use></svg>
             </div>
@@ -346,25 +319,27 @@ function colorHex(name: string): string {
             )}
           </div>
           <div class="product-info">
-            <div class="product-tags">
+            <div class="product-top">
               <span class="tag tag-material">{p.material}</span>
-              {p.color && <span class="tag tag-color">{p.color}</span>}
-              {code === '0' && <span class="tag tag-out">Немає</span>}
-              {code === '1' && <span class="tag tag-in">В наявності</span>}
-              {code === '2' && <span class="tag tag-unknown">Уточнюйте</span>}
+              <span class="product-brand">{p.brand}</span>
             </div>
             <h3 class="product-name">{p.name ?? `${p.material} ${p.color ?? ''}`}</h3>
             <div class="product-meta">
-              <span>{p.brand}</span>
-              {p.weightKg && <span>{p.weightKg}кг</span>}
-              {p.diameterMm && <span>{p.diameterMm}мм</span>}
+              {p.color && (
+                <span class="meta-color">
+                  <span class="swatch swatch-sm" style={`background:${colorHex(p.color)}`} aria-hidden="true"></span>
+                  {p.color}
+                </span>
+              )}
+              {p.weightKg && <span>{p.weightKg} кг</span>}
+              {p.diameterMm && <span>{p.diameterMm} мм</span>}
             </div>
             <div class="product-price">
               {pps !== null
-                ? <span class="price-spool">{pps} {p.currency === 'UAH' ? 'грн' : p.currency}</span>
-                : <span class="price-spool price-unknown">—</span>
+                ? <span class="price-spool">{pps} <small>{p.currency === 'UAH' ? 'грн' : p.currency}</small></span>
+                : <span class={`stock-note stock-note-${code}`}>{code === '0' ? 'Немає в наявності' : 'Уточнюйте наявність'}</span>
               }
-              {ppk !== null && <span class="price-kg">{ppk} грн/кг</span>}
+              {ppk !== null && <span class="price-kg">{Math.round(ppk)} грн/кг</span>}
             </div>
           </div>
         </a>
@@ -393,8 +368,10 @@ function colorHex(name: string): string {
     margin-bottom: 24px;
   }
   .catalog-header h1 {
-    font-size: 2rem;
-    margin: 0 0 8px;
+    font-size: clamp(1.6rem, 4vw, 2.1rem);
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+    margin: 0 0 6px;
     color: var(--color-text-primary);
   }
   .catalog-header .subtitle {
@@ -634,7 +611,7 @@ function colorHex(name: string): string {
   }
   .swatch-sm { width: 12px; height: 12px; }
   .swatch-all {
-    background: conic-gradient(#d92020, #ffd400, #2e8b57, #1e3a8a, #7b2cbf, #d92020);
+    background: conic-gradient(#d92020, #ffd400, #2e9b4f, #1f4fbf, #7b2cbf, #d92020);
   }
   /* Table */
   .product-table {
@@ -685,7 +662,7 @@ function colorHex(name: string): string {
   .row-link:hover { color: var(--color-info); text-decoration: underline; }
   .product-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
     gap: 16px;
   }
   /* HTML [hidden] gets clobbered by display:grid/table on the class —
@@ -696,14 +673,17 @@ function colorHex(name: string): string {
     border: 1px solid var(--color-border);
     border-radius: var(--radius-lg);
     overflow: hidden;
-    transition: transform 0.15s, border-color 0.15s;
+    transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
   }
   .product-card:hover {
     transform: translateY(-2px);
-    border-color: var(--color-info);
+    border-color: var(--color-accent);
+    box-shadow: var(--shadow-lift);
   }
+  .product-card[data-instock="0"] .product-image img { opacity: 0.55; filter: grayscale(0.4); }
   .product-card-link {
-    display: block;
+    display: flex;
+    flex-direction: column;
     color: inherit;
     text-decoration: none;
     height: 100%;
@@ -740,47 +720,58 @@ function colorHex(name: string): string {
     object-fit: contain;
   }
   .product-info {
-    padding: 12px;
+    padding: 12px 14px 14px;
     display: flex;
     flex-direction: column;
     gap: 8px;
+    flex: 1;
   }
-  .product-tags {
+  .product-top {
     display: flex;
-    flex-wrap: wrap;
-    gap: 4px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .product-brand {
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-text-secondary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
   .tag {
     font-size: 0.75rem;
     padding: 2px 8px;
-    border-radius: var(--radius-sm);
+    border-radius: 999px;
     border: 1px solid var(--color-border);
     background: var(--color-bg-card);
     color: var(--color-text-secondary);
+    white-space: nowrap;
   }
   .tag-material {
     background: var(--color-info-bg);
     color: var(--color-info);
-    border-color: var(--color-info);
+    border-color: transparent;
     font-weight: 600;
   }
   .tag-in {
     background: var(--color-success-bg);
     color: var(--color-success);
-    border-color: var(--color-success);
+    border-color: transparent;
   }
   .tag-out {
     background: var(--color-danger-bg);
     color: var(--color-danger);
-    border-color: var(--color-danger);
+    border-color: transparent;
   }
   .tag-unknown {
     background: var(--color-bg-card);
     color: var(--color-text-secondary);
     border-color: var(--color-border);
-    font-style: italic;
   }
-  .price-unknown { color: var(--color-text-secondary); font-weight: 500; }
   .color-name { flex: 1; }
   .color-count {
     color: var(--color-text-secondary);
@@ -790,37 +781,62 @@ function colorHex(name: string): string {
   .color-option.active .color-count { color: inherit; opacity: 0.7; }
   .product-name {
     margin: 0;
-    font-size: 0.95rem;
+    font-size: 0.92rem;
     color: var(--color-text-primary);
     font-weight: 500;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
-    line-height: 1.3;
-    min-height: 2.6em;
+    line-height: 1.35;
+    min-height: 2.7em;
   }
   .product-meta {
-    display: flex; flex-wrap: wrap; gap: 8px;
+    display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px;
     font-size: 0.8rem;
     color: var(--color-text-secondary);
   }
+  .meta-color { display: inline-flex; align-items: center; gap: 6px; }
   .product-price {
     display: flex;
-    flex-direction: column;
-    gap: 2px;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px;
     margin-top: auto;
-    padding-top: 6px;
+    padding-top: 10px;
     border-top: 1px solid var(--color-border);
   }
   .price-spool {
-    font-size: 1.1rem;
+    font-size: 1.3rem;
+    line-height: 1.1;
     color: var(--color-text-primary);
-    font-weight: 600;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.01em;
+  }
+  .price-spool small {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--color-text-secondary);
   }
   .price-kg {
-    font-size: 0.8rem;
-    color: var(--color-text-secondary);
+    font-size: 0.78rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    color: var(--color-success);
+    background: var(--color-success-bg);
+    padding: 2px 8px;
+    border-radius: 999px;
+    white-space: nowrap;
+  }
+  .stock-note { font-size: 0.85rem; color: var(--color-text-secondary); }
+  .stock-note-0 { color: var(--color-danger); }
+  @media (max-width: 560px) {
+    .product-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+    .product-info { padding: 10px; gap: 6px; }
+    .product-name { font-size: 0.85rem; }
+    .product-price { flex-direction: column; align-items: flex-start; gap: 6px; }
+    .price-spool { font-size: 1.15rem; }
   }
   .no-results {
     text-align: center;
