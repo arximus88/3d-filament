@@ -1,7 +1,7 @@
 ---
 import BaseHead from "../components/BaseHead.astro";
 import Icons from "../components/Icons.astro";
-import productsData from "../data/products.json";
+import { dataDate, materialSummaries } from "../utils/catalog";
 
 interface Props {
   title: string;
@@ -10,12 +10,6 @@ interface Props {
 }
 
 const { title, description, canonicalURL } = Astro.props;
-const dataDate = new Date(productsData.lastChecked).toLocaleDateString("uk-UA", {
-  day: "numeric",
-  month: "long",
-  year: "numeric",
-  timeZone: "Europe/Kyiv",
-});
 ---
 
 <!doctype html>
@@ -154,11 +148,86 @@ const dataDate = new Date(productsData.lastChecked).toLocaleDateString("uk-UA", 
       }
       footer {
         text-align: center;
-        padding: 40px 20px;
+        padding: 32px 20px 40px;
         color: var(--color-text-secondary);
         border-top: 1px solid var(--color-border);
         margin-top: 60px;
+        font-size: 0.9rem;
       }
+      .footer-nav {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 6px 18px;
+        margin-bottom: 14px;
+      }
+      .footer-nav a { color: var(--color-text-secondary); text-decoration: none; }
+      .footer-nav a:hover { color: var(--color-accent); }
+
+      /* Text pages: material pages, price summary, about. */
+      .prose { max-width: 920px; margin: 0 auto; }
+      .prose h1 {
+        font-size: clamp(1.6rem, 4vw, 2.1rem);
+        letter-spacing: -0.02em;
+        line-height: 1.2;
+        margin-bottom: 6px;
+      }
+      .prose h2 { font-size: 1.3rem; letter-spacing: -0.01em; margin: 36px 0 12px; }
+      .prose h3 { font-size: 1.02rem; margin-bottom: 4px; }
+      .prose p, .prose ul { margin-bottom: 14px; }
+      .prose ul { padding-left: 22px; }
+      .prose li { margin-bottom: 6px; }
+      .prose a { color: var(--color-info); text-decoration: none; }
+      .prose a:hover { text-decoration: underline; }
+      .prose .updated, .prose .muted { color: var(--color-text-secondary); font-size: 0.9rem; }
+      .prose .crumbs { font-size: 0.85rem; color: var(--color-text-secondary); margin-bottom: 10px; }
+      .prose .cta { font-weight: 600; color: var(--color-accent); }
+      .prose .stat-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 12px;
+        margin: 20px 0;
+      }
+      .prose .stat-row > div {
+        background: var(--color-bg-secondary);
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-lg);
+        padding: 12px 16px;
+      }
+      .prose .stat-row dt { font-size: 0.8rem; color: var(--color-text-secondary); }
+      .prose .stat-row dd { font-size: 1.25rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+      .prose .table-wrap {
+        overflow-x: auto;
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-lg);
+        background: var(--color-bg-secondary);
+        margin-bottom: 14px;
+      }
+      .prose table { width: 100%; border-collapse: collapse; font-size: 0.92rem; }
+      .prose th, .prose td { padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--color-border); }
+      .prose thead th {
+        background: var(--color-bg-card);
+        color: var(--color-text-secondary);
+        font-size: 0.82rem;
+        font-weight: 600;
+        white-space: nowrap;
+      }
+      .prose tbody tr:last-child td { border-bottom: 0; }
+      .prose .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+      .prose .faq-item { margin-bottom: 18px; }
+      .prose .chips { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+      .prose .chips li { margin: 0; }
+      .prose .chips a, .material-links a {
+        display: inline-block;
+        padding: 4px 12px;
+        border: 1px solid var(--color-border);
+        border-radius: 999px;
+        background: var(--color-bg-secondary);
+        color: var(--color-text-primary);
+        font-size: 0.88rem;
+        text-decoration: none;
+      }
+      .prose .chips a:hover, .material-links a:hover { border-color: var(--color-accent); color: var(--color-accent); text-decoration: none; }
       @media (max-width: 640px) {
         .brand-name { display: none; }
         .primary-nav a { padding: 6px 10px; font-size: 0.9rem; }
@@ -176,8 +245,9 @@ const dataDate = new Date(productsData.lastChecked).toLocaleDateString("uk-UA", 
           <span class="brand-name">3D Філамент <span class="brand-name-accent">UA</span></span>
         </a>
         <nav class="primary-nav" aria-label="Основна навігація">
-          <a href="/" aria-current={Astro.url.pathname === '/' ? 'page' : undefined}>Каталог філаменту</a>
-          <a href="/shops" aria-current={Astro.url.pathname.startsWith('/shops') ? 'page' : undefined}>Магазини</a>
+          <a href="/" aria-current={Astro.url.pathname === '/' ? 'page' : undefined}>Каталог</a>
+          <a href="/prices/" aria-current={/^\/(prices|material)\//.test(Astro.url.pathname) ? 'page' : undefined}>Ціни</a>
+          <a href="/shops/" aria-current={/^\/(shops|company)\//.test(Astro.url.pathname) ? 'page' : undefined}>Магазини</a>
         </nav>
         <button class="theme-toggle" id="themeToggle" aria-label="Змінити тему">
           <svg class="info-icon" id="themeIcon"><use href="#icon-moon"></use></svg>
@@ -190,6 +260,15 @@ const dataDate = new Date(productsData.lastChecked).toLocaleDateString("uk-UA", 
     </main>
 
     <footer>
+      <nav class="footer-nav" aria-label="Матеріали">
+        {materialSummaries.map(m => <a href={`/material/${m.slug}/`}>{m.material}</a>)}
+      </nav>
+      <nav class="footer-nav" aria-label="Розділи сайту">
+        <a href="/">Каталог</a>
+        <a href="/prices/">Ціни</a>
+        <a href="/shops/">Магазини</a>
+        <a href="/about/">Про каталог</a>
+      </nav>
       <p>Ціни й наявність зібрано з сайтів магазинів {dataDate}</p>
     </footer>
 

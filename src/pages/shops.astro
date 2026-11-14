@@ -36,7 +36,7 @@ const structuredData = {
     '@type': 'ListItem',
     position: i + 1,
     name: c.name,
-    url: `https://3d-filament.pages.dev/company/${c.id}`,
+    url: new URL(`/company/${c.id}/`, Astro.site).href,
   })),
 };
 ---

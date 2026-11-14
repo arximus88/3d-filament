@@ -5,6 +5,7 @@ import companies from '../data/companies.json';
 import { relativeTime } from '../utils/relativeTime';
 import { resizedImg } from '../utils/imgProxy';
 import { colorHex, solidColorHex } from '../utils/colorHex';
+import { materialSummaries } from '../utils/catalog';
 
 interface Product {
   store: string;
@@ -75,7 +76,7 @@ const STORE_NAMES: Record<string, string> = Object.fromEntries(
     .map(c => [c.id, c.name]),
 );
 
-const SITE = 'https://3d-filament.pages.dev';
+const SITE = Astro.site!.origin;
 
 // SEO: ItemList structured data lets Google surface product cards
 // with prices/availability in search results. Only emit entries we can
@@ -117,7 +118,17 @@ const breadcrumbs = {
   ],
 };
 
-const seoTitle = `Каталог філаменту України — ${products.length} товарів від ${storeCount} магазинів • ціни і наявність`;
+const seoTitle = `Філамент для 3D-друку в Україні: ціни й наявність — ${products.length} товарів від ${storeCount} продавців`;
+
+const webSite = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: '3D Філамент UA',
+  alternateName: '3D Filament UA',
+  url: SITE + '/',
+  inLanguage: 'uk',
+  description: 'Каталог філаменту для 3D-друку від українських виробників і магазинів: ціни, ціна за кілограм, наявність.',
+};
 const seoDescription = `Агрегатор пластиків для 3D-друку: ${[...new Set(products.map(p => p.material))].slice(0, 8).join(', ')} та інші. ${products.length} товарів від ${[...new Set(products.map(p => p.brand))].join(', ')}. Сортування за ціною за катушку та за кг, фільтри за матеріалом, кольором, брендом.`;
 
 ---
@@ -126,9 +137,14 @@ const seoDescription = `Агрегатор пластиків для 3D-друк
   <link slot="head" rel="preconnect" href="https://images.weserv.nl" />
   <script type="application/ld+json" set:html={JSON.stringify(itemList)} />
   <script type="application/ld+json" set:html={JSON.stringify(breadcrumbs)} />
+  <script type="application/ld+json" set:html={JSON.stringify(webSite)} />
   <header class="catalog-header">
     <h1>Каталог філаменту</h1>
-    <p class="subtitle">{products.length} товарів від {storeCount} {storeCount === 1 ? 'магазину' : 'магазинів'} • {relativeTime(lastChecked)}</p>
+    <p class="subtitle">{products.length} товарів від {storeCount} {storeCount === 1 ? 'продавця' : 'продавців'} • {relativeTime(lastChecked)}</p>
+    <nav class="material-links" aria-label="Ціни за матеріалами">
+      {materialSummaries.slice(0, 8).map(m => <a href={`/material/${m.slug}/`}>{m.material}</a>)}
+      <a href="/prices/">усі ціни →</a>
+    </nav>
   </header>
 
   <div class="catalog-layout" id="catalogLayout">
@@ -374,6 +390,7 @@ const seoDescription = `Агрегатор пластиків для 3D-друк
     color: var(--color-text-secondary);
     font-size: 0.95rem;
   }
+  .material-links { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
   .store-pill {
     display: inline-flex;
     align-items: center;
