@@ -12,4 +12,3 @@ node_modules/
 dist/
 .astro/
 node_modules/
-bun.lock
