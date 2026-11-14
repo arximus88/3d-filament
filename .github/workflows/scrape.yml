@@ -1,0 +1,33 @@
+# Refreshes the catalog once a day and commits the data; Cloudflare Pages
+# rebuilds the site on push. A store that fails keeps its previous data
+# (see scripts/scrape.mjs), so a partial outage still produces a commit.
+name: Scrape catalog
+
+on:
+  schedule:
+    - cron: "0 5 * * *" # 05:00 UTC, early morning in Kyiv
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: scrape
+  cancel-in-progress: false
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+      - run: bun test
+      - run: bun run scrape
+      - name: Commit data
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/data/products.json src/data/stock.json
+          git diff --cached --quiet || git commit -m "chore(data): daily catalog update $(date -u +%F)"
+          git push
