@@ -27,11 +27,11 @@ const parsePrice = (text) => {
 };
 
 // "PLA Дуоколір Білий-Синій пастель" → "дуоколір білий-синій пастель";
-// "PLA Wood Ø1,75мм Вага:0,75кг" → "wood". The leading all-caps Latin
-// tokens are the material ("PLA", "ABS PRO", "PLA-LW").
+// "PLA Wood Ø1,75мм Вага:0,75кг" → "wood". The leading Latin tokens with
+// two capitals in a row are the material ("PLA", "ABS PRO", "CoPET").
 export function colorFromTitle(title) {
   const words = title.split("Ø")[0].trim().split(/\s+/);
-  while (words.length && /^[A-Z0-9+-]+$/.test(words[0])) words.shift();
+  while (words.length && /^[A-Za-z0-9+-]*[A-Z]{2}[A-Za-z0-9+-]*$/.test(words[0])) words.shift();
   return normaliseColor(words.join(" "));
 }
 

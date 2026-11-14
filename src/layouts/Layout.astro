@@ -26,63 +26,34 @@ const dataDate = new Date(productsData.lastChecked).toLocaleDateString("uk-UA", 
       description={description}
       canonicalURL={canonicalURL}
     />
+    <slot name="head" />
     <style is:global>
+      /* One palette: every colour is light-dark(<light>, <dark>). Which
+         side applies follows the system setting, unless the visitor picked
+         a theme (data-theme, set before first paint in BaseHead). */
       :root {
-        --color-bg-primary: #1f2430;
-        --color-bg-secondary: #232834;
-        --color-bg-card: #282e3a;
-        --color-text-primary: #cbccc6;
-        --color-text-secondary: #707a8c;
-        --color-accent: #ffcc66;
-        --color-accent-hover: #ffd580;
-        --color-border: #3b4252;
-        --color-success: #a6cc70;
-        --color-info: #5ccfe6;
-        --color-danger: #ff6666;
-        --color-success-bg: rgba(166, 204, 112, 0.15);
-        --color-info-bg: rgba(92, 207, 230, 0.15);
-        --color-danger-bg: rgba(255, 102, 102, 0.15);
+        color-scheme: light dark;
+        --color-bg-primary: light-dark(#f6f7f8, #1f2430);
+        --color-bg-secondary: light-dark(#ffffff, #232834);
+        --color-bg-card: light-dark(#f3f4f5, #282e3a);
+        --color-text-primary: light-dark(#2d333b, #cbccc6);
+        --color-text-secondary: light-dark(#6a727d, #707a8c);
+        --color-accent: light-dark(#f08019, #ffcc66);
+        --color-accent-hover: light-dark(#ff9940, #ffd580);
+        --color-border: light-dark(#e3e5e8, #3b4252);
+        --color-success: light-dark(#5f8a00, #a6cc70);
+        --color-info: light-dark(#399ee6, #5ccfe6);
+        --color-danger: light-dark(#d92020, #ff6666);
+        --color-success-bg: light-dark(rgba(134, 179, 0, 0.1), rgba(166, 204, 112, 0.15));
+        --color-info-bg: light-dark(rgba(57, 158, 230, 0.1), rgba(92, 207, 230, 0.15));
+        --color-danger-bg: light-dark(rgba(217, 32, 32, 0.1), rgba(255, 102, 102, 0.15));
+        --shadow-lift: 0 10px 24px light-dark(rgba(30, 40, 60, 0.12), rgba(0, 0, 0, 0.28));
         --radius-sm: 5px;
         --radius-md: 8px;
         --radius-lg: 12px;
-        --shadow-lift: 0 10px 24px rgba(0, 0, 0, 0.28);
       }
-      [data-theme="light"] {
-        --color-bg-primary: #f6f7f8;
-        --color-bg-secondary: #ffffff;
-        --color-bg-card: #f3f4f5;
-        --color-text-primary: #2d333b;
-        --color-text-secondary: #6a727d;
-        --color-accent: #f08019;
-        --color-accent-hover: #ff9940;
-        --color-border: #e3e5e8;
-        --color-success: #5f8a00;
-        --color-info: #399ee6;
-        --color-danger: #d92020;
-        --color-success-bg: rgba(134, 179, 0, 0.1);
-        --color-info-bg: rgba(57, 158, 230, 0.1);
-        --color-danger-bg: rgba(217, 32, 32, 0.1);
-        --shadow-lift: 0 10px 24px rgba(30, 40, 60, 0.12);
-      }
-      @media (prefers-color-scheme: light) {
-        :root:not([data-theme="dark"]) {
-          --color-bg-primary: #f6f7f8;
-          --color-bg-secondary: #ffffff;
-          --color-bg-card: #f3f4f5;
-          --color-text-primary: #2d333b;
-          --color-text-secondary: #6a727d;
-          --color-accent: #f08019;
-          --color-accent-hover: #ff9940;
-          --color-border: #e3e5e8;
-          --color-success: #5f8a00;
-          --color-info: #399ee6;
-          --color-danger: #d92020;
-          --color-success-bg: rgba(134, 179, 0, 0.1);
-          --color-info-bg: rgba(57, 158, 230, 0.1);
-          --color-danger-bg: rgba(217, 32, 32, 0.1);
-          --shadow-lift: 0 10px 24px rgba(30, 40, 60, 0.12);
-        }
-      }
+      :root[data-theme="light"] { color-scheme: light; }
+      :root[data-theme="dark"] { color-scheme: dark; }
       :root { --header-height: 56px; }
       * {
         margin: 0;
@@ -153,7 +124,7 @@ const dataDate = new Date(productsData.lastChecked).toLocaleDateString("uk-UA", 
         color: var(--color-text-primary);
         background: var(--color-bg-secondary);
       }
-      .primary-nav a.active {
+      .primary-nav a[aria-current="page"] {
         color: var(--color-accent);
         background: var(--color-bg-secondary);
       }
@@ -204,9 +175,9 @@ const dataDate = new Date(productsData.lastChecked).toLocaleDateString("uk-UA", 
           <span class="brand-flag" aria-hidden="true">🇺🇦</span>
           <span class="brand-name">3D Філамент <span class="brand-name-accent">UA</span></span>
         </a>
-        <nav class="primary-nav">
-          <a href="/" class={Astro.url.pathname === '/' ? 'active' : ''}>Каталог філаменту</a>
-          <a href="/shops" class={Astro.url.pathname.startsWith('/shops') ? 'active' : ''}>Магазини</a>
+        <nav class="primary-nav" aria-label="Основна навігація">
+          <a href="/" aria-current={Astro.url.pathname === '/' ? 'page' : undefined}>Каталог філаменту</a>
+          <a href="/shops" aria-current={Astro.url.pathname.startsWith('/shops') ? 'page' : undefined}>Магазини</a>
         </nav>
         <button class="theme-toggle" id="themeToggle" aria-label="Змінити тему">
           <svg class="info-icon" id="themeIcon"><use href="#icon-moon"></use></svg>
@@ -228,26 +199,39 @@ const dataDate = new Date(productsData.lastChecked).toLocaleDateString("uk-UA", 
       const themeIcon = document
         .getElementById("themeIcon")
         ?.querySelector("use");
-      const savedTheme = localStorage.getItem("theme");
-      const prefersDark = window.matchMedia(
-        "(prefers-color-scheme: dark)",
-      ).matches;
-      let currentTheme = savedTheme || (prefersDark ? "dark" : "light");
+      const root = document.documentElement;
+      const systemDark = window.matchMedia("(prefers-color-scheme: dark)");
+      const systemTheme = () => (systemDark.matches ? "dark" : "light");
+      // data-theme is present only when the visitor's choice differs from
+      // the system setting; BaseHead applies the stored one before paint.
+      const activeTheme = () => root.dataset.theme ?? systemTheme();
 
-      function setTheme(theme: string) {
-        document.documentElement.setAttribute("data-theme", theme);
-        localStorage.setItem("theme", theme);
-        if (themeIcon)
-          themeIcon.setAttribute(
-            "href",
-            theme === "dark" ? "#icon-sun" : "#icon-moon",
-          );
-        currentTheme = theme;
+      function syncIcon() {
+        themeIcon?.setAttribute("href", activeTheme() === "dark" ? "#icon-sun" : "#icon-moon");
       }
-      setTheme(currentTheme);
+      function setTheme(theme: string) {
+        // Choosing what the system already says means "follow the system".
+        if (theme === systemTheme()) {
+          delete root.dataset.theme;
+          localStorage.removeItem("theme");
+        } else {
+          root.dataset.theme = theme;
+          localStorage.setItem("theme", theme);
+        }
+        syncIcon();
+      }
+      syncIcon();
       themeToggle?.addEventListener("click", () =>
-        setTheme(currentTheme === "dark" ? "light" : "dark"),
+        setTheme(activeTheme() === "dark" ? "light" : "dark"),
       );
+      systemDark.addEventListener("change", syncIcon);
+      // Keep other open tabs in step.
+      window.addEventListener("storage", (e) => {
+        if (e.key !== "theme") return;
+        if (e.newValue === "light" || e.newValue === "dark") root.dataset.theme = e.newValue;
+        else delete root.dataset.theme;
+        syncIcon();
+      });
     </script>
   </body>
 </html>

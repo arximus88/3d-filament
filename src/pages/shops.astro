@@ -92,10 +92,10 @@ const structuredData = {
   </div>
 
   <!-- Tabs -->
-  <div class="tabs" id="tabs">
-    <button class="tab active" data-type="all">Всі <span class="tab-count">({companies.length})</span></button>
-    <button class="tab" data-type="manufacturer">Виробники <span class="tab-count">({manufacturerCount})</span></button>
-    <button class="tab" data-type="shop">Магазини <span class="tab-count">({shopCount})</span></button>
+  <div class="tabs" id="tabs" role="group" aria-label="Тип продавця">
+    <button class="tab active" data-type="all" aria-pressed="true">Всі <span class="tab-count">({companies.length})</span></button>
+    <button class="tab" data-type="manufacturer" aria-pressed="false">Виробники <span class="tab-count">({manufacturerCount})</span></button>
+    <button class="tab" data-type="shop" aria-pressed="false">Магазини <span class="tab-count">({shopCount})</span></button>
   </div>
 
   <!-- Grid — server-rendered, all cards present in HTML for SEO -->
@@ -254,7 +254,10 @@ const structuredData = {
   if (params.get('sort')) sortFilter.value = params.get('sort')!;
   if (params.get('q')) searchInput.value = params.get('q')!;
   if (params.get('instock') === '1') inStockOnly.checked = true;
-  tabs.forEach(t => t.classList.toggle('active', t.dataset.type === currentType));
+  tabs.forEach(t => {
+    t.classList.toggle('active', t.dataset.type === currentType);
+    t.setAttribute('aria-pressed', String(t.dataset.type === currentType));
+  });
 
   function updateUrl() {
     const p = new URLSearchParams();
@@ -308,8 +311,10 @@ const structuredData = {
 
   tabs.forEach(tab => {
     tab.addEventListener('click', () => {
-      tabs.forEach(t => t.classList.remove('active'));
-      tab.classList.add('active');
+      tabs.forEach(t => {
+        t.classList.toggle('active', t === tab);
+        t.setAttribute('aria-pressed', String(t === tab));
+      });
       currentType = tab.dataset.type || 'all';
       filterAndSort();
     });
