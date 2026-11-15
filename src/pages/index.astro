@@ -360,8 +360,8 @@ const seoDescription = `Агрегатор пластиків для 3D-друк
   </div>
 
   <div class="no-results" id="noResults" style="display:none">
-    <h3>Нічого не знайдено</h3>
-    <p>Спробуйте змінити фільтри.</p>
+    <h3 id="noResultsTitle">Нічого не знайдено</h3>
+    <p id="noResultsHint">Спробуйте змінити фільтри.</p>
   </div>
     </div><!-- /.catalog-main -->
   </div><!-- /.catalog-layout -->
@@ -875,6 +875,15 @@ const seoDescription = `Агрегатор пластиків для 3D-друк
   const rowTemplate = document.getElementById('rowTemplate') as HTMLTemplateElement;
   const sortHeaders = document.querySelectorAll<HTMLElement>('th[data-sort]');
   const noResults = document.getElementById('noResults')!;
+  const noResultsTitle = document.getElementById('noResultsTitle')!;
+  const noResultsHint = document.getElementById('noResultsHint')!;
+  const EMPTY_DEFAULT = ['Нічого не знайдено', 'Спробуйте змінити фільтри.'];
+  // Searches that deserve a better answer than "nothing found".
+  const EMPTY_JOKES: [RegExp, string, string][] = [
+    [/спагет|spaghetti/, 'Спагеті не продаємо', 'Їх принтер робить сам, безкоштовно і без попередження.'],
+    [/benchy|бенчі/, 'Benchy тут немає', 'Його не купують, його друкують. Першим, на новому принтері.'],
+    [/адгез|adhesion|не липне/, 'Адгезію не завезли', 'Спробуйте помити стіл і підняти температуру на 5 °C.'],
+  ];
   const summary = document.getElementById('resultsSummary')!;
   const search = document.getElementById('search') as HTMLInputElement;
   const materialF = document.getElementById('materialFilter') as HTMLSelectElement;
@@ -1095,6 +1104,11 @@ const seoDescription = `Агрегатор пластиків для 3D-друк
     const n = visible.length;
     summary.textContent = `Знайдено ${n} ${PRODUCT_WORD[plural.select(n)]}`;
     noResults.style.display = n === 0 ? '' : 'none';
+    if (n === 0) {
+      const [title, hint] = EMPTY_JOKES.find(([re]) => re.test(q))?.slice(1) ?? EMPTY_DEFAULT;
+      noResultsTitle.textContent = title as string;
+      noResultsHint.textContent = hint as string;
+    }
     applyView();
     syncSortIndicators();
     updateUrl();
