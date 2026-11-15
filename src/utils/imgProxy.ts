@@ -25,7 +25,7 @@ export function resizedImg(
     url,
     w: String(width),
     output: 'webp',
-    q: '82',
+    q: '75',
   });
   if (height) {
     params.set('h', String(height));
