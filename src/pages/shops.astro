@@ -210,10 +210,11 @@ const structuredData = {
   .tab:hover { background: var(--color-bg-card); }
   .tab.active {
     background: var(--color-accent);
-    color: var(--color-bg-primary);
+    color: var(--color-on-accent);
     border-color: var(--color-accent);
   }
   .tab-count { opacity: 0.7; font-size: 0.85em; }
+  .tab.active .tab-count { opacity: 1; }
   .grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));

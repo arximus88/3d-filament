@@ -122,3 +122,33 @@ export const materialSummaries: MaterialSummary[] = [...Map.groupBy(products, p 
     stats: priceStats(items),
   }))
   .sort((a, b) => b.total - a.total);
+
+/** What a product photo shows, in words: brand, material, colour, spool size. */
+export function imageAlt(p: { brand: string; material: string; color: string | null; weightKg: number | null }) {
+  const weight = p.weightKg ? `, котушка ${String(p.weightKg).replace('.', ',')} кг` : '';
+  return `Філамент ${p.brand} ${p.material}${p.color ? ` ${p.color}` : ''}${weight}`;
+}
+
+/** schema.org Product for one catalog record, with the facts a photo is matched against. */
+export function productSchema(p: (typeof products)[number]) {
+  return {
+    '@type': 'Product',
+    name: p.name ?? `${p.material} ${p.color ?? ''}`.trim(),
+    url: p.url,
+    image: p.image ?? undefined,
+    sku: p.sku ?? undefined,
+    category: 'Філамент для 3D-друку',
+    material: p.material,
+    color: p.color ?? undefined,
+    weight: p.weightKg ? { '@type': 'QuantitativeValue', value: p.weightKg, unitCode: 'KGM' } : undefined,
+    brand: { '@type': 'Brand', name: p.brand },
+    offers: {
+      '@type': 'Offer',
+      priceCurrency: p.currency,
+      price: p.pricePerSpool,
+      url: p.url,
+      itemCondition: 'https://schema.org/NewCondition',
+      availability: 'https://schema.org/InStock',
+    },
+  };
+}

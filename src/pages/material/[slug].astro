@@ -1,5 +1,6 @@
 ---
 import Layout from '../../layouts/Layout.astro';
+import { resizedImg } from '../../utils/imgProxy';
 import { MATERIAL_INFO } from '../../utils/materials';
 import {
   products,
@@ -8,6 +9,8 @@ import {
   materialSummaries,
   plural,
   uah,
+  imageAlt,
+  productSchema,
   type MaterialSummary,
 } from '../../utils/catalog';
 
@@ -78,6 +81,15 @@ const jsonLd = [
       { '@type': 'ListItem', position: 3, name: material, item: pageUrl },
     ],
   },
+  ...(cheapest.length
+    ? [{
+        '@context': 'https://schema.org',
+        '@type': 'ItemList',
+        name: `Найдешевший ${material} філамент у наявності`,
+        numberOfItems: cheapest.length,
+        itemListElement: cheapest.map((o, i) => ({ '@type': 'ListItem', position: i + 1, item: productSchema(o) })),
+      }]
+    : []),
   {
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
@@ -125,7 +137,18 @@ const jsonLd = [
             <tbody>
               {cheapest.map(o => (
                 <tr>
-                  <td><a href={o.url} target="_blank" rel="noopener noreferrer">{o.name}</a></td>
+                  <td>
+                    <a class="offer" href={o.url} target="_blank" rel="noopener noreferrer">
+                      {o.image && (
+                        <img
+                          src={resizedImg(o.image, 56, 56) ?? o.image}
+                          srcset={`${resizedImg(o.image, 56, 56) ?? o.image} 1x, ${resizedImg(o.image, 112, 112) ?? o.image} 2x`}
+                          alt={imageAlt(o)} width="56" height="56" loading="lazy" decoding="async"
+                        />
+                      )}
+                      <span>{o.name}</span>
+                    </a>
+                  </td>
                   <td>{o.brand}</td>
                   <td class="num">{kg(o.weightKg)}</td>
                   <td class="num">{uah(o.pricePerSpool)}</td>
