@@ -133,7 +133,69 @@ document.getElementById('themeToggle')?.addEventListener('click', () => {
   }, 80);
 });
 
-// 4. A note for people who open the console.
+// 4. "На русский" in the footer: an FPV drone takes care of it. The link
+// stays gone until the page is reloaded.
+const DRONE = `<svg viewBox="0 0 40 40" width="40" height="40" fill="none" stroke-linecap="round">
+  <path d="M10 10 30 30M30 10 10 30" stroke="#8f98a6" stroke-width="3"/>
+  <rect x="15" y="14" width="10" height="12" rx="3" fill="#4d5665" stroke="#c3c9d2"/>
+  <circle cx="20" cy="17" r="2" fill="#ff5f56"/>
+  <g fill="#9aa3b0" fill-opacity=".45" stroke="#8f98a6">
+    <circle cx="9" cy="9" r="6.5"/><circle cx="31" cy="9" r="6.5"/>
+    <circle cx="9" cy="31" r="6.5"/><circle cx="31" cy="31" r="6.5"/>
+  </g>
+</svg>`;
+
+document.getElementById('ruLink')?.addEventListener('click', (e) => {
+  const link = e.currentTarget as HTMLButtonElement;
+  const gone = () => {
+    link.remove();
+    toast('Ціль уражено. Цієї версії немає й не буде.');
+  };
+  if (calm.matches) return gone();
+  link.disabled = true;
+
+  const box = link.getBoundingClientRect();
+  const tx = box.left + box.width / 2 - 20;
+  const ty = box.top + box.height / 2 - 20;
+  const fromLeft = tx > window.innerWidth / 2;
+  const sx = fromLeft ? -60 : window.innerWidth + 60;
+  const sy = Math.max(-60, ty - 320);
+  const el = layer(2500);
+  const drone = Object.assign(document.createElement('span'), { innerHTML: DRONE });
+  drone.style.cssText = 'position:absolute;left:0;top:0;line-height:0';
+  el.append(drone);
+
+  const tilt = fromLeft ? 25 : -25;
+  drone.animate(
+    [
+      { translate: `${sx}px ${sy}px`, rotate: `${tilt}deg`, scale: 1.5 },
+      // A short wobble before the dive.
+      { translate: `${(sx + tx) / 2}px ${sy + 40}px`, rotate: `${-tilt / 2}deg`, scale: 1.2, offset: 0.55 },
+      { translate: `${tx}px ${ty}px`, rotate: `${tilt * 2}deg`, scale: 0.7 },
+    ],
+    { duration: 1100, easing: 'cubic-bezier(0.5, 0, 0.9, 0.6)', fill: 'forwards' },
+  ).finished.then(() => {
+    drone.remove();
+    for (let i = 0; i < 14; i++) {
+      const spark = document.createElement('span');
+      const size = 3 + Math.random() * 4;
+      spark.style.cssText = `position:absolute;left:${tx + 20}px;top:${ty + 20}px;width:${size}px;height:${size}px;border-radius:50%;background:${i % 3 ? '#ff9940' : '#ffd580'}`;
+      el.append(spark);
+      const angle = Math.random() * Math.PI * 2;
+      const dist = 20 + Math.random() * 45;
+      spark.animate(
+        [
+          { translate: '0 0', opacity: 1 },
+          { translate: `${Math.cos(angle) * dist}px ${Math.sin(angle) * dist}px`, opacity: 0 },
+        ],
+        { duration: 450 + Math.random() * 300, easing: 'ease-out', fill: 'forwards' },
+      );
+    }
+    link.animate([{ scale: 1, opacity: 1 }, { scale: 1.4, opacity: 0 }], { duration: 180 }).finished.then(gone);
+  });
+});
+
+// 5. A note for people who open the console.
 console.log(
   '%c; 3D Філамент UA\n%cM104 S210 ; гріємо сопло\nM140 S60  ; гріємо стіл\nG28       ; додому\nM117 Спробуйте Konami-код або наберіть benchy',
   'font-weight:bold;color:#f08019',
