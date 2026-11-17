@@ -8,8 +8,7 @@ import {
   trackedCompanies,
   priceStats,
   plural,
-  uah,
-} from '../utils/catalog';
+  uah, comparisons, colorLandings } from '../utils/catalog';
 
 const inStockTotal = products.filter(p => p.inStock === true).length;
 const priced = materialSummaries.filter(m => m.stats);
@@ -117,6 +116,20 @@ const jsonLd = {
           </tbody>
         </table>
       </div>
+    </section>
+
+    <section>
+      <h2>Порівняння матеріалів</h2>
+      <ul class="chips">
+        {comparisons.map(c => <li><a href={`/compare/${c.slug}/`}>{c.a} чи {c.b}</a></li>)}
+      </ul>
+    </section>
+
+    <section>
+      <h2>Ціни за кольором</h2>
+      <ul class="chips">
+        {colorLandings.map(c => <li><a href={`/material/${c.materialSlug}/${c.slug}/`}>{c.material} · {c.color}</a></li>)}
+      </ul>
     </section>
 
     <p class="muted">Як збираються й рахуються ці дані — на сторінці <a href="/about/">«Про каталог»</a>.</p>

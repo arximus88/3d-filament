@@ -1,6 +1,6 @@
 ---
 import Layout from '../../layouts/Layout.astro';
-import { resizedImg } from '../../utils/imgProxy';
+import OfferTable from '../../components/OfferTable.astro';
 import { MATERIAL_INFO } from '../../utils/materials';
 import {
   products,
@@ -9,8 +9,9 @@ import {
   materialSummaries,
   plural,
   uah,
-  imageAlt,
   productSchema,
+  colorLandings,
+  comparisons,
   type MaterialSummary,
 } from '../../utils/catalog';
 
@@ -37,6 +38,8 @@ const byBrand = stats
       .sort((a, b) => a.from - b.from)
   : [];
 
+const colors = colorLandings.filter(c => c.material === material);
+const versus = comparisons.filter(c => c.a === material || c.b === material);
 const catalogUrl = `/?material=${encodeURIComponent(material)}`;
 const pageUrl = new URL(`/material/${summary.slug}/`, Astro.site).href;
 
@@ -129,35 +132,7 @@ const jsonLd = [
       <section>
         <h2>Найдешевший {material} у наявності</h2>
         <p>Котушки від 0,5 кг, відсортовані за ціною за кілограм.</p>
-        <div class="table-wrap" tabindex="0" role="region" aria-label={`Найдешевший ${material} у наявності`}>
-          <table>
-            <thead>
-              <tr><th scope="col">Товар</th><th scope="col">Продавець</th><th scope="col" class="num">Котушка</th><th scope="col" class="num">Ціна</th><th scope="col" class="num">За кг</th></tr>
-            </thead>
-            <tbody>
-              {cheapest.map(o => (
-                <tr>
-                  <td>
-                    <a class="offer" href={o.url} target="_blank" rel="noopener noreferrer">
-                      {o.image && (
-                        <img
-                          src={resizedImg(o.image, 56, 56) ?? o.image}
-                          srcset={`${resizedImg(o.image, 56, 56) ?? o.image} 1x, ${resizedImg(o.image, 112, 112) ?? o.image} 2x`}
-                          alt={imageAlt(o)} width="56" height="56" loading="lazy" decoding="async"
-                        />
-                      )}
-                      <span>{o.name}</span>
-                    </a>
-                  </td>
-                  <td>{o.brand}</td>
-                  <td class="num">{kg(o.weightKg)}</td>
-                  <td class="num">{uah(o.pricePerSpool)}</td>
-                  <td class="num"><strong>{uah(o.pricePerKg)}</strong></td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <OfferTable offers={cheapest} label={`Найдешевший ${material} у наявності`} />
       </section>
     )}
 
@@ -194,6 +169,26 @@ const jsonLd = [
         )}
         <ul>{info.notes.map(note => <li>{note}</li>)}</ul>
         <p class="muted">{material} — {info.fullName}. Наведено типові значення; точні режими дивіться на етикетці котушки.</p>
+      </section>
+    )}
+
+    {colors.length > 0 && (
+      <section>
+        <h2>{material} за кольором</h2>
+        <ul class="chips">
+          {colors.map(c => (
+            <li><a href={`/material/${c.materialSlug}/${c.slug}/`}>{c.color} · від {uah(c.stats.min)}/кг</a></li>
+          ))}
+        </ul>
+      </section>
+    )}
+
+    {versus.length > 0 && (
+      <section>
+        <h2>Порівняння з іншими матеріалами</h2>
+        <ul class="chips">
+          {versus.map(c => <li><a href={`/compare/${c.slug}/`}>{c.a} чи {c.b}</a></li>)}
+        </ul>
       </section>
     )}
 

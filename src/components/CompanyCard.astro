@@ -69,7 +69,7 @@ const phones = company.phone ? company.phone.split(',').map(p => p.trim()).filte
   <div class="card-header">
     <h2 class="card-title">
       {showLink
-        ? <a href={`/company/${company.id}`} class="company-link">{company.name}</a>
+        ? <a href={`/company/${company.id}/`} class="company-link">{company.name}</a>
         : company.name
       }
     </h2>
@@ -138,7 +138,7 @@ const phones = company.phone ? company.phone.split(',').map(p => p.trim()).filte
       : <a href={company.url} target="_blank" rel="noopener noreferrer" class="btn">Перейти на сайт →</a>
     }
     {showLink && (
-      <a href={`/company/${company.id}`} class="btn btn-secondary">
+      <a href={`/company/${company.id}/`} class="btn btn-secondary">
         Детальніше
       </a>
     )}

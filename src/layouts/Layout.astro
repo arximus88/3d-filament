@@ -226,7 +226,7 @@ const { title, description, canonicalURL } = Astro.props;
       .prose a { color: var(--color-info); text-decoration: none; }
       .prose a:hover { text-decoration: underline; }
       /* A link inside running text must not rely on colour alone. */
-      .prose :is(p, li) a:not(.cta, .chips a) { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+      .prose :is(p, li, th, .crumbs) a:not(.cta, .chips a) { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
       .prose .updated, .prose .muted { color: var(--color-text-secondary); font-size: 0.9rem; }
       .prose .crumbs { font-size: 0.85rem; color: var(--color-text-secondary); margin-bottom: 10px; }
       .prose .cta { font-weight: 600; color: var(--color-accent-text); }
@@ -299,7 +299,7 @@ const { title, description, canonicalURL } = Astro.props;
         </a>
         <nav class="primary-nav" aria-label="Основна навігація">
           <a href="/" aria-current={Astro.url.pathname === '/' ? 'page' : undefined}>Каталог</a>
-          <a href="/prices/" aria-current={/^\/(prices|material)\//.test(Astro.url.pathname) ? 'page' : undefined}>Ціни</a>
+          <a href="/prices/" aria-current={/^\/(prices|material|compare)\//.test(Astro.url.pathname) ? 'page' : undefined}>Ціни</a>
           <a href="/shops/" aria-current={/^\/(shops|company)\//.test(Astro.url.pathname) ? 'page' : undefined}>Магазини</a>
         </nav>
         <button class="theme-toggle" id="themeToggle" aria-label="Змінити тему">

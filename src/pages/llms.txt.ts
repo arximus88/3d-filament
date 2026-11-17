@@ -3,7 +3,17 @@
 // numbers, and which pages hold which facts.
 
 import type { APIRoute } from 'astro';
-import { products, dataDate, materialSummaries, trackedCompanies, plural, uah } from '../utils/catalog';
+import {
+  products,
+  dataDate,
+  materialSummaries,
+  trackedCompanies,
+  plural,
+  uah,
+  colorLandings,
+  colorHeading,
+  comparisons,
+} from '../utils/catalog';
 
 export const GET: APIRoute = ({ site }) => {
   const url = (path: string) => new URL(path, site).href;
@@ -17,6 +27,14 @@ export const GET: APIRoute = ({ site }) => {
   });
   const sellerLines = trackedCompanies.map(
     c => `- [${c.name}](${url(`/company/${c.id}/`)}): ${c.type === 'manufacturer' ? 'виробник' : 'магазин'}, ${c.city}`,
+  );
+
+  const colorLines = colorLandings.map(
+    c =>
+      `- [${colorHeading(c.material, c.color)}](${url(`/material/${c.materialSlug}/${c.slug}/`)}): від ${uah(c.stats.min)}/кг, ${plural(c.stats.offers.length, 'пропозиція', 'пропозиції', 'пропозицій')} у ${plural(c.stats.brands.length, 'продавця', 'продавців', 'продавців')}`,
+  );
+  const compareLines = comparisons.map(
+    c => `- [${c.a} чи ${c.b}](${url(`/compare/${c.slug}/`)}): властивості, температури друку й актуальні ціни обох матеріалів`,
   );
 
   const body = `# 3D Філамент UA
@@ -35,6 +53,14 @@ export const GET: APIRoute = ({ site }) => {
 ## Ціни за матеріалами
 
 ${materialLines.join('\n')}
+
+## Ціни за матеріалом і кольором
+
+${colorLines.join('\n')}
+
+## Порівняння матеріалів
+
+${compareLines.join('\n')}
 
 ## Продавці з цінами в каталозі
 

@@ -152,3 +152,76 @@ export function productSchema(p: (typeof products)[number]) {
     },
   };
 }
+
+// ── Colour landing pages ────────────────────────────────────────────────
+// A material × colour page exists only when it compares something: at least
+// MIN_COLOR_OFFERS spools in stock from MIN_COLOR_SELLERS different sellers.
+// Everything thinner stays a catalog filter and gets no URL of its own.
+const MIN_COLOR_OFFERS = 5;
+const MIN_COLOR_SELLERS = 3;
+
+const TRANSLIT: Record<string, string> = {
+  а: 'a', б: 'b', в: 'v', г: 'h', ґ: 'g', д: 'd', е: 'e', є: 'ie', ж: 'zh', з: 'z', и: 'y', і: 'i', ї: 'i',
+  й: 'i', к: 'k', л: 'l', м: 'm', н: 'n', о: 'o', п: 'p', р: 'r', с: 's', т: 't', у: 'u', ф: 'f', х: 'kh',
+  ц: 'ts', ч: 'ch', ш: 'sh', щ: 'shch', ь: '', ю: 'iu', я: 'ia', "'": '', 'ʼ': '',
+};
+/** "чорний" → "chornyi", "світло-сірий" → "svitlo-siryi" */
+export const colorSlug = (color: string) =>
+  [...color.toLowerCase()].map(ch => TRANSLIT[ch] ?? ch).join('').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+
+/** "Чорний PETG філамент", or "PETG філамент кольору хакі" when the colour isn't an adjective. */
+export function colorHeading(material: string, color: string) {
+  const adjective = /(ий|ій)$/.test(color) && !color.includes(' ');
+  return adjective
+    ? `${color[0].toUpperCase()}${color.slice(1)} ${material} філамент`
+    : `${material} філамент кольору ${color}`;
+}
+
+export interface ColorLanding {
+  material: string;
+  materialSlug: string;
+  color: string;
+  slug: string;
+  stats: PriceStats;
+}
+
+export const colorLandings: ColorLanding[] = materialSummaries.flatMap(m =>
+  [...Map.groupBy(m.stats?.offers ?? [], o => o.color)]
+    .flatMap(([color, offers]) => {
+      const stats = color ? priceStats(offers) : null;
+      return stats && stats.offers.length >= MIN_COLOR_OFFERS && stats.brands.length >= MIN_COLOR_SELLERS
+        ? [{ material: m.material, materialSlug: m.slug, color: color!, slug: colorSlug(color!), stats }]
+        : [];
+    })
+    .sort((a, b) => b.stats.offers.length - a.stats.offers.length),
+);
+
+// ── Material comparisons ────────────────────────────────────────────────
+/** Pairs people actually weigh against each other; each gets /compare/a-vs-b/. */
+export const COMPARISONS: Array<{ a: string; b: string; verdict: string }> = [
+  {
+    a: 'PLA',
+    b: 'PETG',
+    verdict:
+      'PLA беріть для декору, прототипів і першого досвіду друку: він найпростіший у налаштуванні. PETG — коли деталь має тримати навантаження, вологу або нагрів до 75–80 °C: кріплення, корпуси, вироби для вулиці.',
+  },
+  {
+    a: 'PETG',
+    b: 'ABS',
+    verdict:
+      'PETG простіший: друкується без закритої камери й майже не дає усадки. ABS варто обирати заради термостійкості близько 95–100 °C і можливості шліфувати та згладжувати деталь ацетоном — за умови, що є гарячий стіл і провітрювання.',
+  },
+  {
+    a: 'PLA',
+    b: 'ABS',
+    verdict:
+      'PLA друкується на будь-якому принтері й без запаху, але розм\'якшується вже при 55–60 °C. ABS витримує близько 95–100 °C і краще тримає удар, проте потребує гарячого столу, бажано закритої камери й провітрювання.',
+  },
+];
+export const comparisonSlug = (a: string, b: string) => `${materialSlug(a)}-vs-${materialSlug(b)}`;
+/** Comparisons where both materials have a page, so every link resolves. */
+export const comparisons = COMPARISONS.flatMap(c => {
+  const a = materialSummaries.find(m => m.material === c.a);
+  const b = materialSummaries.find(m => m.material === c.b);
+  return a && b ? [{ ...c, slug: comparisonSlug(c.a, c.b), left: a, right: b }] : [];
+});
