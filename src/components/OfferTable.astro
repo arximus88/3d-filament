@@ -1,0 +1,43 @@
+---
+// Offers as a table: photo and name, seller, spool size, price, price per kg.
+// Also emits nothing but markup — structured data is the page's job.
+import { resizedImg } from '../utils/imgProxy';
+import { imageAlt, uah, type Offer } from '../utils/catalog';
+
+interface Props {
+  offers: Offer[];
+  label: string;
+}
+const { offers, label } = Astro.props;
+const kg = (n: number) => `${String(n).replace('.', ',')} кг`;
+---
+
+<div class="table-wrap" tabindex="0" role="region" aria-label={label}>
+  <table>
+    <thead>
+      <tr><th scope="col">Товар</th><th scope="col">Продавець</th><th scope="col" class="num">Котушка</th><th scope="col" class="num">Ціна</th><th scope="col" class="num">За кг</th></tr>
+    </thead>
+    <tbody>
+      {offers.map(o => (
+        <tr>
+          <td>
+            <a class="offer" href={o.url} target="_blank" rel="noopener noreferrer">
+              {o.image && (
+                <img
+                  src={resizedImg(o.image, 56, 56) ?? o.image}
+                  srcset={`${resizedImg(o.image, 56, 56) ?? o.image} 1x, ${resizedImg(o.image, 112, 112) ?? o.image} 2x`}
+                  alt={imageAlt(o)} width="56" height="56" loading="lazy" decoding="async"
+                />
+              )}
+              <span>{o.name}</span>
+            </a>
+          </td>
+          <td>{o.brand}</td>
+          <td class="num">{kg(o.weightKg)}</td>
+          <td class="num">{uah(o.pricePerSpool)}</td>
+          <td class="num"><strong>{uah(o.pricePerKg)}</strong></td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>

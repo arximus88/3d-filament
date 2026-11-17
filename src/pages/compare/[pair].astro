@@ -1,0 +1,148 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import OfferTable from '../../components/OfferTable.astro';
+import { MATERIAL_INFO } from '../../utils/materials';
+import { dataDate, lastChecked, plural, uah, comparisons } from '../../utils/catalog';
+
+export function getStaticPaths() {
+  return comparisons.map(comparison => ({ params: { pair: comparison.slug }, props: { comparison } }));
+}
+
+interface Props {
+  comparison: (typeof comparisons)[number];
+}
+const { comparison } = Astro.props;
+const { a, b, verdict, left, right } = comparison;
+const sides = [left, right];
+const info = sides.map(m => MATERIAL_INFO[m.material]);
+
+const price = (m: typeof left) => (m.stats ? `${uah(m.stats.min)}/кг` : 'немає в наявності');
+const median = (m: typeof left) => (m.stats ? `${uah(m.stats.median)}/кг` : '—');
+const rows: Array<[string, string, string]> = [
+  ['Повна назва', info[0]?.fullName ?? '—', info[1]?.fullName ?? '—'],
+  ['Температура сопла', info[0]?.nozzle ?? '—', info[1]?.nozzle ?? '—'],
+  ['Температура столу', info[0]?.bed ?? '—', info[1]?.bed ?? '—'],
+  ['Ціна від', price(left), price(right)],
+  ['Медіанна ціна', median(left), median(right)],
+  ['Пропозицій у наявності', String(left.stats?.offers.length ?? 0), String(right.stats?.offers.length ?? 0)],
+  ['Продавців', String(left.brands.length), String(right.brands.length)],
+];
+
+// Which one is cheaper right now, by median price per kg.
+let priceAnswer = `Зараз у наявності є не обидва матеріали, тож порівняти ціни неможливо.`;
+if (left.stats && right.stats) {
+  const [cheap, dear] = left.stats.median <= right.stats.median ? [left, right] : [right, left];
+  const diff = Math.round(((dear.stats!.median - cheap.stats!.median) / cheap.stats!.median) * 100);
+  priceAnswer =
+    diff === 0
+      ? `Станом на ${dataDate} медіанні ціни однакові: ${uah(cheap.stats!.median)} за кілограм.`
+      : `Станом на ${dataDate} дешевший ${cheap.material}: медіанна ціна ${uah(cheap.stats!.median)}/кг проти ${uah(dear.stats!.median)}/кг у ${dear.material} — різниця близько ${diff}%. Найдешевші пропозиції: ${cheap.material} від ${uah(cheap.stats!.min)}/кг, ${dear.material} від ${uah(dear.stats!.min)}/кг.`;
+}
+
+const faq = [
+  { q: `Що дешевше: ${a} чи ${b}?`, a: priceAnswer },
+  { q: `Що обрати: ${a} чи ${b}?`, a: verdict },
+  {
+    q: `За якої температури друкувати ${a} і ${b}?`,
+    a: `Типові налаштування: ${a} — сопло ${info[0]?.nozzle}, стіл ${info[0]?.bed}; ${b} — сопло ${info[1]?.nozzle}, стіл ${info[1]?.bed}. Точні значення дивіться на етикетці котушки.`,
+  },
+];
+
+const pageUrl = new URL(`/compare/${comparison.slug}/`, Astro.site).href;
+const title = `${a} чи ${b}: що обрати, порівняння цін і властивостей`;
+const description = `${a} проти ${b}: температури друку, термостійкість і актуальні ціни в Україні — ${a} ${price(left)}, ${b} ${price(right)}. Дані оновлено ${dataDate}.`;
+
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Каталог філаменту', item: Astro.site!.href },
+      { '@type': 'ListItem', position: 2, name: 'Ціни', item: new URL('/prices/', Astro.site).href },
+      { '@type': 'ListItem', position: 3, name: `${a} чи ${b}`, item: pageUrl },
+    ],
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    dateModified: lastChecked,
+    mainEntity: faq.map(({ q, a: answer }) => ({
+      '@type': 'Question',
+      name: q,
+      acceptedAnswer: { '@type': 'Answer', text: answer },
+    })),
+  },
+];
+---
+
+<Layout title={title} description={description}>
+  {jsonLd.map(data => <script type="application/ld+json" set:html={JSON.stringify(data)} />)}
+
+  <article class="prose">
+    <nav class="crumbs" aria-label="Навігаційний ланцюжок">
+      <a href="/">Каталог</a> / <a href="/prices/">Ціни</a> / <span>{a} чи {b}</span>
+    </nav>
+    <h1>{a} чи {b}: що обрати</h1>
+    <p class="updated">Ціни зібрано з сайтів продавців <time datetime={lastChecked}>{dataDate}</time>.</p>
+
+    <p>{verdict}</p>
+
+    <section>
+      <h2>Порівняння {a} і {b}</h2>
+      <div class="table-wrap" tabindex="0" role="region" aria-label={`Порівняння ${a} і ${b}`}>
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">Показник</th>
+              {sides.map(m => <th scope="col"><a href={`/material/${m.slug}/`}>{m.material}</a></th>)}
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map(([name, x, y]) => (
+              <tr><th scope="row">{name}</th><td>{x}</td><td>{y}</td></tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p class="muted">Температури — типові значення; ціни рахуються за котушками від 0,5 кг, що є в наявності.</p>
+    </section>
+
+    {sides.map((m, i) => info[i] && (
+      <section>
+        <h2>{m.material}: що варто знати</h2>
+        <p>{info[i].summary}</p>
+        <ul>{info[i].notes.map(note => <li>{note}</li>)}</ul>
+        {m.stats && (
+          <>
+            <h3>Найдешевший {m.material} у наявності</h3>
+            <OfferTable offers={m.stats.offers.slice(0, 5)} label={`Найдешевший ${m.material} у наявності`} />
+          </>
+        )}
+        <p>
+          <a class="cta" href={`/material/${m.slug}/`}>
+            Усі ціни на {m.material} ({plural(m.stats?.offers.length ?? 0, 'пропозиція', 'пропозиції', 'пропозицій')}) →
+          </a>
+        </p>
+      </section>
+    ))}
+
+    <section>
+      <h2>Часті запитання</h2>
+      {faq.map(({ q, a: answer }) => (
+        <div class="faq-item">
+          <h3>{q}</h3>
+          <p>{answer}</p>
+        </div>
+      ))}
+    </section>
+
+    <section>
+      <h2>Інші порівняння</h2>
+      <ul class="chips">
+        {comparisons.filter(c => c.slug !== comparison.slug).map(c => (
+          <li><a href={`/compare/${c.slug}/`}>{c.a} чи {c.b}</a></li>
+        ))}
+      </ul>
+    </section>
+  </article>
+</Layout>

@@ -1,0 +1,167 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import OfferTable from '../../../components/OfferTable.astro';
+import {
+  dataDate,
+  lastChecked,
+  plural,
+  uah,
+  productSchema,
+  colorLandings,
+  colorHeading,
+  type ColorLanding,
+} from '../../../utils/catalog';
+
+export function getStaticPaths() {
+  return colorLandings.map(landing => ({
+    params: { slug: landing.materialSlug, color: landing.slug },
+    props: { landing },
+  }));
+}
+
+interface Props {
+  landing: ColorLanding;
+}
+const { landing } = Astro.props;
+const { material, color, stats } = landing;
+const heading = colorHeading(material, color);
+const best = stats.offers[0];
+// The heading mid-sentence: lower-case, but the material keeps its capitals.
+const inline = heading.toLowerCase().replace(material.toLowerCase(), material);
+const kg = (n: number) => `${String(n).replace('.', ',')} кг`;
+const offersWord = plural(stats.offers.length, 'пропозиція', 'пропозиції', 'пропозицій');
+const sellersWord = plural(stats.brands.length, 'продавця', 'продавців', 'продавців');
+
+const byBrand = [...Map.groupBy(stats.offers, o => o.brand)]
+  .map(([brand, offers]) => ({ brand, count: offers.length, from: offers[0].pricePerKg }))
+  .sort((a, b) => a.from - b.from);
+const siblings = colorLandings.filter(c => c.material === material && c.color !== color);
+const sameColor = colorLandings.filter(c => c.color === color && c.material !== material);
+
+const materialUrl = `/material/${landing.materialSlug}/`;
+const catalogUrl = `/?material=${encodeURIComponent(material)}&color=${encodeURIComponent(color)}`;
+const pageUrl = new URL(`${materialUrl}${landing.slug}/`, Astro.site).href;
+
+const title = `${heading}: ціни від ${uah(stats.min)}/кг в Україні`;
+const description = `${heading} 1,75 мм: ${offersWord} в наявності від ${sellersWord}, ${uah(stats.min)}–${uah(stats.max)} за кг. Ціни оновлено ${dataDate}.`;
+
+const faq = [
+  {
+    q: `Скільки коштує ${inline}?`,
+    a: `Станом на ${dataDate} — від ${uah(stats.min)} до ${uah(stats.max)} за кілограм, медіанна ціна ${uah(stats.median)}/кг. Це ${offersWord} котушок від 0,5 кг у ${sellersWord}.`,
+  },
+  {
+    q: `Де купити ${inline} найдешевше?`,
+    a: `Найнижча ціна за кілограм зараз у ${best.brand}: ${best.name} — ${uah(best.pricePerSpool)} за котушку ${kg(best.weightKg)}, тобто ${uah(best.pricePerKg)}/кг.`,
+  },
+  {
+    q: `Хто продає ${inline}?`,
+    a: `У наявності він є у ${sellersWord}: ${stats.brands.join(', ')}.`,
+  },
+];
+
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Каталог філаменту', item: Astro.site!.href },
+      { '@type': 'ListItem', position: 2, name: 'Ціни', item: new URL('/prices/', Astro.site).href },
+      { '@type': 'ListItem', position: 3, name: material, item: new URL(materialUrl, Astro.site).href },
+      { '@type': 'ListItem', position: 4, name: color, item: pageUrl },
+    ],
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: heading,
+    numberOfItems: stats.offers.length,
+    itemListElement: stats.offers.map((o, i) => ({ '@type': 'ListItem', position: i + 1, item: productSchema(o) })),
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    dateModified: lastChecked,
+    mainEntity: faq.map(({ q, a }) => ({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: a } })),
+  },
+];
+---
+
+<Layout title={title} description={description}>
+  {jsonLd.map(data => <script type="application/ld+json" set:html={JSON.stringify(data)} />)}
+
+  <article class="prose">
+    <nav class="crumbs" aria-label="Навігаційний ланцюжок">
+      <a href="/">Каталог</a> / <a href="/prices/">Ціни</a> / <a href={materialUrl}>{material}</a> / <span>{color}</span>
+    </nav>
+    <h1>{heading}: ціни та наявність</h1>
+    <p class="updated">Дані зібрано з сайтів продавців <time datetime={lastChecked}>{dataDate}</time>.</p>
+
+    <dl class="stat-row">
+      <div><dt>Найнижча ціна</dt><dd>{uah(stats.min)}/кг</dd></div>
+      <div><dt>Медіанна ціна</dt><dd>{uah(stats.median)}/кг</dd></div>
+      <div><dt>У наявності</dt><dd>{stats.offers.length}</dd></div>
+      <div><dt>Продавців</dt><dd>{stats.brands.length}</dd></div>
+    </dl>
+
+    <p>
+      Усі котушки {material} кольору «{color}» від 0,5 кг, які зараз є в наявності в українських продавців,
+      відсортовані за ціною за кілограм. Діаметр нитки — 1,75 мм, якщо в назві не вказано інше.
+    </p>
+    <p><a class="cta" href={catalogUrl}>Відкрити в каталозі з фільтрами →</a></p>
+
+    <section>
+      <h2>Пропозиції в наявності</h2>
+      <OfferTable offers={stats.offers} label={`${heading}: пропозиції в наявності`} />
+    </section>
+
+    <section>
+      <h2>Ціни за продавцями</h2>
+      <div class="table-wrap" tabindex="0" role="region" aria-label="Ціни за продавцями">
+        <table>
+          <thead>
+            <tr><th scope="col">Продавець</th><th scope="col" class="num">Пропозицій</th><th scope="col" class="num">Ціна від</th></tr>
+          </thead>
+          <tbody>
+            {byBrand.map(b => (
+              <tr>
+                <td>{b.brand}</td>
+                <td class="num">{b.count}</td>
+                <td class="num">{uah(b.from)}/кг</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section>
+      <h2>Часті запитання</h2>
+      {faq.map(({ q, a }) => (
+        <div class="faq-item">
+          <h3>{q}</h3>
+          <p>{a}</p>
+        </div>
+      ))}
+    </section>
+
+    {siblings.length > 0 && (
+      <section>
+        <h2>Інші кольори {material}</h2>
+        <ul class="chips">
+          {siblings.map(c => <li><a href={`/material/${c.materialSlug}/${c.slug}/`}>{c.color}</a></li>)}
+          <li><a href={materialUrl}>усі ціни на {material}</a></li>
+        </ul>
+      </section>
+    )}
+
+    {sameColor.length > 0 && (
+      <section>
+        <h2>Цей колір в інших матеріалах</h2>
+        <ul class="chips">
+          {sameColor.map(c => <li><a href={`/material/${c.materialSlug}/${c.slug}/`}>{c.material} · {c.color}</a></li>)}
+        </ul>
+      </section>
+    )}
+  </article>
+</Layout>
