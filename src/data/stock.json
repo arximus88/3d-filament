@@ -1,59 +1,59 @@
 {
-  "lastChecked": "2026-11-26T14:56:39.805Z",
+  "lastChecked": "2026-11-27T14:54:50.875Z",
   "companies": {
     "lbl-corp": {
       "PLA": "out",
       "PETG": "in",
-      "checkedAt": "2026-11-26T14:56:39.805Z"
+      "checkedAt": "2026-11-27T14:54:50.875Z"
     },
     "monofilament": {
       "PLA": "in",
       "PETG": "in",
       "ABS": "in",
-      "checkedAt": "2026-11-26T14:56:39.805Z"
+      "checkedAt": "2026-11-27T14:54:50.875Z"
     },
     "u3df": {
       "PLA": "in",
       "PETG": "in",
       "ABS": "out",
       "TPU": "unknown",
-      "checkedAt": "2026-11-26T14:56:39.805Z"
+      "checkedAt": "2026-11-27T14:54:50.875Z"
     },
     "plexiwire": {
       "PLA": "in",
       "PETG": "in",
       "ABS": "in",
       "TPU": "in",
-      "checkedAt": "2026-11-26T14:56:39.805Z"
+      "checkedAt": "2026-11-27T14:54:50.875Z"
     },
     "3dfilament": {
       "PLA": "in",
       "ABS": "out",
       "PETG": "in",
-      "checkedAt": "2026-11-26T14:56:39.805Z"
+      "checkedAt": "2026-11-27T14:54:50.875Z"
     },
     "pochatok-filament": {
       "PLA": "in",
       "PETG": "in",
-      "checkedAt": "2026-11-26T14:56:39.805Z"
+      "checkedAt": "2026-11-27T14:54:50.875Z"
     },
     "fainyi-3d": {
       "PLA": "in",
       "PETG": "in",
       "ABS": "unknown",
-      "checkedAt": "2026-11-26T14:56:39.805Z"
+      "checkedAt": "2026-11-27T14:54:50.875Z"
     },
     "polydream": {
       "ABS": "in",
       "PLA": "in",
       "PETG": "in",
-      "checkedAt": "2026-11-26T14:56:39.805Z"
+      "checkedAt": "2026-11-27T14:54:50.875Z"
     },
     "techfil": {
       "PLA": "unknown",
       "PETG": "in",
       "ABS": "in",
-      "checkedAt": "2026-11-26T14:56:39.805Z"
+      "checkedAt": "2026-11-27T14:54:50.875Z"
     }
   }
 }
